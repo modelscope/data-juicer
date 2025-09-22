@@ -15,8 +15,8 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `lang` | <class 'str'> | `'en'` | language of the text in the samples. 'en' for detection of |
-| `min_action_num` | <class 'int'> | `1` | The min action number in the filtering. samples |
+| `lang` | <class 'str'> | `'en'` | language of the text in the samples. 'en' for detection of actions in English and 'zh' for detection of actions in Chinese. |
+| `min_action_num` | <class 'int'> | `1` | The min action number in the filtering. samples will be filtered if their action number in the text is below this parameter. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

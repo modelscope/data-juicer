@@ -426,13 +426,14 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
+
 <span class="sd">        :param api_model: API model name.</span>
 <span class="sd">        :param query_entities: Entity list to be queried.</span>
 <span class="sd">        :param query_attributes: Attribute list to be queried.</span>
 <span class="sd">        :param entity_key: The key name in the meta field to store the</span>
 <span class="sd">            given main entity for attribute extraction. It&#39;s &quot;entity&quot; in</span>
 <span class="sd">            default.</span>
-<span class="sd">        :param entity_attribute_key: The key name in the meta field to</span>
+<span class="sd">        :param attribute_key: The key name in the meta field to</span>
 <span class="sd">            store the given attribute to be extracted. It&#39;s &quot;attribute&quot;</span>
 <span class="sd">            in default.</span>
 <span class="sd">        :param attribute_desc_key: The key name in the meta field to store</span>
@@ -449,7 +450,7 @@
 <span class="sd">        :param input_template: Template for building the model input.</span>
 <span class="sd">        :param attr_pattern_template: Pattern for parsing the attribute from</span>
 <span class="sd">            output. Need to be specified by given attribute.</span>
-<span class="sd">        :param: demo_pattern: Pattern for parsing the demonstration from</span>
+<span class="sd">        :param demo_pattern: Pattern for parsing the demonstration from</span>
 <span class="sd">            output to support the attribute.</span>
 <span class="sd">        :param try_num: The number of retry attempts when there is an API</span>
 <span class="sd">            call error or output parsing error.</span>

@@ -17,12 +17,12 @@ Tags 标签: cpu, video
 |--------|------|--------|------|
 | `min_score` | <class 'float'> | `0.25` | The minimum motion score to keep samples. |
 | `max_score` | <class 'float'> | `1.7976931348623157e+308` | The maximum motion score to keep samples. |
-| `sampling_fps` | typing.Annotated[float, Gt(gt=0)] | `2` | The sampling rate in frames_per_second for |
-| `size` | typing.Union[typing.Annotated[int, Gt(gt=0)], typing.Tuple[typing.Annotated[int, Gt(gt=0)]], typing.Tuple[typing.Annotated[int, Gt(gt=0)], typing.Annotated[int, Gt(gt=0)]], NoneType] | `None` | Resize frames before computing optical flow. If size is a |
-| `max_size` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The maximum allowed for the longer edge of resized |
+| `sampling_fps` | typing.Annotated[float, Gt(gt=0)] | `2` | The sampling rate in frames_per_second for optical flow calculations. |
+| `size` | typing.Union[typing.Annotated[int, Gt(gt=0)], typing.Tuple[typing.Annotated[int, Gt(gt=0)]], typing.Tuple[typing.Annotated[int, Gt(gt=0)], typing.Annotated[int, Gt(gt=0)]], NoneType] | `None` | Resize frames before computing optical flow. If size is a sequence like (h, w), frame size will be matched to this. If size is an int, smaller edge of frames will be matched to this number. i.e, if height > width, then frame will be rescaled to (size * height / width, size). Default `None` to keep the original size. |
+| `max_size` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The maximum allowed for the longer edge of resized frames. If the longer edge of frames is greater than max_size after being resized according to size, size will be overruled so that the longer edge is equal to max_size. As a result, the smaller edge may be shorter than size. This is only supported if size is an int. |
 | `divisible` | typing.Annotated[int, Gt(gt=0)] | `1` | The number that the dimensions must be divisible by. |
-| `relative` | <class 'bool'> | `False` | If `True`, the optical flow magnitude is normalized to |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `relative` | <class 'bool'> | `False` | If `True`, the optical flow magnitude is normalized to a [0, 1] range, relative to the frame's diagonal length. |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

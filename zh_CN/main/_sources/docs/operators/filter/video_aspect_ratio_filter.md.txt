@@ -15,9 +15,9 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_ratio` | <class 'str'> | `'9/21'` | The minimum aspect ratio to keep samples, |
-| `max_ratio` | <class 'str'> | `'21/9'` | The maximum aspect ratio to keep samples, |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `min_ratio` | <class 'str'> | `'9/21'` | The minimum aspect ratio to keep samples, supported format is a string, such as "9:21" or "9/21". |
+| `max_ratio` | <class 'str'> | `'21/9'` | The maximum aspect ratio to keep samples, supported format is a string, such as "21:9" or "21/9". |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

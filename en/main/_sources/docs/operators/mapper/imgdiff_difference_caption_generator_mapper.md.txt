@@ -35,9 +35,9 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `mllm_mapper_args` | typing.Optional[typing.Dict] | `{}` | Arguments for multimodal language model mapper. |
-| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image-text matching filter. |
-| `text_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for text pair similarity filter. |
+| `mllm_mapper_args` | typing.Optional[typing.Dict] | `{}` | Arguments for multimodal language model mapper. Controls the generation of captions for bounding box regions. Default empty dict will use fixed values: max_new_tokens=256, temperature=0.2, top_p=None, num_beams=1, hf_model="llava-hf/llava-v1.6-vicuna-7b-hf". |
+| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image-text matching filter. Controls the matching between cropped regions and generated captions. Default empty dict will use fixed values: min_score=0.1, max_score=1.0, hf_blip="Salesforce/blip-itm-base-coco", num_proc=1. |
+| `text_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for text pair similarity filter. Controls the similarity comparison between caption pairs. Default empty dict will use fixed values: min_score=0.1, max_score=1.0, hf_clip="openai/clip-vit-base-patch32", text_key_second="target_text", num_proc=1. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

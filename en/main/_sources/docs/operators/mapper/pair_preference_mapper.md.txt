@@ -17,15 +17,15 @@ Tags 标签: cpu, api, text
 |--------|------|--------|------|
 | `api_model` | <class 'str'> | `'gpt-4o'` | API model name. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |
-| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. |
+| `response_path` | typing.Optional[str] | `None` | Path to extract content from the API response. Defaults to 'choices.0.message.content'. |
 | `system_prompt` | typing.Optional[str] | `None` | System prompt for guiding the generation task. |
-| `input_template` | typing.Optional[str] | `None` | Template for building the model input. It must |
+| `input_template` | typing.Optional[str] | `None` | Template for building the model input. It must contain placeholders '{query}' and '{response}', and can optionally include '{reference}'. |
 | `output_pattern` | typing.Optional[str] | `None` | Regular expression for parsing model output. |
-| `rejected_key` | <class 'str'> | `'rejected_response'` | The field name in the sample to store the |
-| `reason_key` | <class 'str'> | `'reason'` | The field name in the sample to store the reason for |
-| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retries for the API call in case of |
+| `rejected_key` | <class 'str'> | `'rejected_response'` | The field name in the sample to store the generated rejected response. Defaults to 'rejected_response'. |
+| `reason_key` | <class 'str'> | `'reason'` | The field name in the sample to store the reason for generating the response. Defaults to 'reason'. |
+| `try_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of retries for the API call in case of response parsing failure. Defaults to 3. |
 | `model_params` | typing.Dict | `{}` | Parameters for initializing the API model. |
-| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. |
+| `sampling_params` | typing.Dict | `{}` | Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95} |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示

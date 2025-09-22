@@ -394,27 +394,27 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_len</span></code></p></td>
 <td><p>typing.Optional[typing.Annotated[int, Gt(gt=0)]]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Split text into multi texts with this max len if not</p></td>
+<td><p>Split text into multi texts with this max len if not None.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">split_pattern</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'\n\n'</span></code></p></td>
-<td><p>Make sure split in this pattern if it is not None</p></td>
+<td><p>Make sure split in this pattern if it is not None and force cut if the length exceeds max_len.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">overlap_len</span></code></p></td>
 <td><p>typing.Annotated[int, Ge(ge=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
-<td><p>Overlap length of the split texts if not split in</p></td>
+<td><p>Overlap length of the split texts if not split in the split pattern.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tokenizer</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The tokenizer name of Hugging Face tokenizers.</p></td>
+<td><p>The tokenizer name of Hugging Face tokenizers. The text length will be calculate as the token num if it is offered. Otherwise, the text length equals to string length. Support tiktoken tokenizer (such as gpt-4o), dashscope tokenizer ( such as qwen2.5-72b-instruct) and huggingface tokenizer.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">trust_remote_code</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p></p></td>
+<td><p>whether to trust the remote code of HF models.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

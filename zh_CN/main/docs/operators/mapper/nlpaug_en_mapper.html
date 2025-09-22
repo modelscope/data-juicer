@@ -378,62 +378,62 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sequential</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether combine all augmentation methods to a</p></td>
+<td><p>whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">aug_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
-<td><p>number of augmented samples to be generated. If</p></td>
+<td><p>number of augmented samples to be generated. If <code class="docutils literal notranslate"><span class="pre">sequential</span></code> is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">keep_original_sample</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
-<td><p>whether to keep the original sample. If</p></td>
+<td><p>whether to keep the original sample. If it's set to False, there will be only generated texts in the final datasets and the original texts will be removed. It's True in default.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">delete_random_word</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of deleting random words from the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;I LLM&quot;</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">swap_random_word</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of swapping random contiguous words in the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;Love I LLM&quot;</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">spelling_error_word</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of simulating the spelling error for words in the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;Ai love LLM&quot;</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">split_random_word</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of splitting words randomly with whitespaces in the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;I love LL M&quot;</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">keyboard_error_char</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of simulating the keyboard error for characters in the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;I ;ov4 LLM&quot;</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ocr_error_char</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of simulating the OCR error for characters in the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;I 10ve LLM&quot;</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">delete_random_char</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of deleting random characters from the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;I oe LLM&quot;</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">swap_random_char</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;I ovle LLM&quot;</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">insert_random_char</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p>whether to open the augmentation method of</p></td>
+<td><p>whether to open the augmentation method of inserting random characters into the original texts. e.g. &quot;I love LLM&quot; --&gt; &quot;I ^lKove LLM&quot;</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

@@ -388,7 +388,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">response_path</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Path to extract content from the API response.</p></td>
+<td><p>Path to extract content from the API response. Defaults to 'choices.0.message.content'.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">system_prompt</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
@@ -398,7 +398,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">input_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Template for building the model input. It must</p></td>
+<td><p>Template for building the model input. It must contain placeholders '{query}' and '{response}', and can optionally include '{reference}'.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">output_pattern</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
@@ -408,17 +408,17 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rejected_key</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'rejected_response'</span></code></p></td>
-<td><p>The field name in the sample to store the</p></td>
+<td><p>The field name in the sample to store the generated rejected response. Defaults to 'rejected_response'.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reason_key</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'reason'</span></code></p></td>
-<td><p>The field name in the sample to store the reason for</p></td>
+<td><p>The field name in the sample to store the reason for generating the response. Defaults to 'reason'.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">try_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
-<td><p>The number of retries for the API call in case of</p></td>
+<td><p>The number of retries for the API call in case of response parsing failure. Defaults to 3.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model_params</span></code></p></td>
 <td><p>typing.Dict</p></td>
@@ -428,7 +428,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sampling_params</span></code></p></td>
 <td><p>typing.Dict</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{}</span></code></p></td>
-<td><p>Extra parameters passed to the API call.</p></td>
+<td><p>Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></p></td>
 <td><p></p></td>

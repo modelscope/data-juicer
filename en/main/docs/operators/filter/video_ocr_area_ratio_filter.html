@@ -376,27 +376,27 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_area_ratio</span></code></p></td>
 <td><p>&lt;class ‘float’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
-<td><p>The min ocr area ratio to keep samples. It’s 0</p></td>
+<td><p>The min ocr area ratio to keep samples. It’s 0 by default.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_area_ratio</span></code></p></td>
 <td><p>&lt;class ‘float’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1.0</span></code></p></td>
-<td><p>The max ocr area ratio to keep samples. It’s 1.0</p></td>
+<td><p>The max ocr area ratio to keep samples. It’s 1.0 by default.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">frame_sample_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
-<td><p>The number of sampled frames to calculate the</p></td>
+<td><p>The number of sampled frames to calculate the ocr area ratio. If it’s 1, only middle frame will be selected. If it’s 2, only the first and the last frames will be selected. If it’s larger than 2, in addition to the first and the last frames, other frames will be sampled evenly within the video duration.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">languages_to_detect</span></code></p></td>
 <td><p>typing.Union[str, typing.List[str]]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">['ch_sim',</span> <span class="pre">'en']</span></code></p></td>
-<td><p>texts in which languages should be</p></td>
+<td><p>texts in which languages should be detected. Default: [‘ch_sim’, ‘en’]. Full language list can be found here: <a class="reference external" href="https://www.jaided.ai/easyocr/">https://www.jaided.ai/easyocr/</a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">any_or_all</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'any'</span></code></p></td>
-<td><p>keep this sample with ‘any’ or ‘all’ strategy of</p></td>
+<td><p>keep this sample with ‘any’ or ‘all’ strategy of all videos. ‘any’: keep this sample if any videos meet the condition. ‘all’: keep this sample only if all videos meet the condition.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

@@ -376,22 +376,22 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_width</span></code></p></td>
 <td><p>&lt;class ‘int’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
-<td><p>Videos with width less than ‘min_width’ will be</p></td>
+<td><p>Videos with width less than ‘min_width’ will be mapped to videos with equal or bigger width.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_width</span></code></p></td>
 <td><p>&lt;class ‘int’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">9223372036854775807</span></code></p></td>
-<td><p>Videos with width more than ‘max_width’ will be</p></td>
+<td><p>Videos with width more than ‘max_width’ will be mapped to videos with equal of smaller width.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_height</span></code></p></td>
 <td><p>&lt;class ‘int’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
-<td><p>Videos with height less than ‘min_height’ will be</p></td>
+<td><p>Videos with height less than ‘min_height’ will be mapped to videos with equal or bigger height.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_height</span></code></p></td>
 <td><p>&lt;class ‘int’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">9223372036854775807</span></code></p></td>
-<td><p>Videos with height more than ‘max_height’ will be</p></td>
+<td><p>Videos with height more than ‘max_height’ will be mapped to videos with equal or smaller height.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">force_original_aspect_ratio</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
@@ -406,7 +406,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">save_dir</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The directory where generated video files will be stored.</p></td>
+<td><p>The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the <code class="docutils literal notranslate"><span class="pre">DJ_PRODUCED_DATA_DIR</span></code> environment variable.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

@@ -398,22 +398,22 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">frame_sampling_method</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'all_keyframes'</span></code></p></td>
-<td><p>sampling method of extracting frame</p></td>
+<td><p>sampling method of extracting frame videos from the videos. Should be one of [&quot;all_keyframes&quot;, &quot;uniform&quot;]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. If &quot;duration&quot; &gt; 0, frame_sampling_method acts on every segment. Default: &quot;all_keyframes&quot;.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">frame_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
-<td><p>the number of frames to be extracted uniformly from</p></td>
+<td><p>the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is &quot;uniform&quot;. If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. If &quot;duration&quot; &gt; 0, frame_num is the number of frames per segment.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">duration</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
-<td><p>The duration of each segment in seconds.</p></td>
+<td><p>The duration of each segment in seconds. If 0, frames are extracted from the entire video. If duration &gt; 0, the video is segmented into multiple segments based on duration, and frames are extracted from each segment.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">frame_dir</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Output directory to save extracted frames.</p></td>
+<td><p>Output directory to save extracted frames. If None, a default directory based on the video file path is used.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">frame_key</span></code></p></td>
 <td><p></p></td>

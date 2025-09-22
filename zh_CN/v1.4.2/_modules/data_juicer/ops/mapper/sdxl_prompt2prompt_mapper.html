@@ -406,6 +406,7 @@
 
 <span class="sd">        :param hf_diffusion: diffusion model name on huggingface to generate</span>
 <span class="sd">            the image.</span>
+<span class="sd">        :param trust_remote_code: whether to trust the remote code of HF models.</span>
 <span class="sd">        :param torch_dtype: the floating point type used to load the diffusion</span>
 <span class="sd">            model.</span>
 <span class="sd">        :param num_inference_steps: The larger the value, the better the</span>
@@ -419,7 +420,6 @@
 <span class="sd">        :param text_key_second: the key name used to store the second caption</span>
 <span class="sd">            in the caption pair.</span>
 <span class="sd">        :param output_dir: the storage location of the generated images.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mem_required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;38GB&quot;</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mem_required&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mem_required&quot;</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

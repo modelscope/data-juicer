@@ -378,37 +378,37 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">roi_strings</span></code></p></td>
 <td><p>typing.List[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">['0,0,0.1,0.1']</span></code></p></td>
-<td><p>a given list of regions the watermarks locate.</p></td>
+<td><p>a given list of regions the watermarks locate. The format of each can be &quot;x1, y1, x2, y2&quot;, &quot;(x1, y1, x2, y2)&quot;, or &quot;[x1, y1, x2, y2]&quot;.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">roi_type</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'ratio'</span></code></p></td>
-<td><p>the roi string type. When the type is 'pixel', (x1,</p></td>
+<td><p>the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by widths and heights.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">roi_key</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>the key name of fields in samples to store roi_strings</p></td>
+<td><p>the key name of fields in samples to store roi_strings for each sample. It's used for set different rois for different samples. If it's none, use rois in parameter &quot;roi_strings&quot;. It's None in default.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">frame_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p></td>
-<td><p>the number of frames to be extracted uniformly from</p></td>
+<td><p>the number of frames to be extracted uniformly from the video to detect the pixels of watermark.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_frame_threshold</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">7</span></code></p></td>
-<td><p>a coordination is considered as the</p></td>
+<td><p>a coordination is considered as the location of a watermark pixel when it is that in no less min_frame_threshold frames.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">detection_method</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'pixel_value'</span></code></p></td>
-<td><p>the method to detect the pixels of watermark.</p></td>
+<td><p>the method to detect the pixels of watermark. If it is 'pixel_value', we consider the distribution of pixel value in each frame. If it is 'pixel_diversity', we will consider the pixel diversity in different frames. The min_frame_threshold is useless and frame_num must be greater than 1 in 'pixel_diversity' mode.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">save_dir</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The directory where generated video files will be stored.</p></td>
+<td><p>The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the <code class="docutils literal notranslate"><span class="pre">DJ_PRODUCED_DATA_DIR</span></code> environment variable.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

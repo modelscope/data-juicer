@@ -374,22 +374,22 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_ratio</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'9/21'</span></code></p></td>
-<td><p>The minimum aspect ratio to enforce videos with</p></td>
+<td><p>The minimum aspect ratio to enforce videos with an aspect ratio below <code class="docutils literal notranslate"><span class="pre">min_ratio</span></code> will be resized to match this minimum ratio. The ratio should be provided as a string in the format “9:21” or “9/21”.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_ratio</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'21/9'</span></code></p></td>
-<td><p>The maximum aspect ratio to enforce videos with</p></td>
+<td><p>The maximum aspect ratio to enforce videos with an aspect ratio above <code class="docutils literal notranslate"><span class="pre">max_ratio</span></code> will be resized to match this maximum ratio. The ratio should be provided as a string in the format “21:9” or “21/9”.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">strategy</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'increase'</span></code></p></td>
-<td><p>The resizing strategy to apply when adjusting the</p></td>
+<td><p>The resizing strategy to apply when adjusting the video dimensions. It can be either ‘decrease’ to reduce the dimension or ‘increase’ to enlarge it. Accepted values are [‘decrease’, ‘increase’].</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">save_dir</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The directory where generated video files will be stored.</p></td>
+<td><p>The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the <code class="docutils literal notranslate"><span class="pre">DJ_PRODUCED_DATA_DIR</span></code> environment variable.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

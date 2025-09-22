@@ -388,12 +388,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">select_ratio</span></code></p></td>
 <td><p>typing.Optional[typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The ratio to select. When both</p></td>
+<td><p>The ratio to select. When both select_ratio and select_num are set, the value corresponding to the smaller number of samples will be applied.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">select_num</span></code></p></td>
 <td><p>typing.Optional[typing.Annotated[int, Gt(gt=0)]]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The number of samples to select. When both</p></td>
+<td><p>The number of samples to select. When both select_ratio and select_num are set, the value corresponding to the smaller number of samples will be applied.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

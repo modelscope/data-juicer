@@ -15,11 +15,11 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_area_ratio` | <class 'float'> | `0` | The min ocr area ratio to keep samples. It's 0 |
-| `max_area_ratio` | <class 'float'> | `1.0` | The max ocr area ratio to keep samples. It's 1.0 |
-| `frame_sample_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of sampled frames to calculate the |
-| `languages_to_detect` | typing.Union[str, typing.List[str]] | `['ch_sim', 'en']` | texts in which languages should be |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `min_area_ratio` | <class 'float'> | `0` | The min ocr area ratio to keep samples. It's 0 by default. |
+| `max_area_ratio` | <class 'float'> | `1.0` | The max ocr area ratio to keep samples. It's 1.0 by default. |
+| `frame_sample_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of sampled frames to calculate the ocr area ratio. If it's 1, only middle frame will be selected. If it's 2, only the first and the last frames will be selected. If it's larger than 2, in addition to the first and the last frames, other frames will be sampled evenly within the video duration. |
+| `languages_to_detect` | typing.Union[str, typing.List[str]] | `['ch_sim', 'en']` | texts in which languages should be detected. Default: ['ch_sim', 'en']. Full language list can be found here: https://www.jaided.ai/easyocr/. |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

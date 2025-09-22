@@ -15,7 +15,7 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `consider_text` | <class 'bool'> | `False` | whether to consider text hash together with video |
+| `consider_text` | <class 'bool'> | `False` | whether to consider text hash together with video hash when applying deduplication. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

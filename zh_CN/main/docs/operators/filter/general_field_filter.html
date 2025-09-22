@@ -378,7 +378,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">filter_condition</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
-<td><p>The filter condition as a string.</p></td>
+<td><p>The filter condition as a string. It can include logical operators (and/or) and chain comparisons. For example: &quot;10 &lt; num &lt;= 30 and text != 'nothing here' and <strong>dj__meta</strong>.a == 3&quot;.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>
@@ -396,7 +396,44 @@
 </section>
 <section id="effect-demonstration">
 <h2>📊 Effect demonstration 效果演示<a class="headerlink" href="#effect-demonstration" title="Link to this heading">¶</a></h2>
-<p>not available 暂无</p>
+<section id="test-simple-comparison">
+<h3>test_simple_comparison<a class="headerlink" href="#test-simple-comparison" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">GeneralFieldFilter</span><span class="p">(</span><span class="n">filter_condition</span><span class="o">=</span><span class="s1">&#39;10 &lt; num &lt; 20&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="input-data">
+<h4>📥 input data 输入数据<a class="headerlink" href="#input-data" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample1</pre><div class='meta' style='margin:6px 0;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #e3e3e3;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:8px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>num</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>5</td></tr></table></div></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 2:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample2</pre><div class='meta' style='margin:6px 0;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #e3e3e3;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:8px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>num</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>15</td></tr></table></div></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 3:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample3</pre><div class='meta' style='margin:6px 0;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #e3e3e3;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:8px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>num</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>25</td></tr></table></div></div>
+</section>
+<section id="output-data">
+<h4>📤 output data 输出数据<a class="headerlink" href="#output-data" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample2</pre><div class='meta' style='margin:6px 0;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #e3e3e3;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:8px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>num</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>15</td></tr><tr><th colspan='2' style='text-align:left; vertical-align:top; padding:6px 8px; font-weight:600; border-bottom:1px solid #e3e3e3;'>__dj__stats__</th></tr><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:22px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>general_field_filter_condition</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>True</td></tr></table></div></div>
+</section>
+<section id="explanation">
+<h4>✨ explanation 解释<a class="headerlink" href="#explanation" title="Link to this heading">¶</a></h4>
+<p>This example demonstrates the operator's ability to filter data based on a simple comparison. The operator checks if the 'num' field is between 10 and 20. Only the sample with 'num' equal to 15 meets this condition, so it is kept in the output. The output also includes an additional '<strong>dj__stats</strong>' field indicating that the condition was met.
+这个例子展示了算子基于简单比较来过滤数据的能力。算子检查'num'字段是否在10到20之间。只有'num'等于15的样本满足这个条件，因此它被保留在输出中。输出还包括一个额外的'<strong>dj__stats</strong>'字段，表示条件已被满足。</p>
+</section>
+</section>
+<section id="test-field-missing">
+<h3>test_field_missing<a class="headerlink" href="#test-field-missing" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">GeneralFieldFilter</span><span class="p">(</span><span class="n">filter_condition</span><span class="o">=</span><span class="s1">&#39;num &lt;= 5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="id1">
+<h4>📥 input data 输入数据<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample1</pre><div class='meta' style='margin:6px 0;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #e3e3e3;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:8px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>num</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>5</td></tr></table></div></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 2:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample2</pre></div><div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 3:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample3</pre><div class='meta' style='margin:6px 0;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #e3e3e3;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:8px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>num</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>25</td></tr></table></div></div>
+</section>
+<section id="id2">
+<h4>📤 output data 输出数据<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
+<div class="sample-card" style="border:1px solid #ddd; padding:12px; margin:8px 0; border-radius:6px; background:#fafafa; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><div class="sample-header" style="background:#f8f9fa; padding:4px 8px; margin-bottom:6px; border-radius:3px; font-size:0.9em; color:#666; border-left:3px solid #007acc;"><strong>Sample 1:</strong> text</div><pre style="padding:6px; background:#f6f8fa; border-radius:4px; overflow-x:auto; white-space:pre; word-wrap:normal;">sample1</pre><div class='meta' style='margin:6px 0;'><table class='meta-table' style='border-collapse:collapse; width:100%; border:1px solid #e3e3e3;'><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:8px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>num</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>5</td></tr><tr><th colspan='2' style='text-align:left; vertical-align:top; padding:6px 8px; font-weight:600; border-bottom:1px solid #e3e3e3;'>__dj__stats__</th></tr><tr><td style='text-align:left; vertical-align:top; padding:4px 8px; padding-left:22px; font-weight:500; color:#444; border-bottom:1px solid #e3e3e3; white-space:nowrap;'>general_field_filter_condition</td><td style='text-align:left; vertical-align:top; padding:4px 6px; padding-left:4px; border-bottom:1px solid #e3e3e3;'>True</td></tr></table></div></div>
+</section>
+<section id="id3">
+<h4>✨ explanation 解释<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
+<p>This example shows how the operator handles missing fields. The filter condition checks if 'num' is less than or equal to 5. If the 'num' field is missing, the sample is automatically excluded. In this case, only the first sample has a 'num' value of 5 and is kept. The output also includes an additional '<strong>dj__stats</strong>' field indicating that the condition was met.
+这个例子展示了算子如何处理缺失的字段。过滤条件检查'num'是否小于或等于5。如果'num'字段缺失，样本将自动被排除。在这种情况下，只有第一个样本的'num'值为5并被保留。输出还包括一个额外的'<strong>dj__stats</strong>'字段，表示条件已被满足。</p>
+</section>
+</section>
 </section>
 <section id="related-links">
 <h2>🔗 related links 相关链接<a class="headerlink" href="#related-links" title="Link to this heading">¶</a></h2>
@@ -447,7 +484,21 @@
             <ul>
 <li><a class="reference internal" href="#">general_field_filter</a><ul>
 <li><a class="reference internal" href="#parameter-configuration">🔧 Parameter Configuration 参数配置</a></li>
-<li><a class="reference internal" href="#effect-demonstration">📊 Effect demonstration 效果演示</a></li>
+<li><a class="reference internal" href="#effect-demonstration">📊 Effect demonstration 效果演示</a><ul>
+<li><a class="reference internal" href="#test-simple-comparison">test_simple_comparison</a><ul>
+<li><a class="reference internal" href="#input-data">📥 input data 输入数据</a></li>
+<li><a class="reference internal" href="#output-data">📤 output data 输出数据</a></li>
+<li><a class="reference internal" href="#explanation">✨ explanation 解释</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-field-missing">test_field_missing</a><ul>
+<li><a class="reference internal" href="#id1">📥 input data 输入数据</a></li>
+<li><a class="reference internal" href="#id2">📤 output data 输出数据</a></li>
+<li><a class="reference internal" href="#id3">✨ explanation 解释</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#related-links">🔗 related links 相关链接</a></li>
 </ul>
 </li>

@@ -376,37 +376,37 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hf_diffusion</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'stabilityai/stable-diffusion-xl-base-1.0'</span></code></p></td>
-<td><p>diffusion model name on huggingface to generate</p></td>
+<td><p>diffusion model name on huggingface to generate the image.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trust_remote_code</span></code></p></td>
 <td><p></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p></p></td>
+<td><p>whether to trust the remote code of HF models.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">torch_dtype</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'fp32'</span></code></p></td>
-<td><p>the floating point type used to load the diffusion</p></td>
+<td><p>the floating point type used to load the diffusion model.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">num_inference_steps</span></code></p></td>
 <td><p>&lt;class ‘float’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">50</span></code></p></td>
-<td><p>The larger the value, the better the</p></td>
+<td><p>The larger the value, the better the image generation quality; however, this also increases the time required for generation.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">guidance_scale</span></code></p></td>
 <td><p>&lt;class ‘float’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">7.5</span></code></p></td>
-<td><p>A higher guidance scale value encourages the</p></td>
+<td><p>A higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality. Guidance scale is enabled when</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">text_key</span></code></p></td>
 <td><p></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>the key name used to store the first caption</p></td>
+<td><p>the key name used to store the first caption in the caption pair.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">text_key_second</span></code></p></td>
 <td><p></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>the key name used to store the second caption</p></td>
+<td><p>the key name used to store the second caption in the caption pair.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">output_dir</span></code></p></td>
 <td><p></p></td>

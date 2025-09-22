@@ -378,57 +378,57 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hf_diffusion</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'CompVis/stable-diffusion-v1-4'</span></code></p></td>
-<td><p>diffusion model name on huggingface to generate</p></td>
+<td><p>diffusion model name on huggingface to generate the image.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trust_remote_code</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p></p></td>
+<td><p>whether to trust the remote code of HF models.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">torch_dtype</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'fp32'</span></code></p></td>
-<td><p>the floating point type used to load the diffusion</p></td>
+<td><p>the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16']</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">revision</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'main'</span></code></p></td>
-<td><p>The specific model version to use. It can be a</p></td>
+<td><p>The specific model version to use. It can be a branch name, a tag name, a commit id, or any identifier allowed by Git.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">strength</span></code></p></td>
 <td><p>typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0.8</span></code></p></td>
-<td><p>Indicates extent to transform the reference image.</p></td>
+<td><p>Indicates extent to transform the reference image. Must be between 0 and 1. image is used as a starting point and more noise is added the higher the strength. The number of denoising steps depends on the amount of noise initially added. When strength is 1, added noise is maximum and the denoising process runs for the full number of iterations specified in num_inference_steps. A value of 1 essentially ignores image.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">guidance_scale</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">7.5</span></code></p></td>
-<td><p>A higher guidance scale value encourages the</p></td>
+<td><p>A higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality. Guidance scale is enabled when guidance_scale &gt; 1.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aug_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
-<td><p>The image number to be produced by stable-diffusion</p></td>
+<td><p>The image number to be produced by stable-diffusion model.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">keep_original_sample</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
-<td><p>whether to keep the original sample. If</p></td>
+<td><p>whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True by default.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">caption_key</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>the key name of fields in samples to store captions</p></td>
+<td><p>the key name of fields in samples to store captions for each images. It can be a string if there is only one image in each sample. Otherwise, it should be a list. If it's none, ImageDiffusionMapper will produce captions for each images.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hf_img2seq</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'Salesforce/blip2-opt-2.7b'</span></code></p></td>
-<td><p>model name on huggingface to generate caption if</p></td>
+<td><p>model name on huggingface to generate caption if caption_key is None.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">save_dir</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The directory where generated image files will be stored.</p></td>
+<td><p>The directory where generated image files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the <code class="docutils literal notranslate"><span class="pre">DJ_PRODUCED_DATA_DIR</span></code> environment variable.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

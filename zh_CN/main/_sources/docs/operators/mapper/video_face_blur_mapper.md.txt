@@ -15,10 +15,10 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `cv_classifier` | <class 'str'> | `''` | OpenCV classifier path for face detection. |
-| `blur_type` | <class 'str'> | `'gaussian'` | Type of blur kernel, including |
+| `cv_classifier` | <class 'str'> | `''` | OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'. |
+| `blur_type` | <class 'str'> | `'gaussian'` | Type of blur kernel, including ['mean', 'box', 'gaussian']. |
 | `radius` | <class 'float'> | `2` | Radius of blur kernel. |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

@@ -383,17 +383,17 @@
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">source_entity</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The source entity of the relation to be</p></td>
+<td><p>The source entity of the relation to be identified.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">target_entity</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The target entity of the relation to be</p></td>
+<td><p>The target entity of the relation to be identified.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">output_key</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'role_relation'</span></code></p></td>
-<td><p>The output key in the meta field in the</p></td>
+<td><p>The output key in the meta field in the samples. It is 'role_relation' in default.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">api_endpoint</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
@@ -403,7 +403,7 @@
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">response_path</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Path to extract content from the API response.</p></td>
+<td><p>Path to extract content from the API response. Defaults to 'choices.0.message.content'.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">system_prompt_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
@@ -418,12 +418,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">output_pattern_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Regular expression template for</p></td>
+<td><p>Regular expression template for parsing model output.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">try_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
-<td><p>The number of retry attempts when there is an API</p></td>
+<td><p>The number of retry attempts when there is an API call error or output parsing error.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">drop_text</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
@@ -438,7 +438,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sampling_params</span></code></p></td>
 <td><p>typing.Dict</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{}</span></code></p></td>
-<td><p>Extra parameters passed to the API call.</p></td>
+<td><p>Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></p></td>
 <td><p></p></td>

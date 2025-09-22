@@ -15,8 +15,8 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_ratio` | <class 'float'> | `0.0` | The min filter ratio in this op, samples will |
-| `max_ratio` | <class 'float'> | `0.25` | The max filter ratio in this op, samples will |
+| `min_ratio` | <class 'float'> | `0.0` | The min filter ratio in this op, samples will be filtered if their special-char ratio is below this parameter. |
+| `max_ratio` | <class 'float'> | `0.25` | The max filter ratio in this op, samples will be filtered if their special-char ratio exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

@@ -398,7 +398,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_desc</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The description of the validation task.</p></td>
+<td><p>The description of the validation task. If valid_dataset=None and task_desc=None, 'self.prepare_valid_feature' should be manually called before applying the filter.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">n_shot</span></code></p></td>
 <td><p>typing.Optional[int]</p></td>

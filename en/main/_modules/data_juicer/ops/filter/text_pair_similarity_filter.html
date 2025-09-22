@@ -367,7 +367,7 @@
 
 
 <div class="viewcode-block" id="TextPairSimilarityFilter">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextPairSimilarityFilter">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.text_pair_similarity_filter.html#data_juicer.ops.filter.text_pair_similarity_filter.TextPairSimilarityFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextPairSimilarityFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep text pairs with similarities within a specific range.</span>
@@ -384,7 +384,7 @@
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
 
 <div class="viewcode-block" id="TextPairSimilarityFilter.__init__">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextPairSimilarityFilter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.text_pair_similarity_filter.html#data_juicer.ops.filter.text_pair_similarity_filter.TextPairSimilarityFilter.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_clip</span><span class="o">=</span><span class="s2">&quot;openai/clip-vit-base-patch32&quot;</span><span class="p">,</span>
@@ -399,18 +399,19 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
-<span class="sd">            :param hf_clip: clip model name on huggingface to compute</span>
-<span class="sd">                the similarity between image and text.</span>
-<span class="sd">            :param min_score: The min similarity to keep samples.</span>
-<span class="sd">            :param max_score: The max similarity to keep samples.</span>
-<span class="sd">            :param text_key_second: used to store the other sentence</span>
-<span class="sd">                in the text pair.</span>
-<span class="sd">            :param any_or_all: keep this sample with &#39;any&#39; or &#39;all&#39; strategy of</span>
-<span class="sd">                all images. &#39;any&#39;: keep this sample if any images meet the</span>
-<span class="sd">                condition. &#39;all&#39;: keep this sample only if all images meet the</span>
-<span class="sd">                condition.</span>
-<span class="sd">            :param args: extra args</span>
-<span class="sd">            :param kwargs: extra args</span>
+<span class="sd">        :param hf_clip: clip model name on huggingface to compute</span>
+<span class="sd">            the similarity between image and text.</span>
+<span class="sd">        :param trust_remote_code: whether to trust the remote code of HF models.</span>
+<span class="sd">        :param min_score: The min similarity to keep samples.</span>
+<span class="sd">        :param max_score: The max similarity to keep samples.</span>
+<span class="sd">        :param text_key_second: used to store the other sentence</span>
+<span class="sd">            in the text pair.</span>
+<span class="sd">        :param any_or_all: keep this sample with &#39;any&#39; or &#39;all&#39; strategy of</span>
+<span class="sd">            all images. &#39;any&#39;: keep this sample if any images meet the</span>
+<span class="sd">            condition. &#39;all&#39;: keep this sample only if all images meet the</span>
+<span class="sd">            condition.</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -428,7 +429,7 @@
 
 
 <div class="viewcode-block" id="TextPairSimilarityFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextPairSimilarityFilter.compute_stats_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.text_pair_similarity_filter.html#data_juicer.ops.filter.text_pair_similarity_filter.TextPairSimilarityFilter.compute_stats_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">text_pair_similarity</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -467,7 +468,7 @@
 
 
 <div class="viewcode-block" id="TextPairSimilarityFilter.process_single">
-<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.html#data_juicer.ops.filter.TextPairSimilarityFilter.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../api/data_juicer.ops.filter.text_pair_similarity_filter.html#data_juicer.ops.filter.text_pair_similarity_filter.TextPairSimilarityFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">similarity</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">text_pair_similarity</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">similarity</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>

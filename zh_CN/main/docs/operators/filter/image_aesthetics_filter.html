@@ -378,12 +378,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hf_scorer_model</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p></td>
-<td><p>Huggingface model name for the aesthetics</p></td>
+<td><p>Huggingface model name for the aesthetics predictor. By default, we will use 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', refer to <a class="reference external" href="http://pypi.org/project/simple-aesthetics-predictor">pypi.org/project/simple-aesthetics-predictor</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trust_remote_code</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p></p></td>
+<td><p>whether to trust the remote code of HF models.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_score</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
@@ -398,7 +398,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">any_or_all</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'any'</span></code></p></td>
-<td><p>Keep this sample with 'any' or 'all' strategy of</p></td>
+<td><p>Keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

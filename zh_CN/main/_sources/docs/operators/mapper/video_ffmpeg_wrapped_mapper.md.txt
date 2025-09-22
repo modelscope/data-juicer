@@ -20,7 +20,7 @@ Tags 标签: cpu, video
 | `global_args` | typing.Optional[typing.List[str]] | `None` | list-arguments passed to ffmpeg command-line. |
 | `capture_stderr` | <class 'bool'> | `True` | whether to capture stderr. |
 | `overwrite_output` | <class 'bool'> | `True` | whether to overwrite output file. |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

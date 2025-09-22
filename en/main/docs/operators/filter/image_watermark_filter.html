@@ -376,22 +376,22 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hf_watermark_model</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'amrul-hzz/watermark_detector'</span></code></p></td>
-<td><p>watermark detection model name on</p></td>
+<td><p>watermark detection model name on huggingface.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trust_remote_code</span></code></p></td>
 <td><p>&lt;class ‘bool’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p></p></td>
+<td><p>whether to trust the remote code of HF models.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prob_threshold</span></code></p></td>
 <td><p>&lt;class ‘float’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0.8</span></code></p></td>
-<td><p>the predicted watermark probability threshold</p></td>
+<td><p>the predicted watermark probability threshold for samples. range from 0 to 1. Samples with watermark probability less than this threshold will be kept.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">any_or_all</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'any'</span></code></p></td>
-<td><p>keep this sample with ‘any’ or ‘all’ strategy of</p></td>
+<td><p>keep this sample with ‘any’ or ‘all’ strategy of all images. ‘any’: keep this sample if any images meet the condition. ‘all’: keep this sample only if all images meet the condition.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

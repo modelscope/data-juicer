@@ -378,12 +378,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hf_owlvit</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'google/owlvit-base-patch32'</span></code></p></td>
-<td><p>Owl-ViT model name on huggingface to locate the</p></td>
+<td><p>Owl-ViT model name on huggingface to locate the phrases extracted from the text.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trust_remote_code</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p></p></td>
+<td><p>whether to trust the remote code of HF models.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_recall</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
@@ -408,27 +408,27 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">any_or_all</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'any'</span></code></p></td>
-<td><p>keep this sample with 'any' or 'all' strategy of</p></td>
+<td><p>keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reduce_mode</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'avg'</span></code></p></td>
-<td><p>reduce mode when one text corresponds to</p></td>
+<td><p>reduce mode when one text corresponds to multiple images in a chunk. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">iou_thr</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code></p></td>
-<td><p>the IoU threshold for NMS-like post-process. If two</p></td>
+<td><p>the IoU threshold for NMS-like post-process. If two predicted bboxes are overlap with an IoU larger than this threshold, the bbox with less confidence will be removed. Default: 0.5.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">large_area_ratio_thr</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0.95</span></code></p></td>
-<td><p>the area ratio threshold for filtering out</p></td>
+<td><p>the area ratio threshold for filtering out those large predicted bboxes. If the area of a predicted bbox accounts for more than this ratio threshold of the whole image area, this bbox will be removed. Default: 0.95.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">conf_thr</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
-<td><p>the confidence score threshold for removing</p></td>
+<td><p>the confidence score threshold for removing low-confidence bboxes. If the confidence score of a predicted bbox is lower than the threshold, this bbox will be removed. Default: 0.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

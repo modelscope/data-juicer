@@ -775,6 +775,7 @@ kept. Scores are normalized by dividing by 10 if the model name includes
 predictor. By default, we will use
 ‘shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE’,
 refer to pypi.org/project/simple-aesthetics-predictor</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_score</strong> – Min score for the predicted aesthetics in an image.</p></li>
 <li><p><strong>max_score</strong> – Max score for the predicted aesthetics in an image.</p></li>
 <li><p><strong>any_or_all</strong> – Keep this sample with ‘any’ or ‘all’ strategy of
@@ -1022,6 +1023,7 @@ scores are cached in the ‘image_nsfw_score’ field of the sample’s stats.</
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_nsfw_model</strong> – nsfw detection model name on huggingface.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_score</strong> – the min nsfw score threshold for samples.
 range from 0 to 1.</p></li>
 <li><p><strong>max_score</strong> – the max nsfw score threshold for samples.
@@ -1092,6 +1094,7 @@ field. Each sample must include exactly two distinct images.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_clip</strong> – clip model name on huggingface to compute
 the similarity between image and text.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_score</strong> – The min similarity to keep samples.</p></li>
 <li><p><strong>max_score</strong> – The max similarity to keep samples.</p></li>
 <li><p><strong>any_or_all</strong> – keep this sample with ‘any’ or ‘all’ strategy of
@@ -1298,6 +1301,7 @@ keeps the sample only if all images meet the condition.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_blip</strong> – blip model name on huggingface to compute
 the matching score between image and text.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_score</strong> – The min matching score to keep samples.</p></li>
 <li><p><strong>max_score</strong> – The max matching score to keep samples.</p></li>
 <li><p><strong>horizontal_flip</strong> – Flip image horizontally (left to right).</p></li>
@@ -1374,6 +1378,7 @@ horizontally or vertically before computing the similarity.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_clip</strong> – clip model name on huggingface to compute
 the similarity between image and text.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_score</strong> – The min similarity to keep samples.</p></li>
 <li><p><strong>max_score</strong> – The max similarity to keep samples.</p></li>
 <li><p><strong>horizontal_flip</strong> – Flip image horizontally (left to right).</p></li>
@@ -1450,6 +1455,7 @@ are present in the sample, the metric is set to an empty array.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_watermark_model</strong> – watermark detection model name on
 huggingface.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>prob_threshold</strong> – the predicted watermark probability threshold
 for samples. range from 0 to 1. Samples with watermark probability
 less than this threshold will be kept.</p></li>
@@ -2195,6 +2201,7 @@ present, the recall is set to an empty array.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_owlvit</strong> – Owl-ViT model name on huggingface to locate the
 phrases extracted from the text.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_recall</strong> – The min phrase grounding recall to keep samples.</p></li>
 <li><p><strong>max_recall</strong> – The max phrase grounding recall to keep samples.</p></li>
 <li><p><strong>horizontal_flip</strong> – Flip image horizontally (left to right).</p></li>
@@ -2862,36 +2869,25 @@ sample’s stats.</p>
 <dt class="sig sig-object py" id="data_juicer.ops.filter.TextPairSimilarityFilter.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openai/clip-vit-base-patch32'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trust_remote_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_key_second</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/filter/text_pair_similarity_filter.html#TextPairSimilarityFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.TextPairSimilarityFilter.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param hf_clip<span class="colon">:</span></dt>
-<dd class="field-odd"><p>clip model name on huggingface to compute
-the similarity between image and text.</p>
-</dd>
-<dt class="field-even">param min_score<span class="colon">:</span></dt>
-<dd class="field-even"><p>The min similarity to keep samples.</p>
-</dd>
-<dt class="field-odd">param max_score<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The max similarity to keep samples.</p>
-</dd>
-<dt class="field-even">param text_key_second<span class="colon">:</span></dt>
-<dd class="field-even"><p>used to store the other sentence
-in the text pair.</p>
-</dd>
-<dt class="field-odd">param any_or_all<span class="colon">:</span></dt>
-<dd class="field-odd"><p>keep this sample with ‘any’ or ‘all’ strategy of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hf_clip</strong> – clip model name on huggingface to compute
+the similarity between image and text.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
+<li><p><strong>min_score</strong> – The min similarity to keep samples.</p></li>
+<li><p><strong>max_score</strong> – The max similarity to keep samples.</p></li>
+<li><p><strong>text_key_second</strong> – used to store the other sentence
+in the text pair.</p></li>
+<li><p><strong>any_or_all</strong> – keep this sample with ‘any’ or ‘all’ strategy of
 all images. ‘any’: keep this sample if any images meet the
 condition. ‘all’: keep this sample only if all images meet the
-condition.</p>
-</dd>
-<dt class="field-even">param args<span class="colon">:</span></dt>
-<dd class="field-even"><p>extra args</p>
-</dd>
-<dt class="field-odd">param kwargs<span class="colon">:</span></dt>
-<dd class="field-odd"><p>extra args</p>
+condition.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -3019,6 +3015,7 @@ multiple videos.</p>
 predictor. By default, we will use
 ‘shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE’,
 refer to pypi.org/project/simple-aesthetics-predictor</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_score</strong> – Min score for the predicted aesthetics in a video.</p></li>
 <li><p><strong>max_score</strong> – Max score for the predicted aesthetics in a video.</p></li>
 <li><p><strong>frame_sampling_method</strong> – sampling method of extracting frame
@@ -3249,6 +3246,7 @@ The key metric is stored in the ‘video_frames_text_similarity’ field.</p>
 the similarity between frame image and text. It’s kind of
 language-related. For example, for Chinese datasets, ChineseCLIP
 might be a better choice.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>min_score</strong> – the min similarity to keep samples.</p></li>
 <li><p><strong>max_score</strong> – the max similarity to keep samples.</p></li>
 <li><p><strong>frame_sampling_method</strong> – sampling method of extracting frame
@@ -3498,6 +3496,10 @@ decide if a sample should be kept based on the NSFW scores of its videos.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_nsfw_model</strong> – nsfw detection model name on huggingface.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
+<li><p><strong>min_score</strong> – the nsfw score threshold for samples.
+range from 0 to 1. Samples with nsfw score greater than this
+threshold will be kept.</p></li>
 <li><p><strong>max_score</strong> – the nsfw score threshold for samples.
 range from 0 to 1. Samples with nsfw score less than this threshold
 will be kept.</p></li>
@@ -3825,6 +3827,7 @@ or ‘uniform’, and the reduce mode can be ‘avg’, ‘max’, or ‘min’.
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_watermark_model</strong> – watermark detection model name on
 huggingface.</p></li>
+<li><p><strong>trust_remote_code</strong> – whether to trust the remote code of HF models.</p></li>
 <li><p><strong>prob_threshold</strong> – the predicted watermark probability threshold
 for samples. range from 0 to 1. Samples with watermark probability
 less than this threshold will be kept.</p></li>

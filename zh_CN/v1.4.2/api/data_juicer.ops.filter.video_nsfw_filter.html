@@ -376,6 +376,10 @@ decide if a sample should be kept based on the NSFW scores of its videos.</p>
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_nsfw_model</strong> -- nsfw detection model name on huggingface.</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
+<li><p><strong>min_score</strong> -- the nsfw score threshold for samples.
+range from 0 to 1. Samples with nsfw score greater than this
+threshold will be kept.</p></li>
 <li><p><strong>max_score</strong> -- the nsfw score threshold for samples.
 range from 0 to 1. Samples with nsfw score less than this threshold
 will be kept.</p></li>

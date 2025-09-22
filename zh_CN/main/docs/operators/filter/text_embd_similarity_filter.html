@@ -393,7 +393,7 @@
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">response_path</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'data.0.embedding'</span></code></p></td>
-<td><p>Path to extract content from the API response.</p></td>
+<td><p>Path to extract content from the API response. Defaults to 'data.0.embedding' for embedding model.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model_params</span></code></p></td>
 <td><p>typing.Optional[typing.Dict]</p></td>
@@ -413,17 +413,17 @@
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">valid_dataset</span></code></p></td>
 <td><p>typing.Optional[typing.List[typing.Dict]]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The dataset to use for validation.</p></td>
+<td><p>The dataset to use for validation. If None, 'self.prepare_valid_feature' should be manually called before applying the filter.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ebd_dim</span></code></p></td>
 <td><p>&lt;class 'int'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">4096</span></code></p></td>
-<td><p>The embedding's dimension via API.</p></td>
+<td><p>The embedding's dimension via API. API specific parameter, i.e., if is_hf_model=True, this parameter will not take effect.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pooling</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>strategy to extract embedding from the hidden states. <a class="reference external" href="https://arxiv.org/abs/2503.01807">https://arxiv.org/abs/2503.01807</a></p></td>
+<td><p>strategy to extract embedding from the hidden states. <a class="reference external" href="https://arxiv.org/abs/2503.01807">https://arxiv.org/abs/2503.01807</a> None: default option, the hidden state of the last token. &quot;mean&quot;: uniform mean of hidden states. &quot;weighted_mean&quot;: weighted mean of hidden states. <a class="reference external" href="https://arxiv.org/abs/2202.08904">https://arxiv.org/abs/2202.08904</a> HF_MODEL specific parameter, i.e., if is_hf_model=False, this parameter will not take effect.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">input_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>

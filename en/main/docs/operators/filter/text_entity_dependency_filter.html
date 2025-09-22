@@ -376,17 +376,17 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lang</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'en'</span></code></p></td>
-<td><p>language of the text in the samples. ‘en’ for detection of</p></td>
+<td><p>language of the text in the samples. ‘en’ for detection of entities in English and ‘zh’ for detection of entities in Chinese.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">min_dependency_num</span></code></p></td>
 <td><p>&lt;class ‘int’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
-<td><p>The min token number in the filtering.</p></td>
+<td><p>The min token number in the filtering. Objects is independent if their number of edges in the dependency tree is below this parameter.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">any_or_all</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'all'</span></code></p></td>
-<td><p>keep this sample with ‘any’ or ‘all’ strategy.</p></td>
+<td><p>keep this sample with ‘any’ or ‘all’ strategy. ‘any’: keep this sample if any object is dependent. ‘all’: keep this sample only if all images are dependent.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

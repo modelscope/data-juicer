@@ -380,13 +380,11 @@ Default: 0.001. Minimum noise amplification factor.</p></li>
 Default: 0.015. Maximum noise amplification factor.</p></li>
 <li><p><strong>p</strong> -- float range: [0.0, 1.0].  Default: 0.5.
 The probability of applying this transform.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="simple">
-<dt>save_dir: str. Default: None.</dt><dd><p>The directory where generated audio files will be stored.
+<li><p><strong>save_dir</strong> -- str. Default: None.
+The directory where generated audio files will be stored.
 If not specified, outputs will be saved in the same directory as their corresponding input files.
-This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR</cite> environment variable.</p>
+This path can alternatively be defined by setting the <cite>DJ_PRODUCED_DATA_DIR</cite> environment variable.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1557,19 +1555,17 @@ provided.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractEntityAttributeMapper.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpt-4o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'main_entities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'attributes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_desc_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'attribute_descriptions'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">support_text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'attribute_support_texts'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_pattern_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demo_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/extract_entity_attribute_mapper.html#ExtractEntityAttributeMapper.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractEntityAttributeMapper.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Initialization method.
-:param api_model: API model name.
-:param query_entities: Entity list to be queried.
-:param query_attributes: Attribute list to be queried.
-:param entity_key: The key name in the meta field to store the</p>
-<blockquote>
-<div><p>given main entity for attribute extraction. It's &quot;entity&quot; in
-default.</p>
-</div></blockquote>
+<dd><p>Initialization method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entity_attribute_key</strong> -- The key name in the meta field to
+<li><p><strong>api_model</strong> -- API model name.</p></li>
+<li><p><strong>query_entities</strong> -- Entity list to be queried.</p></li>
+<li><p><strong>query_attributes</strong> -- Attribute list to be queried.</p></li>
+<li><p><strong>entity_key</strong> -- The key name in the meta field to store the
+given main entity for attribute extraction. It's &quot;entity&quot; in
+default.</p></li>
+<li><p><strong>attribute_key</strong> -- The key name in the meta field to
 store the given attribute to be extracted. It's &quot;attribute&quot;
 in default.</p></li>
 <li><p><strong>attribute_desc_key</strong> -- The key name in the meta field to store
@@ -1586,6 +1582,8 @@ task. Need to be specified by given entity and attribute.</p></li>
 <li><p><strong>input_template</strong> -- Template for building the model input.</p></li>
 <li><p><strong>attr_pattern_template</strong> -- Pattern for parsing the attribute from
 output. Need to be specified by given attribute.</p></li>
+<li><p><strong>demo_pattern</strong> -- Pattern for parsing the demonstration from
+output to support the attribute.</p></li>
 <li><p><strong>try_num</strong> -- The number of retry attempts when there is an API
 call error or output parsing error.</p></li>
 <li><p><strong>drop_text</strong> -- If drop the text in the output.</p></li>
@@ -1594,10 +1592,6 @@ call error or output parsing error.</p></li>
 e.g {'temperature': 0.9, 'top_p': 0.95}</p></li>
 <li><p><strong>kwargs</strong> -- Extra keyword arguments.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>demo_pattern: Pattern for parsing the demonstration from
-output to support the attribute.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2475,6 +2469,7 @@ set, the <cite>prompt_key</cite> takes precedence.</p>
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_img2seq</strong> -- model name on huggingface to generate caption</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
 <li><p><strong>caption_num</strong> -- how many candidate captions to generate
 for each image</p></li>
 <li><p><strong>keep_candidate_mode</strong> -- <p>retain strategy for the generated
@@ -2612,6 +2607,7 @@ producing a specified number of augmented images per sample.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_diffusion</strong> -- diffusion model name on huggingface to generate
 the image.</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
 <li><p><strong>torch_dtype</strong> -- the floating point type used to load the diffusion
 model. Can be one of ['fp32', 'fp16', 'bf16']</p></li>
 <li><p><strong>revision</strong> -- The specific model version to use. It can be a
@@ -3064,10 +3060,21 @@ in the original texts. <strong>Notice</strong>: Only for numbers for now. e.g.
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.OptimizePromptMapper">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.</span></span><span class="sig-name descname"><span class="pre">OptimizePromptMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_or_hf_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Qwen/Qwen2.5-7B-Instruct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_example_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_original_sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_vllm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_hf_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/ops/mapper/optimize_prompt_mapper.html#OptimizePromptMapper"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.OptimizePromptMapper" title="Link to this definition">¶</a></dt>
 <dd><p>基类：<a class="reference internal" href="data_juicer.ops.base_op.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to optimize prompts based on the existing ones.
-This OP will use the existing prompts in the same batch and newly optimized prompts as the examples to optimize
-the next ones.</p>
-<p>Reference: <a class="reference external" href="https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html">https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html</a></p>
+<p>Optimize prompts based on existing ones in the same batch.</p>
+<p>This operator uses the existing prompts and newly optimized prompts as examples to
+generate better prompts. It supports using a Hugging Face model or an API for text
+generation. The operator can be configured to keep the original samples or replace them
+with the generated ones. The optimization process involves multiple retries if the
+generated prompt is empty. The operator operates in batch mode and can leverage vLLM for
+inference acceleration on CUDA devices.</p>
+<ul class="simple">
+<li><p>Uses existing and newly generated prompts to optimize future prompts.</p></li>
+<li><p>Supports both Hugging Face models and API-based text generation.</p></li>
+<li><p>Can keep or replace original samples with generated ones.</p></li>
+<li><p>Retries up to a specified number of times if the generated prompt is empty.</p></li>
+<li><p>Operates in batch mode and can use vLLM for acceleration on CUDA.</p></li>
+<li><p>References: <a class="reference external" href="https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html">https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html</a></p></li>
+</ul>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.OptimizePromptMapper.DEFAULT_EXAMPLE_TEMPLATE">
 <span class="sig-name descname"><span class="pre">DEFAULT_EXAMPLE_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\n如下是一条示例数据：\n{}'</span></em><a class="headerlink" href="#data_juicer.ops.mapper.OptimizePromptMapper.DEFAULT_EXAMPLE_TEMPLATE" title="Link to this definition">¶</a></dt>
@@ -3102,6 +3109,8 @@ the next ones.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>api_or_hf_model</strong> -- API or huggingface model name.</p></li>
 <li><p><strong>gen_num</strong> -- The number of new prompts to generate.</p></li>
+<li><p><strong>max_example_num</strong> -- Maximum number of example prompts to include as
+context when generating new optimized prompts.</p></li>
 <li><p><strong>keep_original_sample</strong> -- whether to keep the original sample. If
 it's set to False, there will be only generated texts in the final
 datasets and the original texts will be removed. It's True in
@@ -4118,6 +4127,7 @@ operator requires both text keys to be set for processing.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_diffusion</strong> -- diffusion model name on huggingface to generate
 the image.</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
 <li><p><strong>torch_dtype</strong> -- the floating point type used to load the diffusion
 model.</p></li>
 <li><p><strong>num_inference_steps</strong> -- The larger the value, the better the</p></li>
@@ -4291,12 +4301,10 @@ The text length will be calculate as the token num if it is
 offered. Otherwise, the text length equals to string length.
 Support tiktoken tokenizer (such as gpt-4o), dashscope tokenizer (
 such as qwen2.5-72b-instruct) and huggingface tokenizer.</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
 <li><p><strong>args</strong> -- extra args</p></li>
 <li><p><strong>kwargs</strong> -- extra args</p></li>
 </ul>
-</dd>
-<dt class="field-even">Trust_remote_code<span class="colon">:</span></dt>
-<dd class="field-even"><p>for loading huggingface model</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4376,6 +4384,7 @@ samples are kept.</p>
 <dt class="field-odd">参数<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_img2seq</strong> -- model name on huggingface to generate caption</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
 <li><p><strong>caption_num</strong> -- how many candidate captions to generate
 for each video</p></li>
 <li><p><strong>keep_candidate_mode</strong> -- <p>retain strategy for the generated
@@ -4476,6 +4485,7 @@ texts (captions from video/audio/frames, tags from audio/frames, ...)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_summarizer</strong> -- the summarizer model used to summarize texts
 generated by other methods.</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
 <li><p><strong>consider_video_caption_from_video</strong> -- whether to consider the video
 caption generated from video directly in the summarization process.
 Default: True.</p></li>
@@ -4548,6 +4558,7 @@ the original sample and the generated captions, depending on the configuration.<
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hf_video_blip</strong> -- video-blip model name on huggingface
 to generate caption</p></li>
+<li><p><strong>trust_remote_code</strong> -- whether to trust the remote code of HF models.</p></li>
 <li><p><strong>caption_num</strong> -- how many candidate captions to generate
 for each video</p></li>
 <li><p><strong>keep_candidate_mode</strong> -- <p>retain strategy for the generated

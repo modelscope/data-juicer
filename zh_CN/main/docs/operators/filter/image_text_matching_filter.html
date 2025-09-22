@@ -378,12 +378,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hf_blip</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'Salesforce/blip-itm-base-coco'</span></code></p></td>
-<td><p>blip model name on huggingface to compute</p></td>
+<td><p>blip model name on huggingface to compute the matching score between image and text.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trust_remote_code</span></code></p></td>
 <td><p>&lt;class 'bool'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
-<td><p></p></td>
+<td><p>whether to trust the remote code of HF models.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_score</span></code></p></td>
 <td><p>&lt;class 'float'&gt;</p></td>
@@ -408,12 +408,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">any_or_all</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'any'</span></code></p></td>
-<td><p>keep this sample with 'any' or 'all' strategy of</p></td>
+<td><p>keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reduce_mode</span></code></p></td>
 <td><p>&lt;class 'str'&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'avg'</span></code></p></td>
-<td><p>reduce mode when one text corresponds to</p></td>
+<td><p>reduce mode when one text corresponds to multiple images in a chunk. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

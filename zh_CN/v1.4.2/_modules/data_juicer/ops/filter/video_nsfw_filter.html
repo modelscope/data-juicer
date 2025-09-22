@@ -407,6 +407,10 @@
 <span class="sd">        Initialization method.</span>
 
 <span class="sd">        :param hf_nsfw_model: nsfw detection model name on huggingface.</span>
+<span class="sd">        :param trust_remote_code: whether to trust the remote code of HF models.</span>
+<span class="sd">        :param min_score: the nsfw score threshold for samples.</span>
+<span class="sd">            range from 0 to 1. Samples with nsfw score greater than this</span>
+<span class="sd">            threshold will be kept.</span>
 <span class="sd">        :param max_score: the nsfw score threshold for samples.</span>
 <span class="sd">            range from 0 to 1. Samples with nsfw score less than this threshold</span>
 <span class="sd">            will be kept.</span>

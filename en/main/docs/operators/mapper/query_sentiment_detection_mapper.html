@@ -381,7 +381,7 @@
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">zh_to_en_hf_model</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'Helsinki-NLP/opus-mt-zh-en'</span></code></p></td>
-<td><p>Translation model from Chinese to English.</p></td>
+<td><p>Translation model from Chinese to English. If not None, translate the query from Chinese to English.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model_params</span></code></p></td>
 <td><p>typing.Dict</p></td>
@@ -396,12 +396,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">label_key</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'query_sentiment_label'</span></code></p></td>
-<td><p>The key name in the meta field to store the</p></td>
+<td><p>The key name in the meta field to store the output label. It is ‘query_sentiment_label’ in default.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">score_key</span></code></p></td>
 <td><p>&lt;class ‘str’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">'query_sentiment_label_score'</span></code></p></td>
-<td><p>The key name in the meta field to store the</p></td>
+<td><p>The key name in the meta field to store the corresponding label score. It is ‘query_sentiment_label_score’ in default.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></p></td>
 <td><p></p></td>

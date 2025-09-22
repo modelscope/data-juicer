@@ -386,12 +386,12 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">example_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
-<td><p>The number of selected examples.</p></td>
+<td><p>The number of selected examples. Randomly select N examples from “seed_file” and put them into prompt as QA examples.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">similarity_threshold</span></code></p></td>
 <td><p>&lt;class ‘float’&gt;</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0.7</span></code></p></td>
-<td><p>The similarity score threshold</p></td>
+<td><p>The similarity score threshold between the generated samples and the seed examples. Range from 0 to 1. Samples with similarity score less than this threshold will be kept.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">system_prompt</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
@@ -401,22 +401,22 @@
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">input_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Template for building the input prompt. It must</p></td>
+<td><p>Template for building the input prompt. It must include one placeholder ‘{}’, which will be replaced by <code class="docutils literal notranslate"><span class="pre">example_num</span></code> formatted examples defined by <code class="docutils literal notranslate"><span class="pre">example_template</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">example_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Template for formatting one QA example. It</p></td>
+<td><p>Template for formatting one QA example. It must include one placeholder ‘{}’, which will be replaced by one formatted qa_pair.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">qa_pair_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Template for formatting a single QA pair</p></td>
+<td><p>Template for formatting a single QA pair within each example. Must include two placeholders ‘{}’ for the question and answer.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">output_pattern</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Regular expression pattern to extract questions</p></td>
+<td><p>Regular expression pattern to extract questions and answers from model response.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">enable_vllm</span></code></p></td>
 <td><p>&lt;class ‘bool’&gt;</p></td>
@@ -431,7 +431,7 @@
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sampling_params</span></code></p></td>
 <td><p>typing.Optional[typing.Dict]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Sampling parameters for text generation.</p></td>
+<td><p>Sampling parameters for text generation. e.g {‘temperature’: 0.9, ‘top_p’: 0.95}</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></p></td>
 <td><p></p></td>

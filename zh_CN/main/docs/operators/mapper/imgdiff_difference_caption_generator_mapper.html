@@ -402,17 +402,17 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mllm_mapper_args</span></code></p></td>
 <td><p>typing.Optional[typing.Dict]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{}</span></code></p></td>
-<td><p>Arguments for multimodal language model mapper.</p></td>
+<td><p>Arguments for multimodal language model mapper. Controls the generation of captions for bounding box regions. Default empty dict will use fixed values: max_new_tokens=256, temperature=0.2, top_p=None, num_beams=1, hf_model=&quot;llava-hf/llava-v1.6-vicuna-7b-hf&quot;.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">image_text_matching_filter_args</span></code></p></td>
 <td><p>typing.Optional[typing.Dict]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{}</span></code></p></td>
-<td><p>Arguments for image-text matching filter.</p></td>
+<td><p>Arguments for image-text matching filter. Controls the matching between cropped regions and generated captions. Default empty dict will use fixed values: min_score=0.1, max_score=1.0, hf_blip=&quot;Salesforce/blip-itm-base-coco&quot;, num_proc=1.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">text_pair_similarity_filter_args</span></code></p></td>
 <td><p>typing.Optional[typing.Dict]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{}</span></code></p></td>
-<td><p>Arguments for text pair similarity filter.</p></td>
+<td><p>Arguments for text pair similarity filter. Controls the similarity comparison between caption pairs. Default empty dict will use fixed values: min_score=0.1, max_score=1.0, hf_clip=&quot;openai/clip-vit-base-patch32&quot;, text_key_second=&quot;target_text&quot;, num_proc=1.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
 <td><p></p></td>

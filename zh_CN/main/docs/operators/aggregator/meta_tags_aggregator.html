@@ -408,7 +408,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">response_path</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>Path to extract content from the API response.</p></td>
+<td><p>Path to extract content from the API response. Defaults to 'choices.0.message.content'.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">system_prompt</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
@@ -428,7 +428,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tag_template</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
-<td><p>The tap template for each tag and its</p></td>
+<td><p>The tap template for each tag and its frequency.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">output_pattern</span></code></p></td>
 <td><p>typing.Optional[str]</p></td>
@@ -438,7 +438,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">try_num</span></code></p></td>
 <td><p>typing.Annotated[int, Gt(gt=0)]</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
-<td><p>The number of retry attempts when there is an API</p></td>
+<td><p>The number of retry attempts when there is an API call error or output parsing error.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model_params</span></code></p></td>
 <td><p>typing.Dict</p></td>
@@ -448,7 +448,7 @@
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sampling_params</span></code></p></td>
 <td><p>typing.Dict</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{}</span></code></p></td>
-<td><p>Extra parameters passed to the API call.</p></td>
+<td><p>Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></p></td>
 <td><p></p></td>

@@ -15,13 +15,13 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `roi_strings` | typing.List[str] | `['0,0,0.1,0.1']` | a given list of regions the watermarks locate. |
-| `roi_type` | <class 'str'> | `'ratio'` | the roi string type. When the type is 'pixel', (x1, |
-| `roi_key` | typing.Optional[str] | `None` | the key name of fields in samples to store roi_strings |
-| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `10` | the number of frames to be extracted uniformly from |
-| `min_frame_threshold` | typing.Annotated[int, Gt(gt=0)] | `7` | a coordination is considered as the |
-| `detection_method` | <class 'str'> | `'pixel_value'` | the method to detect the pixels of watermark. |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `roi_strings` | typing.List[str] | `['0,0,0.1,0.1']` | a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]". |
+| `roi_type` | <class 'str'> | `'ratio'` | the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by widths and heights. |
+| `roi_key` | typing.Optional[str] | `None` | the key name of fields in samples to store roi_strings for each sample. It's used for set different rois for different samples. If it's none, use rois in parameter "roi_strings". It's None in default. |
+| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `10` | the number of frames to be extracted uniformly from the video to detect the pixels of watermark. |
+| `min_frame_threshold` | typing.Annotated[int, Gt(gt=0)] | `7` | a coordination is considered as the location of a watermark pixel when it is that in no less min_frame_threshold frames. |
+| `detection_method` | <class 'str'> | `'pixel_value'` | the method to detect the pixels of watermark. If it is 'pixel_value', we consider the distribution of pixel value in each frame. If it is 'pixel_diversity', we will consider the pixel diversity in different frames. The min_frame_threshold is useless and frame_num must be greater than 1 in 'pixel_diversity' mode. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

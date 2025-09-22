@@ -372,13 +372,21 @@
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizePromptMapper">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizePromptMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper to optimize prompts based on the existing ones.</span>
-<span class="sd">    This OP will use the existing prompts in the same batch and newly optimized prompts as the examples to optimize</span>
-<span class="sd">    the next ones.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimize prompts based on existing ones in the same batch.</span>
 
-<span class="sd">    Reference: https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    This operator uses the existing prompts and newly optimized prompts as examples to</span>
+<span class="sd">    generate better prompts. It supports using a Hugging Face model or an API for text</span>
+<span class="sd">    generation. The operator can be configured to keep the original samples or replace them</span>
+<span class="sd">    with the generated ones. The optimization process involves multiple retries if the</span>
+<span class="sd">    generated prompt is empty. The operator operates in batch mode and can leverage vLLM for</span>
+<span class="sd">    inference acceleration on CUDA devices.</span>
+
+<span class="sd">    - Uses existing and newly generated prompts to optimize future prompts.</span>
+<span class="sd">    - Supports both Hugging Face models and API-based text generation.</span>
+<span class="sd">    - Can keep or replace original samples with generated ones.</span>
+<span class="sd">    - Retries up to a specified number of times if the generated prompt is empty.</span>
+<span class="sd">    - Operates in batch mode and can use vLLM for acceleration on CUDA.</span>
+<span class="sd">    - References: https://doc.agentscope.io/v0/en/build_tutorial/prompt_optimization.html&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;请你仔细观察多个示例提示词，按照你的理解，总结出相应规矩，然后写出一个新的更好的提示词，以让模型更好地完成指定任务。&quot;</span>
@@ -424,6 +432,8 @@
 
 <span class="sd">        :param api_or_hf_model: API or huggingface model name.</span>
 <span class="sd">        :param gen_num: The number of new prompts to generate.</span>
+<span class="sd">        :param max_example_num: Maximum number of example prompts to include as</span>
+<span class="sd">            context when generating new optimized prompts.</span>
 <span class="sd">        :param keep_original_sample: whether to keep the original sample. If</span>
 <span class="sd">            it&#39;s set to False, there will be only generated texts in the final</span>
 <span class="sd">            datasets and the original texts will be removed. It&#39;s True in</span>

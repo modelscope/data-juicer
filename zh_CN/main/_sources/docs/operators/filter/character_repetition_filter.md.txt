@@ -16,8 +16,8 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `rep_len` | typing.Annotated[int, Gt(gt=0)] | `10` | Repetition length for char-level n-gram. |
-| `min_ratio` | <class 'float'> | `0.0` | The min filter ratio in this op, samples will |
-| `max_ratio` | <class 'float'> | `0.5` | The max filter ratio in this op, samples will |
+| `min_ratio` | <class 'float'> | `0.0` | The min filter ratio in this op, samples will be filtered if their char-level n-gram repetition ratio is below this parameter. |
+| `max_ratio` | <class 'float'> | `0.5` | The max filter ratio in this op, samples will be filtered if their char-level n-gram repetition ratio exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

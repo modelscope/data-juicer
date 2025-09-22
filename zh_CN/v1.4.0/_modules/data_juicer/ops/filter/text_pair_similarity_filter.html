@@ -399,18 +399,19 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
-<span class="sd">            :param hf_clip: clip model name on huggingface to compute</span>
-<span class="sd">                the similarity between image and text.</span>
-<span class="sd">            :param min_score: The min similarity to keep samples.</span>
-<span class="sd">            :param max_score: The max similarity to keep samples.</span>
-<span class="sd">            :param text_key_second: used to store the other sentence</span>
-<span class="sd">                in the text pair.</span>
-<span class="sd">            :param any_or_all: keep this sample with &#39;any&#39; or &#39;all&#39; strategy of</span>
-<span class="sd">                all images. &#39;any&#39;: keep this sample if any images meet the</span>
-<span class="sd">                condition. &#39;all&#39;: keep this sample only if all images meet the</span>
-<span class="sd">                condition.</span>
-<span class="sd">            :param args: extra args</span>
-<span class="sd">            :param kwargs: extra args</span>
+<span class="sd">        :param hf_clip: clip model name on huggingface to compute</span>
+<span class="sd">            the similarity between image and text.</span>
+<span class="sd">        :param trust_remote_code: whether to trust the remote code of HF models.</span>
+<span class="sd">        :param min_score: The min similarity to keep samples.</span>
+<span class="sd">        :param max_score: The max similarity to keep samples.</span>
+<span class="sd">        :param text_key_second: used to store the other sentence</span>
+<span class="sd">            in the text pair.</span>
+<span class="sd">        :param any_or_all: keep this sample with &#39;any&#39; or &#39;all&#39; strategy of</span>
+<span class="sd">            all images. &#39;any&#39;: keep this sample if any images meet the</span>
+<span class="sd">            condition. &#39;all&#39;: keep this sample only if all images meet the</span>
+<span class="sd">            condition.</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
