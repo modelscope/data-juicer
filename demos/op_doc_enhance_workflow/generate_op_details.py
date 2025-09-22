@@ -702,6 +702,8 @@ def main():
         # Template data
         op_info_dir = (OPS_DOCS_DIR / op_info["type"]).relative_to(ROOT)
         source_path = Path(f"data_juicer/ops/{op_info['type']}/{op_info['name'].lower()}.py")
+        if op_info["name"] == "general_fused_op":
+            source_path = Path(f"data_juicer/ops/op_fusion.py")
         op_info_tmpl = {
             "name": op_info["name"],
             "type": op_info["type"],
