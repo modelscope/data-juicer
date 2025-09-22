@@ -44,7 +44,7 @@ To reproduce the paper's experiments, please refer to the sandbox usage guide be
 
 Before using sandbox, you might need to install sandbox-related dependencies by running the command below:
 ```shell
-pip install -v -e .[sandbox]
+uv pip install -v -e .[sandbox]
 ```
 And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, InternVL, etc.) according to their official instructions, or you can simply clone the third-party repositories from GitHub and leave the installation process to our `EnvManager` during sandbox running.
 
@@ -52,7 +52,7 @@ And prepare third-party libraries used in sandbox (e.g., EasyAnimate, VBench, In
 
 1. To use [ModelScope](https://github.com/modelscope/modelscope), you need to install the related dependencies from its independent host:
 ```shell
-pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+uv pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
 ```
 Please refer the the [ModelScope documentation](https://www.modelscope.cn/docs/Beginner-s-Guide/Environment-Setup) for more information.
 
@@ -206,12 +206,16 @@ The currently supported component factories and the components supported within 
 
 - DataPoolManipulatorFactory
 
-| Component              | Function                                                | Desc. of Method `run` | Reference Materials                               |
-|------------------------|---------------------------------------------------------|-----------------------|---------------------------------------------------|
-| `DataPoolConstruction` | Construct data pool from specified analyzed data source | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
-| `DataPoolCombination`  | Combine specified data pools                            | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
-| `DataPoolDuplication`  | Duplicate a data pool for specified times               | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
-| `DataPoolDownsampling` | Randomly downsample data pools to specified scale       | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| Component                | Function                                                  | Desc. of Method `run` | Reference Materials                               |
+|--------------------------|-----------------------------------------------------------|-----------------------|---------------------------------------------------|
+| `DataPoolConstruction`   | Construct data pool from specified analyzed data source   | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolCombination`    | Combine specified data pools                              | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolDuplication`    | Duplicate a data pool for specified times                 | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolDownsampling`   | Randomly downsample data pools to specified scale         | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolRanking`        | Rank data pools according to specified evaluation metrics | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolMerging`        | Merge data pools into one dataset or data pool            | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolCartesianJoin`  | Join two sets of data pools with Cartesian Join           | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+
 
 - GeneralDataExecutorFactory
 
@@ -228,11 +232,13 @@ The currently supported component factories and the components supported within 
 
 - DataEvaluatorFactory
 
-| Component | Function | Desc. of Method `run` | Reference Materials |
-| --- | --- | --- | --- |
+| Component | Function                                                                                             | Desc. of Method `run` | Reference Materials |
+| --- |------------------------------------------------------------------------------------------------------| --- | --- |
 | `Gpt3QualityEvaluator` | Evaluate the quality of a dataset using the GPT-3 text quality classifier reproduced by Data-Juicer. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`.<br />- `eval_obj`: A useless parameter.<br /> | [Data-Juicer Quality Classifier Toolkit](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
-| `VBenchEvaluator` | Evaluate the generated videos according to given prompts in multi dimensions | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: The average score of generated videos in multi dimensions.<br /> | [VBench paper](https://arxiv.org/abs/2311.17982) |
-| `InceptionEvaluator` | Evaluate the generated videos by features extracted from video classification models. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+| `VBenchEvaluator` | Evaluate the generated videos according to given prompts in multi dimensions                         | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: The average score of generated videos in multi dimensions.<br /> | [VBench paper](https://arxiv.org/abs/2311.17982) |
+| `InceptionEvaluator` | Evaluate the generated videos by features extracted from video classification models.                | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+| `AccuracyEvaluator` | Evaluate the accuracy to compare the labels in the predicted ones and ground truth                   | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+| `MSEEvaluator` | Evaluate the MSE score between the predicted values and ground truth.                | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter.<br />- Return: A dictionary of scores in the given metric. <br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
 
 - GeneralProbeFactory
 
@@ -258,9 +264,12 @@ The currently supported component factories and the components supported within 
 
 - ModelInferExecutorFactory
 
-| Component | Function | Desc. of Method `run` | Reference Materials |
-| --- | --- | --- | --- |
+| Component | Function                                                                                                          | Desc. of Method `run` | Reference Materials                                     |
+| --- |-------------------------------------------------------------------------------------------------------------------| --- |---------------------------------------------------------|
 | `EasyAnimateInferExecutor` | Perform inference on EasyAnimate text-to-video model with the prompts from VBench, and save the generated videos. | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"easyanimate"` in the component configuration file to activate this component.<br />- `run_obj`: A useless parameter.<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
+| `HFTransformersInferExecutor` | Perform inference with HuggingFace Transformers.                                                                  | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"huggingface"` in the component configuration file to activate this component.<br />- `run_obj`: A useless parameter.<br /> | -                                                       |
+| `VLLMInferExecutor` | Perform inference with vLLM.                                                                                      | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"vllm"` in the component configuration file to activate this component.<br />- `run_obj`: A useless parameter.<br /> | -                                                       |
+| `APIModelInferExecutor` | Perform inference with OpenAI API.                                                                                | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"api"` in the component configuration file to activate this component.<br />- `run_obj`: A useless parameter.<br /> | -                                                       |
 
 - ModelEvaluatorFactory
 

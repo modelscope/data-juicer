@@ -19,8 +19,16 @@ OP_NAME = "image_text_matching_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageTextMatchingFilter(Filter):
-    """Filter to keep samples those matching score between image and text
-    within a specific range."""
+    """Filter to keep samples with image-text matching scores within a specific range.
+
+    This operator uses a Hugging Face BLIP model to compute the matching score between
+    images and text. It keeps samples where the matching score falls within the specified
+    `min_score` and `max_score` range. The key metric, `image_text_matching_score`, is
+    computed for each image-text pair. If multiple images are associated with a single text,
+    the scores can be reduced using 'avg', 'max', or 'min' modes. The operator supports
+    horizontal and vertical flipping of images. Samples are kept based on either 'any' or
+    'all' strategy: 'any' keeps the sample if any image meets the condition, while 'all'
+    keeps the sample only if all images meet the condition."""
 
     _accelerator = "cuda"
 
@@ -42,6 +50,7 @@ class ImageTextMatchingFilter(Filter):
 
         :param hf_blip: blip model name on huggingface to compute
             the matching score between image and text.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: The min matching score to keep samples.
         :param max_score: The max matching score to keep samples.
         :param horizontal_flip: Flip image horizontally (left to right).
@@ -58,7 +67,7 @@ class ImageTextMatchingFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "1500MB")
+        kwargs["mem_required"] = "1500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score
@@ -88,7 +97,9 @@ class ImageTextMatchingFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         text = sample[self.text_key]
         offset = 0
@@ -142,7 +153,9 @@ class ImageTextMatchingFilter(Filter):
         if len(itm_scores) <= 0:
             return True
 
-        keep_bools = np.array([self.min_score <= itm_score <= self.max_score for itm_score in itm_scores])
+        keep_bools = np.array(
+            [self.get_keep_boolean(itm_score, self.min_score, self.max_score) for itm_score in itm_scores]
+        )
 
         # different strategies
         if self.any:

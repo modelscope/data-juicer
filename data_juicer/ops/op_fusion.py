@@ -1,10 +1,11 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 from loguru import logger
 
 from data_juicer.ops.base_op import OP, OPERATORS, Filter, Mapper
 from data_juicer.ops.load import load_ops
+from data_juicer.utils.common_utils import check_op_method_param
 from data_juicer.utils.constant import Fields, InterVars
 from data_juicer.utils.registry import Registry
 
@@ -180,14 +181,29 @@ class FusedFilter(Filter):
 
 
 @OPERATORS.register_module("general_fused_op")
-class GeneralFusedOP(OP):
-    """An explicitly fused operator designed to execute multiple sequential
-    operations (OPs) on the same batch, enabling fine-grained control over
-    data processing."""
+class GeneralFusedOP(Mapper):
+    """An explicitly fused operator designed to execute multiple sequential operations (OPs) on
+    the same batch, enabling fine-grained control over data processing.
+
+    This operator allows for the chaining of multiple data processing steps, such as mappers
+    and filters, into a single pass. It processes each batch of samples sequentially through
+    the defined operations, ensuring that all specified transformations are applied in
+    order. The operator supports both mappers, which transform data, and filters, which
+    remove or keep samples based on computed statistics. Context variables can be passed
+    between operations if needed. The accelerator is set to 'cuda' if any of the fused
+    operations use it. The number of processes is determined by the minimum value among all
+    fused operations. After processing, any temporary context variables, such as those used
+    for video containers, are cleaned up."""
 
     _batched_op = True
 
-    def __init__(self, batch_size: int = 1, fused_op_list: List = None, *args, **kwargs):
+    def __init__(self, batch_size: int = 1, fused_op_list: Optional[List] = None, *args, **kwargs):
+        """
+        Initialization.
+
+        :param batch_size: the batch size of the input samples.
+        :param fused_op_list: a list of OPs to be fused.
+        """
         super().__init__(*args, **kwargs)
         self.batch_size = batch_size
         if fused_op_list is None:
@@ -204,23 +220,48 @@ class GeneralFusedOP(OP):
         self.num_proc = min([op.runtime_np() for op in self.fused_ops]) if self.fused_ops else 1
 
     def process_batched(self, samples, rank=None):
+        from copy import deepcopy
+
+        import av
+
+        tmp_samples = deepcopy(samples)
+
+        # context for the intermediate vars
+        sample_key = list(tmp_samples.keys())[0]
+        num_samples = len(tmp_samples[sample_key])
+        tmp_samples[Fields.context] = [{} for _ in range(num_samples)]
+
         for op in self.fused_ops:
             process_args = {"rank": rank} if op.accelerator == "cuda" else {}
             if isinstance(op, Mapper):
-                samples = op.process_batched(samples, **process_args)
+                if check_op_method_param(op.process, "context"):
+                    # add context param only when the core process method of this OP contains this param
+                    process_args["context"] = True
+                samples = op.process_batched(tmp_samples, **process_args)
             elif isinstance(op, Filter):
-                samples = op.compute_stats_batched(samples, **process_args)
-                indicators = list(op.process_batched(samples))
+                if check_op_method_param(op.compute_stats, "context"):
+                    # add context param only when the core process method of this OP contains this param
+                    process_args["context"] = True
+                tmp_samples = op.compute_stats_batched(tmp_samples, **process_args)
+                indicators = list(op.process_batched(tmp_samples))
                 new_samples = {}
-                for key in samples:
-                    new_samples[key] = [val for val, indicator in zip(samples[key], indicators) if indicator]
-                samples = new_samples
+                for key in tmp_samples:
+                    new_samples[key] = [val for val, indicator in zip(tmp_samples[key], indicators) if indicator]
+                tmp_samples = new_samples
             else:
                 raise NotImplementedError(
                     f"FusedOP does not support OP {op._name} of type "
                     f"{type(op)} and only supports Mapper and Filter now."
                 )
-        return samples
+        # clean up the contexts after processing
+        # check if there are containers that need to be closed
+        for ctx in tmp_samples[Fields.context]:
+            for context_key in ctx:
+                if isinstance(ctx[context_key], av.container.InputContainer):
+                    ctx[context_key].streams.video[0].close()
+                    ctx[context_key].close()
+        _ = tmp_samples.pop(Fields.context)
+        return tmp_samples
 
     def process_batched_for_validation(self, samples, rank=None):
         """Process samples and return boolean masks for validation purposes."""

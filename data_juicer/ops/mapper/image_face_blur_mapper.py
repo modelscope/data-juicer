@@ -22,7 +22,13 @@ OP_NAME = "image_face_blur_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceBlurMapper(Mapper):
-    """Mapper to blur faces detected in images."""
+    """Mapper to blur faces detected in images.
+
+    This operator uses an OpenCV classifier to detect faces in images and applies a
+    specified blur type to the detected face regions. The blur types supported are 'mean',
+    'box', and 'gaussian'. The radius of the blur kernel can be adjusted. If no save
+    directory is provided, the modified images will be saved in the same directory as the
+    input files."""
 
     _default_kwargs = {
         "scaleFactor": 1.1,
@@ -32,7 +38,13 @@ class ImageFaceBlurMapper(Mapper):
     }
 
     def __init__(
-        self, cv_classifier: str = "", blur_type: str = "gaussian", radius: NonNegativeFloat = 2, *args, **kwargs
+        self,
+        cv_classifier: str = "",
+        blur_type: str = "gaussian",
+        radius: NonNegativeFloat = 2,
+        save_dir: str = None,
+        *args,
+        **kwargs,
     ):
         """
         Initialization method.
@@ -42,11 +54,15 @@ class ImageFaceBlurMapper(Mapper):
         :param blur_type: Type of blur kernel, including
             ['mean', 'box', 'gaussian'].
         :param radius: Radius of blur kernel.
+        :param save_dir: The directory where generated image files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         if cv_classifier == "":
             cv_classifier = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_alt.xml")
@@ -73,6 +89,7 @@ class ImageFaceBlurMapper(Mapper):
                 self.extra_kwargs[key] = kwargs[key]
 
         self.model_key = prepare_model(model_type="opencv_classifier", model_path=cv_classifier)
+        self.save_dir = save_dir
 
     def process_single(self, sample, context=False):
         # there is no image in this sample
@@ -85,7 +102,9 @@ class ImageFaceBlurMapper(Mapper):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         model = get_model(self.model_key)
 
@@ -97,6 +116,7 @@ class ImageFaceBlurMapper(Mapper):
 
         # blur face regions
         key_mapping = {}
+        new_images = {}
         for key, image in images.items():
             dets = face_detections[key]
             # only blur when detected face
@@ -106,19 +126,24 @@ class ImageFaceBlurMapper(Mapper):
                     box = (x, y, x + w, y + h)
                     blured_roi = image.crop(box).filter(self.blur)
                     blured_image.paste(blured_roi, box)
-                blured_image_key = transfer_filename(key, OP_NAME, **self._init_parameters)
-                blured_image.save(blured_image_key)
+                blured_image_key = transfer_filename(key, OP_NAME, self.save_dir, **self._init_parameters)
+                if blured_image_key != key:
+                    blured_image.save(blured_image_key)
                 key_mapping[key] = blured_image_key
+                new_images[blured_image_key] = blured_image
                 if context:
                     sample[Fields.context][blured_image_key] = blured_image
             else:
                 key_mapping[key] = key
+        images.update(new_images)
 
         # when the file is modified, its source file needs to be updated.
         for i, value in enumerate(loaded_image_keys):
             if sample[Fields.source_file][i] != value:
                 if key_mapping[value] != value:
                     sample[Fields.source_file][i] = value
+            if self.image_bytes_key in sample and i < len(sample[self.image_bytes_key]):
+                sample[self.image_bytes_key][i] = images[key_mapping[value]].tobytes()
 
         sample[self.image_key] = [key_mapping[key] for key in loaded_image_keys]
         return sample

@@ -14,7 +14,17 @@ OP_NAME = "video_resolution_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoResolutionFilter(Filter):
-    """Keep data samples whose videos' resolutions are within a specified range."""
+    """Keep data samples whose videos' resolutions are within a specified range.
+
+    This operator filters data samples based on the resolution of the videos they contain.
+    It keeps samples if the video resolutions fall within the defined width and height
+    ranges. The filtering strategy can be set to 'any' or 'all':
+    - 'any': Keeps the sample if any video meets the resolution criteria.
+    - 'all': Keeps the sample only if all videos meet the resolution criteria.
+
+    The operator computes and caches the 'video_width' and 'video_height' for each video in
+    the sample. If no videos are present, it sets these fields to empty arrays. These cached
+    values are used to determine whether to keep or filter out the sample."""
 
     def __init__(
         self,
@@ -90,7 +100,11 @@ class VideoResolutionFilter(Filter):
         ws = sample[Fields.stats][StatsKeys.video_width]
         hs = sample[Fields.stats][StatsKeys.video_height]
         keep_bools = np.array(
-            [self.min_width <= w <= self.max_width and self.min_height <= h <= self.max_height for w, h in zip(ws, hs)]
+            [
+                self.get_keep_boolean(w, self.min_width, self.max_width)
+                and self.get_keep_boolean(h, self.min_height, self.max_height)
+                for w, h in zip(ws, hs)
+            ]
         )
         if len(keep_bools) <= 0:
             return True

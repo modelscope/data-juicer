@@ -13,9 +13,16 @@ OP_NAME = "pair_preference_mapper"
 # TODO: Extend LLM-based OPs into API-based implementation.
 @OPERATORS.register_module(OP_NAME)
 class PairPreferenceMapper(Mapper):
-    """
-    Mapper to construct paired preference samples.
-    """
+    """Mapper to construct paired preference samples by generating a rejected response and its
+    reason.
+
+    This operator uses an API model to generate a new response that is opposite in style,
+    factuality, or stance to the original response. The generated response and the reason
+    for its generation are stored in the sample. The default system prompt and input
+    template are provided, but can be customized. The output is parsed using a regular
+    expression to extract the new response and the reason. If parsing fails, the operator
+    retries up to a specified number of times. The generated response and reason are stored
+    in the sample under the keys 'rejected_response' and 'reason', respectively."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = (

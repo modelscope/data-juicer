@@ -62,7 +62,7 @@ def run_mixture():
     data_path = " ".join(args.data_path)
     args.dataset_path = data_path
     dataset_builder = DatasetBuilder(args)
-    dataset = dataset_builder.load_dataset(args.num_proc)
+    dataset = dataset_builder.load_dataset(num_proc=args.num_proc)
     exporter = Exporter(
         export_path=args.export_path,
         export_shard_size=args.export_shard_size,

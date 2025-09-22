@@ -10,8 +10,14 @@ from ..common import SPECIAL_CHARACTERS
 
 @OPERATORS.register_module("special_characters_filter")
 class SpecialCharactersFilter(Filter):
-    """Filter to keep samples with special-char ratio within a specific
-    range."""
+    """Filter to keep samples with special-character ratio within a specific range.
+
+    This operator filters out samples based on the ratio of special characters in the text.
+    It keeps samples where the special-character ratio is within the specified minimum and
+    maximum thresholds. The special-character ratio is computed as the number of special
+    characters divided by the total number of characters in the text. If the
+    'special_char_ratio' is already cached in the stats, it will be reused. Otherwise, it
+    will be computed and stored in the 'special_char_ratio' field."""
 
     _batched_op = True
 
@@ -49,14 +55,8 @@ class SpecialCharactersFilter(Filter):
         return samples
 
     def process_batched(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_ratio <= stat[StatsKeys.special_char_ratio] <= self.max_ratio,
-                samples[Fields.stats],
-            )
-        else:
-            # single sample for ray filter
-            if self.min_ratio <= samples[Fields.stats][StatsKeys.special_char_ratio] <= self.max_ratio:
-                return True
-            else:
-                return False
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[StatsKeys.special_char_ratio], self.min_ratio, self.max_ratio),
+            samples[Fields.stats],
+        )

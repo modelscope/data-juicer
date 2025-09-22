@@ -23,9 +23,14 @@ OP_NAME = "sdxl_prompt2prompt_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class SDXLPrompt2PromptMapper(Mapper):
-    """
-    Generate pairs of similar images by the SDXL model
-    """
+    """Generates pairs of similar images using the SDXL model.
+
+    This operator uses a Hugging Face diffusion model to generate image pairs based on two
+    text prompts. The quality and similarity of the generated images are controlled by
+    parameters such as `num_inference_steps` and `guidance_scale`. The first and second text
+    prompts are specified using `text_key` and `text_key_second`, respectively. The
+    generated images are saved in the specified `output_dir` with unique filenames. The
+    operator requires both text keys to be set for processing."""
 
     _accelerator = "cuda"
 
@@ -47,6 +52,7 @@ class SDXLPrompt2PromptMapper(Mapper):
 
         :param hf_diffusion: diffusion model name on huggingface to generate
             the image.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param torch_dtype: the floating point type used to load the diffusion
             model.
         :param num_inference_steps: The larger the value, the better the
@@ -60,9 +66,8 @@ class SDXLPrompt2PromptMapper(Mapper):
         :param text_key_second: the key name used to store the second caption
             in the caption pair.
         :param output_dir: the storage location of the generated images.
-
         """
-        kwargs.setdefault("mem_required", "38GB")
+        kwargs["mem_required"] = "38GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
         self.num_inference_steps = num_inference_steps

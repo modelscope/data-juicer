@@ -24,8 +24,17 @@ OP_NAME = "video_frames_text_similarity_filter"
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoFramesTextSimilarityFilter(Filter):
-    """Filter to keep samples those similarities between sampled video frame
-    images and text within a specific range."""
+    """Filter to keep samples based on the similarity between video frame images and text
+    within a specific range.
+
+    This operator uses a Hugging Face CLIP model to compute the similarity between video
+    frames and associated text. It keeps samples where the computed similarity scores fall
+    within a specified range. The operator supports different frame sampling methods,
+    including 'all_keyframes' and 'uniform', and allows for horizontal and vertical flipping
+    of the frames. The similarity score is reduced using one of three modes: 'avg', 'max',
+    or 'min'. The operator also supports two strategies for keeping samples: 'any' (keep if
+    any video meets the condition) or 'all' (keep only if all videos meet the condition).
+    The key metric is stored in the 'video_frames_text_similarity' field."""
 
     _accelerator = "cuda"
 
@@ -51,6 +60,7 @@ class VideoFramesTextSimilarityFilter(Filter):
             the similarity between frame image and text. It's kind of
             language-related. For example, for Chinese datasets, ChineseCLIP
             might be a better choice.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: the min similarity to keep samples.
         :param max_score: the max similarity to keep samples.
         :param frame_sampling_method: sampling method of extracting frame
@@ -80,7 +90,7 @@ class VideoFramesTextSimilarityFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "1500MB")
+        kwargs["mem_required"] = "1500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score
@@ -203,7 +213,9 @@ class VideoFramesTextSimilarityFilter(Filter):
         if len(similarity) <= 0:
             return True
 
-        keep_bools = np.array([self.min_score <= sim_value <= self.max_score for sim_value in similarity])
+        keep_bools = np.array(
+            [self.get_keep_boolean(sim_value, self.min_score, self.max_score) for sim_value in similarity]
+        )
 
         # different strategies
         if self.any:

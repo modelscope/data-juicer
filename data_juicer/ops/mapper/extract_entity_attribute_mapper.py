@@ -16,9 +16,17 @@ OP_NAME = "extract_entity_attribute_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractEntityAttributeMapper(Mapper):
-    """
-    Extract attributes for given entities from the text
-    """
+    """Extracts attributes for given entities from the text and stores them in the sample's
+    metadata.
+
+    This operator uses an API model to extract specified attributes for given entities from
+    the input text. It constructs prompts based on provided templates and parses the model's
+    output to extract attribute descriptions and supporting text. The extracted data is
+    stored in the sample's metadata under the specified keys. If the required metadata
+    fields already exist, the operator skips processing for that sample. The operator
+    retries the API call and parsing up to a specified number of times in case of errors.
+    The default system prompt, input template, and parsing patterns are used if not
+    provided."""
 
     DEFAULT_SYSTEM_PROMPT_TEMPLATE = (
         "给定一段文本，从文本中总结{entity}的{attribute}，并且从原文摘录最能说明该{attribute}的代表性示例。\n"
@@ -67,13 +75,14 @@ class ExtractEntityAttributeMapper(Mapper):
     ):
         """
         Initialization method.
+
         :param api_model: API model name.
         :param query_entities: Entity list to be queried.
         :param query_attributes: Attribute list to be queried.
         :param entity_key: The key name in the meta field to store the
             given main entity for attribute extraction. It's "entity" in
             default.
-        :param entity_attribute_key: The key name in the meta field to
+        :param attribute_key: The key name in the meta field to
             store the given attribute to be extracted. It's "attribute"
             in default.
         :param attribute_desc_key: The key name in the meta field to store
@@ -90,7 +99,7 @@ class ExtractEntityAttributeMapper(Mapper):
         :param input_template: Template for building the model input.
         :param attr_pattern_template: Pattern for parsing the attribute from
             output. Need to be specified by given attribute.
-        :param: demo_pattern: Pattern for parsing the demonstration from
+        :param demo_pattern: Pattern for parsing the demonstration from
             output to support the attribute.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.

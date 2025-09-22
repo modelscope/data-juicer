@@ -13,7 +13,22 @@ OP_NAME = "text_chunk_mapper"
 
 @OPERATORS.register_module(OP_NAME)
 class TextChunkMapper(Mapper):
-    """Split input text to chunks."""
+    """Split input text into chunks based on specified criteria.
+
+    - Splits the input text into multiple chunks using a specified maximum length and a
+      split pattern.
+    - If `max_len` is provided, the text is split into chunks with a maximum length of
+      `max_len`.
+    - If `split_pattern` is provided, the text is split at occurrences of the pattern. If
+      the length exceeds `max_len`, it will force a cut.
+    - The `overlap_len` parameter specifies the overlap length between consecutive chunks if
+      the split does not occur at the pattern.
+    - Uses a Hugging Face tokenizer to calculate the text length in tokens if a tokenizer
+      name is provided; otherwise, it uses the string length.
+    - Caches the following stats: 'chunk_count' (number of chunks generated for each
+      sample).
+    - Raises a `ValueError` if both `max_len` and `split_pattern` are `None` or if
+      `overlap_len` is greater than or equal to `max_len`."""
 
     _batched_op = True
 
@@ -41,7 +56,7 @@ class TextChunkMapper(Mapper):
             offered. Otherwise, the text length equals to string length.
             Support tiktoken tokenizer (such as gpt-4o), dashscope tokenizer (
             such as qwen2.5-72b-instruct) and huggingface tokenizer.
-        :trust_remote_code: for loading huggingface model
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param args: extra args
         :param kwargs: extra args
         """

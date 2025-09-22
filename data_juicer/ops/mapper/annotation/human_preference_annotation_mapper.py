@@ -12,7 +12,15 @@ from ...base_op import OPERATORS
 
 @OPERATORS.register_module("human_preference_annotation_mapper")
 class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
-    """Operator for human preference annotation using Label Studio."""
+    """Operator for human preference annotation using Label Studio.
+
+    This operator formats and presents pairs of answers to a prompt for human evaluation. It
+    uses a default or custom Label Studio configuration to display the prompt and answer
+    options. The operator processes the annotations to determine the preferred answer,
+    updating the sample with the chosen and rejected answers. The operator requires specific
+    keys in the samples for the prompt and answer options. If these keys are missing, it
+    logs warnings and uses placeholder text. The annotated results are processed to update
+    the sample with the chosen and rejected answers."""
 
     DEFAULT_LABEL_CONFIG = """
     <View className="root">
@@ -107,17 +115,27 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         rejected_key: str = "rejected",
         **kwargs,
     ):
-        """Initialize the human preference annotation operator."""
+        """
+        Initialize the human preference annotation operator.
+
+        :param label_config_file: Path to the label config file
+        :param answer1_key: Key for the first answer
+        :param answer2_key: Key for the second answer
+        :param prompt_key: Key for the prompt/question
+        :param chosen_key: Key for the chosen answer
+        :param rejected_key: Key for the rejected answer
+        """
+        # Ensure text_key is set to prompt_key if not explicitly provided
+        if "text_key" not in kwargs:
+            kwargs["text_key"] = prompt_key
+
+        super().__init__(**kwargs)
         # Store our class-specific attributes
         self.answer1_key = answer1_key
         self.answer2_key = answer2_key
         self.prompt_key = prompt_key
         self.chosen_key = chosen_key
         self.rejected_key = rejected_key
-
-        # Ensure text_key is set to prompt_key if not explicitly provided
-        if "text_key" not in kwargs:
-            kwargs["text_key"] = prompt_key
 
         # Prepare the label_config parameter
         if label_config_file and os.path.exists(label_config_file):
@@ -127,9 +145,6 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         else:
             kwargs["label_config"] = self.DEFAULT_LABEL_CONFIG.strip()
             logger.info("Using default UI config for human preference annotation")
-
-        # Initialize the parent class with remaining kwargs
-        super().__init__(**kwargs)
 
     def _format_task(self, samples: List[Dict]) -> Dict:
         """Format samples as a Label Studio task for human preference.

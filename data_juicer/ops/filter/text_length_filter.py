@@ -7,8 +7,13 @@ from ..base_op import OPERATORS, Filter
 
 @OPERATORS.register_module("text_length_filter")
 class TextLengthFilter(Filter):
-    """Filter to keep samples with total text length within a specific
-    range."""
+    """Filter to keep samples with total text length within a specific range.
+
+    This operator filters out samples based on their total text length. It retains samples
+    where the text length is between the specified minimum and maximum lengths. The text
+    length is computed as the number of characters in the sample's text. If the 'text_len'
+    key is already present in the sample's stats, it will be reused; otherwise, it will be
+    computed. The operator processes samples in batches for efficiency."""
 
     _batched_op = True
 
@@ -42,11 +47,8 @@ class TextLengthFilter(Filter):
         return samples
 
     def process_batched(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(lambda stat: self.min_len <= stat[StatsKeys.text_len] <= self.max_len, samples[Fields.stats])
-        else:
-            # single sample for ray filter
-            if self.min_len <= samples[Fields.stats][StatsKeys.text_len] <= self.max_len:
-                return True
-            else:
-                return False
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[StatsKeys.text_len], self.min_len, self.max_len),
+            samples[Fields.stats],
+        )

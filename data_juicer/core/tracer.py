@@ -4,6 +4,8 @@ import pandas as pd
 from datasets import Dataset
 from loguru import logger
 
+from data_juicer.ops import OPERATORS
+
 
 class Tracer:
     """
@@ -13,18 +15,25 @@ class Tracer:
     The comparison results will be stored in the work directory.
     """
 
-    def __init__(self, work_dir, show_num=10):
+    def __init__(self, work_dir, op_list_to_trace=None, show_num=10):
         """
         Initialization method.
 
         :param work_dir: the work directory to store the comparison
             results
+        :param op_list_to_trace: the OP list to be traced.
         :param show_num: the maximum number of samples to show in the
             comparison result files.
         """
         self.work_dir = os.path.join(work_dir, "trace")
         if not os.path.exists(self.work_dir):
             os.makedirs(self.work_dir)
+        self.op_list_to_trace = op_list_to_trace
+        if not op_list_to_trace:
+            logger.info("Trace for all ops.")
+            self.op_list_to_trace = set(OPERATORS.modules.keys())
+        else:
+            self.op_list_to_trace = set(op_list_to_trace)
         self.show_num = show_num
 
     def trace_mapper(self, op_name: str, previous_ds: Dataset, processed_ds: Dataset, text_key: str):
@@ -40,6 +49,9 @@ class Tracer:
         :param text_key: which text_key to trace
         :return:
         """
+        if op_name not in self.op_list_to_trace:
+            return
+
         assert len(previous_ds) == len(processed_ds)
         dif_dict = []
         num = 0
@@ -91,6 +103,9 @@ class Tracer:
         :param text_key: which text_key to trace
         :return:
         """
+        if op_name not in self.op_list_to_trace:
+            return
+
         assert previous_ds[0][text_key] == processed_ds[0][text_key]
         aug_dict = []
 
@@ -101,14 +116,7 @@ class Tracer:
             if i + 1 >= self.show_num:
                 break
 
-        if len(aug_dict) == 0:
-            logger.warning(
-                f"Datasets before and after op [{op_name}] are "
-                f"empty. Thus no comparison results would be "
-                f"generated."
-            )
-            return
-        elif len(aug_dict) < self.show_num:
+        if len(aug_dict) < self.show_num:
             logger.warning(f"There are only {len(aug_dict)} samples -- less " f"than expected {self.show_num} samples.")
 
         # export the tracer results.
@@ -127,6 +135,9 @@ class Tracer:
         :param processed_ds: dataset processed by the filter
         :return:
         """
+        if op_name not in self.op_list_to_trace:
+            return
+
         if len(previous_ds) == len(processed_ds):
             logger.warning(
                 f"Datasets before and after op [{op_name}] are all "
@@ -158,14 +169,7 @@ class Tracer:
                 # have found all filtered samples, just stop.
                 break
             i += 1
-        if len(filter_dict) == 0:
-            logger.warning(
-                f"Datasets before and after op [{op_name}] are all "
-                f"the same. Thus no comparison results would be "
-                f"generated."
-            )
-            return
-        elif len(filter_dict) < self.show_num:
+        if len(filter_dict) < self.show_num:
             logger.warning(
                 f"There are {len(filter_dict)} filtered samples "
                 f"before and after op [{op_name}] -- less than "
@@ -177,7 +181,7 @@ class Tracer:
         filter_df = pd.DataFrame(filter_dict)
         filter_df.to_json(os.path.join(self.work_dir, res_name), orient="records", lines=True, force_ascii=False)
 
-    def trace_deduplicator(self, op_name: str, dup_pairs: list):
+    def trace_deduplicator(self, op_name: str, dup_pairs: dict):
         """
         Compare datasets before and after a Deduplicator.
 
@@ -192,6 +196,9 @@ class Tracer:
             deduplicator
         :return:
         """
+        if op_name not in self.op_list_to_trace:
+            return
+
         if dup_pairs is None:
             logger.warning(
                 f"Op [{op_name}] does not generate dup_pairs "

@@ -4,7 +4,7 @@ from data_juicer.core.data.load_strategy import (
     DefaultLocalDataLoadStrategy,
     RayLocalJsonDataLoadStrategy
 )
-from argparse import Namespace
+from jsonargparse import Namespace
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 from data_juicer.config import get_default_cfg
 import os
@@ -257,6 +257,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
     def setUp(self):
         """Instance-level setup run before each test"""
+        super().setUp()
+
         cur_dir = osp.dirname(osp.abspath(__file__))
         self.tmp_dir = osp.join(cur_dir, f'tmp_{uuid.uuid4().hex}')
         os.makedirs(self.tmp_dir, exist_ok=True)

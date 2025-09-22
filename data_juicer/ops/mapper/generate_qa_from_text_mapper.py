@@ -21,19 +21,15 @@ OP_NAME = "generate_qa_from_text_mapper"
 # TODO: Extend LLM-based OPs into API-based implementation.
 @OPERATORS.register_module(OP_NAME)
 class GenerateQAFromTextMapper(Mapper):
-    """
-    Mapper to generate question and answer pairs from text.
-    Recommended model list: [
-        'alibaba-pai/pai-llama3-8b-doc2qa',
-        'alibaba-pai/pai-baichuan2-7b-doc2qa',
-        'alibaba-pai/pai-qwen1_5-4b-doc2qa',
-        'alibaba-pai/pai-qwen1_5-7b-doc2qa',
-        'alibaba-pai/pai-qwen1_5-1b8-doc2qa',
-        'alibaba-pai/pai-qwen1_5-0b5-doc2qa'
-    ]
-    These recommended models are all trained with Chinese data
-    and are suitable for Chinese.
-    """
+    """Generates question and answer pairs from text using a specified model.
+
+    This operator uses a Hugging Face model to generate QA pairs from the input text. It
+    supports both Hugging Face and vLLM models for inference. The recommended models, such
+    as 'alibaba-pai/pai-llama3-8b-doc2qa', are trained on Chinese data and are suitable for
+    Chinese text. The operator can limit the number of generated QA pairs per text and
+    allows custom output patterns for parsing the model's response. By default, it uses a
+    regular expression to extract questions and answers from the model's output. If no QA
+    pairs are extracted, a warning is logged."""
 
     _accelerator = "cuda"
     _batched_op = True

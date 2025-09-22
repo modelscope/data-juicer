@@ -23,7 +23,21 @@ OP_NAME = "document_simhash_deduplicator"
 
 @OPERATORS.register_module(OP_NAME)
 class DocumentSimhashDeduplicator(Deduplicator):
-    """Deduplicator to deduplicate samples at document-level using SimHash."""
+    """Deduplicates samples at the document level using SimHash.
+
+    This operator computes SimHash values for each sample and removes duplicates based on a
+    specified Hamming distance threshold. It supports different tokenization methods:
+    'space', 'punctuation', and 'character'. The SimHash is computed over shingles of a
+    given window size, and the deduplication process clusters similar documents and retains
+    only one from each cluster. The default mode converts text to lowercase and can ignore
+    specific patterns. The key metric, Hamming distance, is used to determine similarity
+    between SimHash values. Important notes:
+    - The `ignore_pattern` parameter can be used to exclude certain substrings during
+      SimHash computation.
+    - For punctuation-based tokenization, the `ignore_pattern` should not include
+      punctuations to avoid conflicts.
+    - The `hamming_distance` must be less than the number of blocks (`num_blocks`).
+    - Only the first sample in each cluster is retained by default."""
 
     def __init__(
         self,
@@ -44,6 +58,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         English-like languages, we recommend to use 'space'. And for
         Chinese-like languages, we recommend to use 'character'
 
+        :param tokenization: tokenization method for sample texts
         :param window_size: window size of shingling
         :param lowercase: whether to convert text to lower case first
         :param ignore_pattern: whether to ignore sub-strings with

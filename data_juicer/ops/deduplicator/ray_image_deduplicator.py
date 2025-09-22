@@ -28,10 +28,14 @@ def get_hash_method(method_name):
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class RayImageDeduplicator(RayBasicDeduplicator):
-    """
-    Deduplicator to deduplicate samples at document-level using exact matching
-    of images between documents.
-    """
+    """Deduplicates samples at the document level using exact matching of images in Ray distributed mode.
+
+    This operator uses a specified hash method to compute image hashes and identifies
+    duplicates by comparing these hashes. It operates in Ray distributed mode, supporting
+    'ray_actor' or 'redis' backends for deduplication. The hash method can be set during
+    initialization, with supported methods listed in `HASH_METHOD`. If a sample does not
+    contain an image, it is assigned an empty hash value. The operator loads images from the
+    specified keys and computes their combined hash for comparison."""
 
     def __init__(
         self,
@@ -45,6 +49,7 @@ class RayImageDeduplicator(RayBasicDeduplicator):
         Initialization.
         :param backend: the backend for dedup, either 'ray_actor' or 'redis'
         :param redis_address: the address of redis server
+        :param method: the hash method to use
         :param args: extra args
         :param kwargs: extra args
         """
@@ -59,7 +64,9 @@ class RayImageDeduplicator(RayBasicDeduplicator):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         # compute hash
         hash_value = ""

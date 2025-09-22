@@ -13,8 +13,14 @@ OP_NAME = "words_num_filter"
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class WordsNumFilter(Filter):
-    """Filter to keep samples with total words number within a specific
-    range."""
+    """Filter to keep samples with a total word count within a specified range.
+
+    This operator filters samples based on the number of words they contain. It retains
+    samples if their word count is within the given minimum and maximum limits. If
+    tokenization is enabled, it uses a Hugging Face tokenizer to count words. The key metric
+    `num_words` is computed and stored in the sample's stats under the `num_words` field. If
+    the word count is already cached, it reuses the cached value to avoid redundant
+    computation."""
 
     _batched_op = True
 
@@ -75,11 +81,8 @@ class WordsNumFilter(Filter):
         return samples
 
     def process_batched(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(lambda stat: self.min_num <= stat[StatsKeys.num_words] <= self.max_num, samples[Fields.stats])
-        else:
-            # single sample for ray filter
-            if self.min_num <= samples[Fields.stats][StatsKeys.num_words] <= self.max_num:
-                return True
-            else:
-                return False
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[StatsKeys.num_words], self.min_num, self.max_num),
+            samples[Fields.stats],
+        )

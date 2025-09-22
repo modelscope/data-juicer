@@ -17,33 +17,33 @@ classifiers = [
 
 # Core dependencies
 dependencies = [
-    "datasets>=2.19.0",  # core data loading
-    "fsspec==2023.5.0",  # file system operations
-    "pandas",  # data manipulation
-    "numpy>=1.26.4,<2.0.0",  # numerical operations
-    "loguru",  # logging
-    "tqdm",  # progress bars
-    "jsonargparse[signatures]",  # configuration
-    "jsonlines",  # JSONL handling
-    "zstandard",  # compression
-    "lz4",  # compression
-    "multiprocess==0.70.12",  # parallel processing
-    "dill==0.3.4",  # serialization
-    "psutil",  # system monitoring
-    "pydantic>=2.0",  # data validation
+    "datasets>=2.19.0", # core data loading
+    "fsspec==2023.5.0", # file system operations
+    "pandas", # data manipulation
+    "numpy>=1.26.4,<2.0.0", # numerical operations
+    "loguru", # logging
+    "tqdm", # progress bars
+    "jsonargparse[signatures]", # configuration
+    "jsonlines", # JSONL handling
+    "zstandard", # compression
+    "lz4", # compression
+    "multiprocess==0.70.16", # parallel processing
+    "dill==0.3.8", # serialization
+    "psutil", # system monitoring
+    "pydantic>=2.0", # data validation
     "uv",
     "wordcloud",
-    "spacy==3.8.0",
+    "spacy==3.8.7",
     "httpx",
-    "av==13.1.0",  # video/audio handling
-    "emoji==2.2.0",  # emoji handling
+    "av==13.1.0", # video/audio handling
+    "emoji==2.2.0", # emoji handling
     "tabulate",
     "librosa>=0.10",
     "resampy",
     "samplerate==0.1.0",
     "bs4",
     "matplotlib",
-    "plotly",  # interactive plots
+    "plotly", # interactive plots
     "seaborn",
     "requests",
     "wget",
@@ -53,17 +53,19 @@ dependencies = [
     "Pillow",
     "fastapi>=0.110",
     "mwparserfromhell",
-    "regex",  # regular expressions
+    "regex", # regular expressions
     "tomli",
     "tomli-w",
-    "gitpython"
+    "gitpython",
+    "mcp[cli]>=1.7.0",
+    "pylance",
 ]
 
 [project.optional-dependencies]
 # Generic ML & DL
 generic = [
     "torch==2.6.0",  # PyTorch
-    "transformers>=4.47.0",  # Hugging Face Transformers
+    "transformers>=4.47.0,<4.55.0",  # Hugging Face Transformers
     "transformers_stream_generator",  # Stream generation for Transformers
     "einops",  # Tensor operations
     "accelerate",  # Model acceleration
@@ -121,11 +123,8 @@ dev = [
     "pre-commit",  # pre-commit hooks
     "sphinx",
     "sphinx-autobuild",
-    "sphinx-multiversion",
     "sphinx_copybutton",
-    "sphinxcontrib-apidoc",
     "furo",
-    "sphinx_rtd_theme",
     "myst_parser",
     "linkify-it-py",
     "recommonmark",
@@ -138,6 +137,7 @@ dev = [
     "build",  # package building
     "black>=25.1.0",
     "flake8-black",
+    "docstring-parser>=0.16",
 ]
 
 # AI Services & APIs
@@ -183,7 +183,7 @@ build-backend = "hatchling.build"
 path = "data_juicer/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["data_juicer"]
+packages = ["data_juicer", "tools"]
 include = ["uv.lock", "pyproject.toml"]
 
 [tool.hatch.build]

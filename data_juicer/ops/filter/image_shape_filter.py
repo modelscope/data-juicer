@@ -12,7 +12,15 @@ from ..op_fusion import LOADED_IMAGES
 @OPERATORS.register_module("image_shape_filter")
 @LOADED_IMAGES.register_module("image_shape_filter")
 class ImageShapeFilter(Filter):
-    """Filter to keep samples with image shape (w, h) within specific ranges."""
+    """Filter to keep samples with image shape (width, height) within specific ranges.
+
+    This operator filters samples based on the width and height of images. It keeps samples
+    where the image dimensions fall within the specified ranges. The operator supports two
+    strategies: 'any' and 'all'. In 'any' mode, a sample is kept if at least one image meets
+    the criteria. In 'all' mode, all images in the sample must meet the criteria for the
+    sample to be kept. The image width and height are stored in the 'image_width' and
+    'image_height' fields of the sample's stats. If no images are present in the sample, the
+    corresponding stats fields will be empty arrays."""
 
     _batched_op = True
 
@@ -62,7 +70,9 @@ class ImageShapeFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         # get width and height for each image
         whs = {key: (images[key].width, images[key].height) for key in images}
@@ -76,7 +86,11 @@ class ImageShapeFilter(Filter):
         if len(ws) <= 0:
             return True
         keep_bools = np.array(
-            [self.min_width <= w <= self.max_width and self.min_height <= h <= self.max_height for w, h in zip(ws, hs)]
+            [
+                self.get_keep_boolean(w, self.min_width, self.max_width)
+                and self.get_keep_boolean(h, self.min_height, self.max_height)
+                for w, h in zip(ws, hs)
+            ]
         )
 
         # different strategies

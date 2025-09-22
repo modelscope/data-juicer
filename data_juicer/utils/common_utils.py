@@ -1,5 +1,8 @@
+import functools
 import hashlib
+import inspect
 import sys
+import warnings
 
 import numpy as np
 from loguru import logger
@@ -122,3 +125,61 @@ def is_float(s):
         return True
     except Exception:
         return False
+
+
+def check_op_method_param(method, param_name):
+    """
+    Check if the given method contains a parameter named param_name, or it contains parameter with **.
+    """
+    parameters = inspect.signature(method).parameters
+    # check if there are parameters with **
+    for name, param in parameters.items():
+        if name == param_name:
+            return True
+        if param.kind == inspect.Parameter.VAR_KEYWORD:
+            return True
+    return False
+
+
+def deprecated(reason=None, *, version=None):
+    """
+    Decorator to mark a function or method as deprecated.
+
+    :param reason: Optional message indicating the deprecation reason.
+    :param version: Optional version in which the function was deprecated.
+    """
+
+    def decorator(func):
+        # Construct the deprecation message
+        message = reason or f"Function {func.__qualname__} is deprecated."
+        if version:
+            message += f" Deprecated since version {version}."
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Emit the deprecation warning
+            warnings.warn(message, DeprecationWarning, stacklevel=2)
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    # Validate parameter types
+    if not (reason is None or isinstance(reason, str) or callable(reason)):
+        raise TypeError("'reason' must be a string, None, or a callable.")
+    if version is not None and not isinstance(version, str):
+        raise TypeError("'version' must be a string or None.")
+
+    if callable(reason):
+        # Check if version is provided when using as @deprecated (without parameters)
+        if version is not None:
+            raise TypeError("Cannot specify 'version' when using @deprecated as a non-argument decorator.")
+        # If reason is a callable, treat it as the function to decorate
+        func = reason
+        reason = None
+        return decorator(func)
+
+    # Ensure reason is a string if provided
+    if reason is not None and not isinstance(reason, str):
+        raise TypeError("'reason' must be a string or None.")
+
+    return decorator

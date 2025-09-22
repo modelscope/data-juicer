@@ -28,16 +28,24 @@ OP_NAME = "video_extract_frames_mapper"
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoExtractFramesMapper(Mapper):
     """Mapper to extract frames from video files according to specified methods.
-    Extracted Frames Data Format:
-        The data format for the extracted frames is a dictionary mapping
-        video key to extracted frames directory where the extracted
-        frames are saved. The dictionary follows the structure:
-        {
-            "video_key_1": "/${frame_dir}/video_key_1_filename/",
-            "video_key_2": "/${frame_dir}/video_key_2_filename/",
-            ...
-        }
-    """
+
+    Extracts frames from video files using either all keyframes or a uniform sampling
+    method. The extracted frames are saved in a directory, and the mapping from video keys
+    to frame directories is stored in the sample's metadata. The data format for the
+    extracted frames is a dictionary mapping video keys to their respective frame
+    directories:
+    - "video_key_1": "/${frame_dir}/video_key_1_filename/"
+    - "video_key_2": "/${frame_dir}/video_key_2_filename/"
+
+    - **Frame Sampling Methods**:
+    - "all_keyframes": Extracts all keyframes from the video.
+    - "uniform": Extracts a specified number of frames uniformly from the video.
+    - If `duration` is set, the video is segmented into multiple segments based on the
+      duration, and frames are extracted from each segment.
+    - The output directory for the frames can be specified; otherwise, a default directory
+      is used.
+    - The field name in the sample's metadata where the frame information is stored can be
+      customized."""
 
     _batched_op = True
 

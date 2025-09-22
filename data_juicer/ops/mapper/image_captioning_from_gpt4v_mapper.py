@@ -71,7 +71,7 @@ def call_gpt_vision_api(
     except requests.exceptions.Timeout:
         logger.warning("The request timed out. Please try again later.")
     except requests.exceptions.RequestException as err:
-        logger.warningt(f"An error occurred: {err}")
+        logger.warning(f"An error occurred: {err}")
     except Exception as e:
         logger.warning(f"An unexpected error occurred: {e}")
 
@@ -82,8 +82,17 @@ def call_gpt_vision_api(
 @OPERATORS.register_module("image_captioning_from_gpt4v_mapper")
 @LOADED_IMAGES.register_module("image_captioning_from_gpt4v_mapper")
 class ImageCaptioningFromGPT4VMapper(Mapper):
-    """Mapper to generate samples whose texts are generated based on
-    gpt-4-vision and the image."""
+    """Generates text captions for images using the GPT-4 Vision model.
+
+    This operator generates text based on the provided images and specified parameters. It
+    supports different modes of text generation, including 'reasoning', 'description',
+    'conversation', and 'custom'. The generated text can be added to the original sample or
+    replace it, depending on the `keep_original_sample` parameter. The operator uses a
+    Hugging Face tokenizer and the GPT-4 Vision API to generate the text. The `any_or_all`
+    parameter determines whether all or any of the images in a sample must meet the
+    generation criteria for the sample to be kept. If `user_prompt_key` is set, it will use
+    the prompt from the sample; otherwise, it will use the `user_prompt` parameter. If both
+    are set, `user_prompt_key` takes precedence."""
 
     _batched_op = True
 

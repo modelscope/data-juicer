@@ -19,8 +19,15 @@ OP_NAME = "image_text_similarity_filter"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageTextSimilarityFilter(Filter):
-    """Filter to keep samples those similarities between image and text
-    within a specific range."""
+    """Filter to keep samples with image-text similarity within a specified range.
+
+    This operator uses a Hugging Face CLIP model to compute the similarity between images
+    and text. It retains samples where the similarity scores fall within the given range.
+    The similarity score is computed for each image-text pair, and the final score can be
+    reduced using 'avg', 'max', or 'min' modes. The 'any' or 'all' strategy determines if at
+    least one or all image-text pairs must meet the similarity criteria. The key metric
+    'image_text_similarity' is cached in the sample's stats. Images can be flipped
+    horizontally or vertically before computing the similarity."""
 
     _accelerator = "cuda"
     _batched_op = True
@@ -43,6 +50,7 @@ class ImageTextSimilarityFilter(Filter):
 
         :param hf_clip: clip model name on huggingface to compute
             the similarity between image and text.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: The min similarity to keep samples.
         :param max_score: The max similarity to keep samples.
         :param horizontal_flip: Flip image horizontally (left to right).
@@ -59,7 +67,7 @@ class ImageTextSimilarityFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "1500MB")
+        kwargs["mem_required"] = "1500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score
@@ -89,7 +97,9 @@ class ImageTextSimilarityFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context, loaded_image_keys, load_image)
+        sample, images = load_data_with_context(
+            sample, context, loaded_image_keys, load_image, mm_bytes_key=self.image_bytes_key
+        )
 
         text = sample[self.text_key]
         offset = 0
@@ -143,7 +153,9 @@ class ImageTextSimilarityFilter(Filter):
         if len(similarity) <= 0:
             return True
 
-        keep_bools = np.array([self.min_score <= sim_value <= self.max_score for sim_value in similarity])
+        keep_bools = np.array(
+            [self.get_keep_boolean(sim_value, self.min_score, self.max_score) for sim_value in similarity]
+        )
 
         # different strategies
         if self.any:

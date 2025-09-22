@@ -11,9 +11,16 @@ OP_NAME = "llm_quality_score_filter"
 
 @OPERATORS.register_module(OP_NAME)
 class LLMQualityScoreFilter(LLMAnalysisFilter):
-    """
-    Filter to keep sample with high quality score estimated by LLM.
-    """
+    """Filter to keep samples with a high quality score estimated by a language model.
+
+    This operator uses a language model to evaluate the quality of each sample across
+    multiple dimensions, including accuracy, grammar, informativeness, and coherence. The
+    LLM provides a numerical score for each dimension on a 1-5 scale, where 1 is the lowest
+    and 5 is the highest. The overall quality score is used to decide whether to keep or
+    filter out the sample based on the specified minimum and maximum score thresholds. The
+    evaluation results are cached in the 'llm_quality_score' and 'llm_quality_record'
+    fields. Important flags and tags from the LLM's analysis may also be stored in the
+    sample's stats."""
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = """
@@ -87,4 +94,4 @@ json
     def process_single(self, sample, rank=None):
         itm_score = sample[Fields.stats][StatsKeys.llm_quality_score]
 
-        return itm_score >= self.min_score
+        return self.get_keep_boolean(itm_score, self.min_score, self.max_score)

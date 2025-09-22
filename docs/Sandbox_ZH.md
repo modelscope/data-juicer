@@ -44,7 +44,7 @@ Data-Juicer (DJ, 228k)模型输出样例如下表所示。
 在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的依赖：
 
 ```shell
-pip install -v -e .[sandbox]
+uv pip install -v -e .[sandbox]
 ```
 
 并根据官方说明准备好沙盒中使用的第三方库（例如 EasyAnimate 、 VBench 、 InternVL 等），或者您也可以简单地从 GitHub 克隆第三方存储库，并在沙盒运行期间将安装过程留给我们的 `EnvManager` 完成。
@@ -53,7 +53,7 @@ pip install -v -e .[sandbox]
 
 1. 要使用[ModelScope](https://github.com/modelscope/modelscope)时需从ModelScope的独立host安装其相关依赖：
 ```shell
-pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
+uv pip install "modelscope[framework,nlp]" -f https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
 ```
 可参考[ModelScope文档](https://www.modelscope.cn/docs/intro/environment-setup)获取更多信息。
 
@@ -207,12 +207,15 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - 数据池操作工厂 -- DataPoolManipulatorFactory
 
-| 组件                     | 功能               | `run`方法说明              | 参考材料                                               |
-|------------------------|------------------|------------------------|----------------------------------------------------|
-| `DataPoolConstruction` | 从指定的已分析数据源构建数据池  | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
-| `DataPoolCombination`  | 组合指定的数据池         | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
-| `DataPoolDuplication`  | 按指定次数复制数据池       | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
-| `DataPoolDownsampling` | 将数据池随机下采样到指定规模   | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| 组件                      | 功能                 | `run`方法说明              | 参考材料                                               |
+|-------------------------|--------------------|------------------------|----------------------------------------------------|
+| `DataPoolConstruction`  | 从指定的已分析数据源构建数据池    | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| `DataPoolCombination`   | 组合指定的数据池           | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| `DataPoolDuplication`   | 按指定次数复制数据池         | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| `DataPoolDownsampling`  | 将数据池随机下采样到指定规模     | -                      | [Sandbox Paper](https://arxiv.org/abs/2407.11784)  |
+| `DataPoolRanking`       | 根据指定的评测指标对数据池进行排序  | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolMerging`       | 将多个数据池合并为一个数据集或数据池 | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
+| `DataPoolCartesianJoin` | 计算两个数据池集合的卡氏积      | -                     | [Sandbox Paper](https://arxiv.org/abs/2407.11784) |
 
 - 通用数据处理工厂 -- GeneralDataExecutorFactory
 
@@ -230,11 +233,13 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - 数据评估工厂 -- DataEvaluatorFactory
 
-| 组件 | 功能 | `run`方法说明 | 参考材料 |
-| --- | --- | --- | --- |
+| 组件 | 功能                                     | `run`方法说明 | 参考材料 |
+| --- |----------------------------------------| --- | --- |
 | `Gpt3QualityEvaluator` | 使用Data-Juicer复现的GPT-3文本质量分类器对数据集进行质量评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：待评估数据集样本质量打分均值<br /> | [Data-Juicer质量分类器工具集](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
-| `VBenchEvaluator` | 使用VBench对基于prompt生成的视频进行多维度的评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：待评生成视频集各维度打分均值<br /> | [VBench论文](https://arxiv.org/abs/2311.17982) |
-| `InceptionEvaluator` | 通过视频分类模型抽取特征测评生成的视频 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+| `VBenchEvaluator` | 使用VBench对基于prompt生成的视频进行多维度的评估         | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：待评生成视频集各维度打分均值<br /> | [VBench论文](https://arxiv.org/abs/2311.17982) |
+| `InceptionEvaluator` | 通过视频分类模型抽取特征测评生成的视频                    | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+| `AccuracyEvaluator` | 评测预测标签和真实标签比较得到的准确率                    | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+| `MSEEvaluator` | 评测预测值和真实值之间的MSE分数                      | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
 
 - 通用数据探测工厂 -- GeneralProbeFactory
 
@@ -261,9 +266,12 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - 模型推理工厂 -- ModelInferExecutorFactory
 
-| 组件 | 功能 | `run`方法说明 | 参考材料 |
-| --- | --- | --- | --- |
+| 组件 | 功能                                           | `run`方法说明                                                                                        | 参考材料 |
+| --- |----------------------------------------------|--------------------------------------------------------------------------------------------------| --- |
 | `EasyAnimateInferExecutor` | 用VBench的prompt数据集对EasyAnimate模型进行推理，并存储生成的视频 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
+| `HFTransformersInferExecutor` | 用HuggingFace Transformers进行推理。               | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"huggingface"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | -                                                       |
+| `VLLMInferExecutor` | 用vLLM进行推理。                                   | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"vllm"`来激活该组件<br />- `run_obj`：未使用的参数<br />        | -                                                       |
+| `APIModelInferExecutor` | 用OpenAI API模型进行推理。                           | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"api"`来激活该组件<br />- `run_obj`：未使用的参数<br />         | -                                                       |
 
 - 模型评估工厂 -- ModelEvaluatorFactory
 

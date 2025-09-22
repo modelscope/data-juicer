@@ -22,10 +22,16 @@ OP_NAME = "video_resize_resolution_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoResizeResolutionMapper(Mapper):
-    """
-    Mapper to resize videos resolution. We leave the super resolution
-    with deep learning for future works.
-    """
+    """Resizes video resolution based on specified width and height constraints.
+
+    This operator resizes videos to fit within the provided minimum and maximum width and
+    height limits. It can optionally maintain the original aspect ratio by adjusting the
+    dimensions accordingly. The resized videos are saved in the specified directory or the
+    same directory as the input if no save directory is provided. The key metric for
+    resizing is the video's width and height, which are adjusted to meet the constraints
+    while maintaining the aspect ratio if configured. The `force_divisible_by` parameter
+    ensures that the output dimensions are divisible by a specified integer, which must be a
+    positive even number when used with aspect ratio adjustments."""
 
     def __init__(
         self,
@@ -35,6 +41,7 @@ class VideoResizeResolutionMapper(Mapper):
         max_height: int = sys.maxsize,
         force_original_aspect_ratio: str = "disable",
         force_divisible_by: PositiveInt = 2,
+        save_dir: str = None,
         *args,
         **kwargs,
     ):
@@ -57,11 +64,15 @@ class VideoResizeResolutionMapper(Mapper):
             width and height, are divisible by the given integer when used \
             together with force_original_aspect_ratio, must be a positive \
             even number.
+        :param save_dir: The directory where generated video files will be stored.
+            If not specified, outputs will be saved in the same directory as their corresponding input files.
+            This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
+        self._init_parameters.pop("save_dir", None)
 
         force_original_aspect_ratio = force_original_aspect_ratio.lower()
 
@@ -81,6 +92,7 @@ class VideoResizeResolutionMapper(Mapper):
         self.scale_method = "scale"
         self.force_original_aspect_ratio = force_original_aspect_ratio
         self.force_divisible_by = force_divisible_by
+        self.save_dir = save_dir
 
     def process_single(self, sample, context=False):
         # there is no video in this sample
@@ -154,7 +166,7 @@ class VideoResizeResolutionMapper(Mapper):
             height = int(round(height / force_divisible_by)) * force_divisible_by
 
             # resize
-            resized_video_key = transfer_filename(video_key, OP_NAME, **self._init_parameters)
+            resized_video_key = transfer_filename(video_key, OP_NAME, self.save_dir, **self._init_parameters)
             if not os.path.exists(resized_video_key) or resized_video_key not in loaded_video_keys:
                 args = ["-nostdin", "-v", "quiet", "-y"]  # close the ffmpeg log
                 stream = ffmpeg.input(video_key)

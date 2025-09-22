@@ -24,10 +24,16 @@ OP_NAME = "video_watermark_filter"
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
 class VideoWatermarkFilter(Filter):
-    """
-    Filter to keep samples whose videos have no watermark with high
-    probability.
-    """
+    """Filter to keep samples whose videos have no watermark with high probability.
+
+    This operator uses a Hugging Face watermark detection model to predict the probability
+    of watermarks in video frames. It keeps samples where the predicted watermark
+    probability is below a specified threshold. The key metric, 'video_watermark_prob', is
+    computed by extracting frames from the video using a specified sampling method and then
+    averaging, maximizing, or minimizing the probabilities based on the reduce mode. If
+    multiple videos are present, the operator can use either an 'any' or 'all' strategy to
+    determine if the sample should be kept. The frame sampling method can be 'all_keyframes'
+    or 'uniform', and the reduce mode can be 'avg', 'max', or 'min'."""
 
     _accelerator = "cuda"
 
@@ -48,6 +54,7 @@ class VideoWatermarkFilter(Filter):
 
         :param hf_watermark_model: watermark detection model name on
             huggingface.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param prob_threshold: the predicted watermark probability threshold
             for samples. range from 0 to 1. Samples with watermark probability
             less than this threshold will be kept.
@@ -75,7 +82,7 @@ class VideoWatermarkFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault("mem_required", "500MB")
+        kwargs["mem_required"] = "500MB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
         self.prob_threshold = prob_threshold
         if frame_sampling_method not in ["all_keyframes", "uniform"]:
@@ -172,7 +179,7 @@ class VideoWatermarkFilter(Filter):
         if len(itm_probs) <= 0:
             return True
 
-        keep_bools = np.array([itm_prob < self.prob_threshold for itm_prob in itm_probs])
+        keep_bools = np.array([self.get_keep_boolean(itm_prob, None, self.prob_threshold) for itm_prob in itm_probs])
 
         # different strategies
         if self.any:

@@ -24,9 +24,19 @@ OP_NAME = "extract_entity_relation_mapper"
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractEntityRelationMapper(Mapper):
-    """
-    Extract entities and relations in the text for knowledge graph.
-    """
+    """Extracts entities and relations from text to build a knowledge graph.
+
+    - Identifies entities based on specified types and extracts their names, types, and
+      descriptions.
+    - Identifies relationships between the entities, including source and target entities,
+      relationship descriptions, keywords, and strength scores.
+    - Uses a Hugging Face tokenizer and a predefined prompt template to guide the extraction
+      process.
+    - Outputs entities and relations in a structured format, using delimiters for
+      separation.
+    - Caches the results in the sample's metadata under the keys 'entity' and 'relation'.
+    - Supports multiple retries and gleaning to ensure comprehensive extraction.
+    - The default entity types include 'organization', 'person', 'geo', and 'event'."""
 
     DEFAULT_PROMPT_TEMPLATE = """-Goal-
 Given a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.

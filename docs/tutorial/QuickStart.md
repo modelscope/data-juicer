@@ -100,6 +100,11 @@ dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 - **Note:** Analyzer only computes stats for Filters that produce stats or other OPs that produce tags/categories in meta. So other OPs will be ignored in the analysis process. We use the following registries to decorate OPs:
   - `NON_STATS_FILTERS`: decorate Filters that **DO NOT** produce any stats.
   - `TAGGING_OPS`: decorate OPs that **DO** produce tags/categories in meta field.
+- Sometimes, "Glyph missing" warning occurs and invalid characters show in the analyzed results figures. Users can specify appropriate font using the environment variable `ANALYZER_FONT`. For example:
+```shell
+export ANALYZER_FONT="Heiti TC"  # Use Heiti for Chinese characters. And it's the default font for analyzer.
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
+```
 
 ## Data Visualization
 

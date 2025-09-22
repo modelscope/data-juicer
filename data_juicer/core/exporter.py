@@ -4,20 +4,17 @@ from multiprocessing import Pool
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, HashKeys
+from data_juicer.utils.file_utils import Sizes, byte_size_to_size_str
 
 
 class Exporter:
     """The Exporter class is used to export a dataset to files of specific
     format."""
 
-    KiB = 2**10  # 1024
-    MiB = 2**20  # 1024*1024
-    GiB = 2**30  # 1024*1024*1024
-    TiB = 2**40  # 1024*1024*1024*1024
-
     def __init__(
         self,
         export_path,
+        export_type=None,
         export_shard_size=0,
         export_in_parallel=True,
         num_proc=1,
@@ -25,14 +22,17 @@ class Exporter:
         keep_stats_in_res_ds=False,
         keep_hashes_in_res_ds=False,
         export_stats=True,
+        **kwargs,
     ):
         """
         Initialization method.
 
         :param export_path: the path to export datasets.
-        :param export_shard_size: the size of each shard of exported
+        :param export_type: the format type of the exported datasets.
+        :param export_shard_size: the approximate size of each shard of exported
             dataset. In default, it's 0, which means export the dataset
             to a single file.
+        :param export_in_parallel: whether to export the datasets in parallel.
         :param num_proc: number of process to export the dataset.
         :param export_ds: whether to export the dataset contents.
         :param keep_stats_in_res_ds: whether to keep stats in the result
@@ -48,31 +48,28 @@ class Exporter:
         self.keep_stats_in_res_ds = keep_stats_in_res_ds
         self.keep_hashes_in_res_ds = keep_hashes_in_res_ds
         self.export_stats = export_stats
-        self.suffix = self._get_suffix(export_path)
+        self.suffix = self._get_suffix(export_path) if export_type is None else export_type
+        support_dict = self._router()
+        if self.suffix not in support_dict:
+            raise NotImplementedError(
+                f"Suffix of export path [{export_path}] or specified export_type [{export_type}] is not supported "
+                f"for now. Only support {list(support_dict.keys())}."
+            )
         self.num_proc = num_proc
         self.max_shard_size_str = ""
 
         # get the string format of shard size
-        if self.export_shard_size // Exporter.TiB:
-            self.max_shard_size_str = "%.2f TiB" % (self.export_shard_size / Exporter.TiB)
-        elif self.export_shard_size // Exporter.GiB:
-            self.max_shard_size_str = "%.2f GiB" % (self.export_shard_size / Exporter.GiB)
-        elif self.export_shard_size // Exporter.MiB:
-            self.max_shard_size_str = "%.2f MiB" % (self.export_shard_size / Exporter.MiB)
-        elif self.export_shard_size // Exporter.KiB:
-            self.max_shard_size_str = "%.2f KiB" % (self.export_shard_size / Exporter.KiB)
-        else:
-            self.max_shard_size_str = "%.2f Bytes" % (self.export_shard_size)
+        self.max_shard_size_str = byte_size_to_size_str(self.export_shard_size)
 
         # we recommend users to set a shard size between MiB and TiB.
-        if 0 < self.export_shard_size < Exporter.MiB:
+        if 0 < self.export_shard_size < Sizes.MiB:
             logger.warning(
                 f"The export_shard_size [{self.max_shard_size_str}]"
                 f" is less than 1MiB. If the result dataset is too "
                 f"large, there might be too many shard files to "
                 f"generate."
             )
-        if self.export_shard_size >= Exporter.TiB:
+        if self.export_shard_size >= Sizes.TiB:
             logger.warning(
                 f"The export_shard_size [{self.max_shard_size_str}]"
                 f" is larger than 1TiB. It might generate large "
@@ -90,14 +87,6 @@ class Exporter:
         :return: the suffix of export_path.
         """
         suffix = export_path.split(".")[-1].lower()
-        support_dict = self._router()
-        if suffix not in support_dict:
-            raise NotImplementedError(
-                f"Suffix of export path ["
-                f"{export_path}] is not supported "
-                f"for now. Only support "
-                f"{list(support_dict.keys())}."
-            )
         return suffix
 
     def _export_impl(self, dataset, export_path, suffix, export_stats=True):

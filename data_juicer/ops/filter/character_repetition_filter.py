@@ -12,8 +12,15 @@ from ..base_op import OPERATORS, Filter
 
 @OPERATORS.register_module("character_repetition_filter")
 class CharacterRepetitionFilter(Filter):
-    """Filter to keep samples with char-level n-gram repetition ratio within a
-    specific range."""
+    """Filter to keep samples with character-level n-gram repetition ratio within a specific
+    range.
+
+    This operator calculates the character-level n-gram repetition ratio for each sample and
+    filters out samples that do not fall within the specified range. The repetition ratio is
+    computed based on the frequency of n-grams in the text. The key metric 'char_rep_ratio'
+    is cached in the stats field. Samples are kept if their 'char_rep_ratio' is between the
+    specified min and max ratios. The n-gram length, minimum, and maximum ratios are
+    configurable."""
 
     _batched_op = True
 
@@ -90,13 +97,8 @@ class CharacterRepetitionFilter(Filter):
         return samples
 
     def process_batched(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_ratio <= stat[StatsKeys.char_rep_ratio] <= self.max_ratio, samples[Fields.stats]
-            )
-        else:
-            # single sample for ray filter
-            if self.min_ratio <= samples[Fields.stats][StatsKeys.char_rep_ratio] <= self.max_ratio:
-                return True
-            else:
-                return False
+        assert isinstance(samples[Fields.stats], list)
+        return map(
+            lambda stat: self.get_keep_boolean(stat[StatsKeys.char_rep_ratio], self.min_ratio, self.max_ratio),
+            samples[Fields.stats],
+        )

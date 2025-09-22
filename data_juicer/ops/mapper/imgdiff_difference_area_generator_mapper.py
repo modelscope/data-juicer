@@ -103,8 +103,21 @@ OP_NAME = "imgdiff_difference_area_generator_mapper"
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class Difference_Area_Generator_Mapper(Mapper):
-    """A fused operator for OPs that is used to run sequential OPs on
-    the same batch to allow fine-grained control on data processing."""
+    """Generates and filters bounding boxes for image pairs based on similarity, segmentation,
+    and text matching.
+
+    This operator processes image pairs to identify and filter regions with significant
+    differences. It uses a sequence of operations:
+    - Filters out image pairs with large differences.
+    - Segments the images to identify potential objects.
+    - Crops sub-images based on bounding boxes.
+    - Determines if the sub-images contain valid objects using image-text matching.
+    - Filters out sub-images that are too similar.
+    - Removes overlapping bounding boxes.
+    - Uses Hugging Face models for similarity and text matching, and FastSAM for
+      segmentation.
+    - Caches intermediate results in `DATA_JUICER_ASSETS_CACHE`.
+    - Returns the filtered bounding boxes in the `MetaKeys.bbox_tag` field."""
 
     _accelerator = "cuda"
 
@@ -116,6 +129,20 @@ class Difference_Area_Generator_Mapper(Mapper):
         *args,
         **kwargs,
     ):
+        """Initialization.
+
+        :param image_pair_similarity_filter_args: Arguments for image pair similarity filter.
+            Controls the similarity filtering between image pairs. Default empty dict will use
+            fixed values: min_score_1=0.1, max_score_1=1.0, min_score_2=0.1, max_score_2=1.0,
+            hf_clip="openai/clip-vit-base-patch32", num_proc=1.
+        :param image_segment_mapper_args: Arguments for image segmentation mapper.
+            Controls the image segmentation process. Default empty dict will use
+            fixed values: imgsz=1024, conf=0.05, iou=0.5, model_path="FastSAM-x.pt".
+        :param image_text_matching_filter_args: Arguments for image-text matching filter.
+            Controls the matching between cropped image regions and text descriptions.
+            Default empty dict will use fixed values: min_score=0.1, max_score=1.0,
+            hf_blip="Salesforce/blip-itm-base-coco", num_proc=1.
+        """
         super().__init__(*args, **kwargs)
 
         self.FIXED_ARGS = {}

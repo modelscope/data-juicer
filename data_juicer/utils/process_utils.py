@@ -3,10 +3,14 @@ import os
 import subprocess
 
 import multiprocess as mp
-import psutil
 from loguru import logger
 
-from data_juicer import cuda_device_count
+from data_juicer.utils.resource_utils import (
+    available_gpu_memories,
+    available_memories,
+    cpu_count,
+    cuda_device_count,
+)
 
 
 def setup_mp(method=None):
@@ -48,72 +52,69 @@ def get_min_cuda_memory():
     return min_cuda_memory
 
 
-def calculate_np(name, mem_required, cpu_required, num_proc=None, use_cuda=False):
-    """Calculate the optimum number of processes for the given OP"""
+def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=0):
+    """Calculate the optimum number of processes for the given OP automatically。"""
+
+    if not use_cuda and gpu_required > 0:
+        raise ValueError(
+            f"Op[{name}] attempted to request GPU resources (gpu_required={gpu_required}), "
+            "but appears to lack GPU support. If you have verified this operator support GPU acceleration, "
+            'please explicitly set its property: `_accelerator = "cuda"`.'
+        )
+
     eps = 1e-9  # about 1 byte
+    cpu_num = cpu_count()
 
     if use_cuda:
-        auto_num_proc = None
-        cuda_mem_available = get_min_cuda_memory() / 1024
-        if mem_required == 0:
+        cuda_mems_available = [m / 1024 for m in available_gpu_memories()]  # GB
+        gpu_count = cuda_device_count()
+        if not mem_required and not gpu_required:
+            auto_num_proc = gpu_count
             logger.warning(
-                f"The required cuda memory of Op[{name}] "
+                f"The required cuda memory and gpu of Op[{name}] "
                 f"has not been specified. "
-                f"Please specify the mem_required field in the "
-                f"config file, or you might encounter CUDA "
-                f"out of memory error. You can reference "
-                f"the mem_required field in the "
-                f"config_all.yaml file."
+                f"Please specify the mem_required field or gpu_required field in the "
+                f"config file. You can reference the config_all.yaml file."
+                f"Set the auto `num_proc` to number of GPUs {auto_num_proc}."
             )
         else:
-            auto_num_proc = math.floor(cuda_mem_available / mem_required) * cuda_device_count()
-            if cuda_mem_available / mem_required < 1.0:
-                logger.warning(
-                    f"The required cuda memory:{mem_required}GB might "
-                    f"be more than the available cuda memory:"
-                    f"{cuda_mem_available}GB."
-                    f"This Op[{name}] might "
-                    f"require more resource to run."
-                )
-
-        if auto_num_proc and num_proc:
-            op_proc = min(auto_num_proc, num_proc)
-            if num_proc > auto_num_proc:
-                logger.warning(
-                    f"The given num_proc: {num_proc} is greater than "
-                    f"the value {auto_num_proc} auto calculated based "
-                    f"on the mem_required of Op[{name}]. "
-                    f"Set the `num_proc` to {auto_num_proc}."
-                )
-        elif not auto_num_proc and not num_proc:
-            op_proc = cuda_device_count()
-            logger.warning(
-                f"Both mem_required and num_proc of Op[{name}] are not set."
-                f"Set the `num_proc` to number of GPUs {op_proc}."
+            auto_proc_from_mem = sum(
+                [math.floor(mem_available / (mem_required + eps)) for mem_available in cuda_mems_available]
             )
-        else:
-            op_proc = auto_num_proc if auto_num_proc else num_proc
+            auto_proc_from_gpu = math.floor(gpu_count / (gpu_required + eps))
+            auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
+            auto_num_proc = min(auto_proc_from_mem, auto_proc_from_gpu, auto_proc_from_cpu)
+            if auto_num_proc < 1:
+                auto_num_proc = len(available_memories())  # set to the number of available nodes
 
-        op_proc = max(op_proc, 1)
-        return op_proc
+            logger.info(
+                f"Set the auto `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"required cuda memory: {mem_required}GB "
+                f"required gpu: {gpu_required} and required cpu: {cpu_required}."
+            )
+        return auto_num_proc
     else:
-        if num_proc is None:
-            num_proc = psutil.cpu_count()
+        mems_available = [m / 1024 for m in available_memories()]  # GB
+        auto_proc_from_mem = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
+        auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
 
-        op_proc = num_proc
-        cpu_available = psutil.cpu_count()
-        mem_available = psutil.virtual_memory().available
-        mem_available = mem_available / 1024**3
-        op_proc = min(op_proc, math.floor(cpu_available / cpu_required + eps))
-        op_proc = min(op_proc, math.floor(mem_available / (mem_required + eps)))
-        if op_proc < 1.0:
+        auto_num_proc = min(cpu_num, auto_proc_from_mem, auto_proc_from_cpu)
+
+        if auto_num_proc < 1.0:
+            auto_num_proc = len(available_memories())  # number of processes is equal to the number of nodes
             logger.warning(
-                f"The required CPU number:{cpu_required} "
-                f"and memory:{mem_required}GB might "
-                f"be more than the available CPU:{cpu_available} "
-                f"and memory :{mem_available}GB."
+                f"The required CPU number: {cpu_required} "
+                f"and memory: {mem_required}GB might "
+                f"be more than the available CPU: {cpu_num} "
+                f"and memory: {mems_available}GB."
                 f"This Op [{name}] might "
-                f"require more resource to run."
+                f"require more resource to run. "
+                f"Set the auto `num_proc` to available nodes number {auto_num_proc}."
             )
-        op_proc = max(op_proc, 1)
-        return op_proc
+        else:
+            logger.info(
+                f"Set the auto `num_proc` to {auto_num_proc} of Op[{name}] based on the "
+                f"required memory: {mem_required}GB "
+                f"and required cpu: {cpu_required}."
+            )
+        return auto_num_proc

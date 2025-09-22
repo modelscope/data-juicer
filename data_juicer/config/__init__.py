@@ -6,6 +6,7 @@ from .config import (
     merge_config,
     prepare_cfgs_for_export,
     prepare_side_configs,
+    update_op_attr,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "prepare_side_configs",
     "get_default_cfg",
     "prepare_cfgs_for_export",
+    "update_op_attr",
 ]

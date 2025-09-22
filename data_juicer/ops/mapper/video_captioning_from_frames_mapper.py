@@ -34,9 +34,20 @@ OP_NAME = 'video_captioning_from_frames_mapper'
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoCaptioningFromFramesMapper(Mapper):
-    """Mapper to generate samples whose captions are generated based on
-    an image-to-text model and sampled video frames. Captions from different
-    frames will be concatenated to a single string."""
+    """Generates video captions from sampled frames using an image-to-text model. Captions from
+    different frames are concatenated into a single string.
+
+    - Uses a Hugging Face image-to-text model to generate captions for sampled video frames.
+    - Supports different frame sampling methods: 'all_keyframes' or 'uniform'.
+    - Can apply horizontal and vertical flips to the frames before captioning.
+    - Offers multiple strategies for retaining generated captions: 'random_any',
+    'similar_one_simhash', or 'all'.
+    - Optionally keeps the original sample in the final dataset.
+    - Allows setting a global prompt or per-sample prompts to guide caption generation.
+    - Generates a specified number of candidate captions per video, which can be reduced
+    based on the selected retention strategy.
+    - The number of output samples depends on the retention strategy and whether original
+    samples are kept."""
 
     _accelerator = 'cuda'
     _batched_op = True
@@ -61,6 +72,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
         Initialization method.
 
         :param hf_img2seq: model name on huggingface to generate caption
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param caption_num: how many candidate captions to generate
             for each video
         :param keep_candidate_mode: retain strategy for the generated
@@ -112,7 +124,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        kwargs.setdefault('mem_required', '20GB')
+        kwargs["mem_required"] = "20GB" if kwargs.get("mem_required", 0) == 0 else kwargs["mem_required"]
         super().__init__(*args, **kwargs)
 
         if keep_candidate_mode not in [

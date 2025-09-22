@@ -15,9 +15,19 @@ OP_NAME = "meta_tags_aggregator"
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
 class MetaTagsAggregator(Aggregator):
-    """
-    Merge similar meta tags to one tag.
-    """
+    """Merge similar meta tags into a single, unified tag.
+
+    This operator aggregates and consolidates similar meta tags from the input data. It can
+    handle two scenarios:
+    - When a set of target tags is provided, it maps the original tags to these predefined
+      categories. If a "miscellaneous" or "other" category is included, any tags that do not
+      fit into the specified categories are grouped under this label.
+    - When no target tags are provided, it generates reasonable categories based on the
+      similarity and frequency of the input tags.
+
+    The operator uses a language model (default: gpt-4o) to analyze and merge the tags. The
+    system prompt, input template, and output pattern can be customized. The aggregated tags
+    are then updated in the input sample's metadata."""
 
     DEFAULT_SYSTEM_PROMPT = (
         "给定一些标签以及这些标签出现的频次，合并意思相近的标签。\n"
