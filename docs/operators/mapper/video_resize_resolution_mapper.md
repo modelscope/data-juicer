@@ -15,13 +15,13 @@ Tags 标签: cpu, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_width` | <class 'int'> | `1` | Videos with width less than 'min_width' will be |
-| `max_width` | <class 'int'> | `9223372036854775807` | Videos with width more than 'max_width' will be |
-| `min_height` | <class 'int'> | `1` | Videos with height less than 'min_height' will be |
-| `max_height` | <class 'int'> | `9223372036854775807` | Videos with height more than 'max_height' will be |
+| `min_width` | <class 'int'> | `1` | Videos with width less than 'min_width' will be mapped to videos with equal or bigger width. |
+| `max_width` | <class 'int'> | `9223372036854775807` | Videos with width more than 'max_width' will be mapped to videos with equal of smaller width. |
+| `min_height` | <class 'int'> | `1` | Videos with height less than 'min_height' will be mapped to videos with equal or bigger height. |
+| `max_height` | <class 'int'> | `9223372036854775807` | Videos with height more than 'max_height' will be mapped to videos with equal or smaller height. |
 | `force_original_aspect_ratio` | <class 'str'> | `'disable'` | Enable decreasing or             increasing output video width or height if necessary             to keep the original aspect ratio, including ['disable',             'decrease', 'increase']. |
 | `force_divisible_by` | typing.Annotated[int, Gt(gt=0)] | `2` | Ensures that both the output dimensions,             width and height, are divisible by the given integer when used             together with force_original_aspect_ratio, must be a positive             even number. |
-| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated video files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

@@ -17,8 +17,8 @@ Tags 标签: cpu, text
 |--------|------|--------|------|
 | `lang` | <class 'str'> | `'en'` | sample in which language. |
 | `tokenization` | <class 'bool'> | `False` | whether to use model to tokenize documents |
-| `min_num` | <class 'int'> | `10` | The min filter word number in this op, samples |
-| `max_num` | <class 'int'> | `9223372036854775807` | The max filter word number in this op, samples |
+| `min_num` | <class 'int'> | `10` | The min filter word number in this op, samples will be filtered if their word number is below this parameter. |
+| `max_num` | <class 'int'> | `9223372036854775807` | The max filter word number in this op, samples will be filtered if their word number exceeds this parameter. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

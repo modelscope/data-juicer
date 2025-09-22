@@ -33,9 +33,9 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `image_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image pair similarity filter. |
-| `image_segment_mapper_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image segmentation mapper. |
-| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image-text matching filter. |
+| `image_pair_similarity_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image pair similarity filter. Controls the similarity filtering between image pairs. Default empty dict will use fixed values: min_score_1=0.1, max_score_1=1.0, min_score_2=0.1, max_score_2=1.0, hf_clip="openai/clip-vit-base-patch32", num_proc=1. |
+| `image_segment_mapper_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image segmentation mapper. Controls the image segmentation process. Default empty dict will use fixed values: imgsz=1024, conf=0.05, iou=0.5, model_path="FastSAM-x.pt". |
+| `image_text_matching_filter_args` | typing.Optional[typing.Dict] | `{}` | Arguments for image-text matching filter. Controls the matching between cropped image regions and text descriptions. Default empty dict will use fixed values: min_score=0.1, max_score=1.0, hf_blip="Salesforce/blip-itm-base-coco", num_proc=1. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

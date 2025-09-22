@@ -19,7 +19,7 @@ Tags 标签: cpu, image
 | `max_width` | <class 'int'> | `9223372036854775807` | The max width to keep samples. |
 | `min_height` | <class 'int'> | `1` | The min height to keep samples. |
 | `max_height` | <class 'int'> | `9223372036854775807` | The max height to keep samples. |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

@@ -18,7 +18,7 @@ Tags 标签: cpu, image
 | `imgsz` |  | `1024` | resolution for image resizing |
 | `conf` |  | `0.05` | confidence score threshold |
 | `iou` |  | `0.5` | IoU (Intersection over Union) score threshold |
-| `model_path` |  | `'FastSAM-x.pt'` | the path to the FastSAM model. Model name should be |
+| `model_path` |  | `'FastSAM-x.pt'` | the path to the FastSAM model. Model name should be one of ['FastSAM-x.pt', 'FastSAM-s.pt']. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

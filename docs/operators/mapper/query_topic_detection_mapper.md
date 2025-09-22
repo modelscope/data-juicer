@@ -22,11 +22,11 @@ Tags 标签: cpu, hf, hf
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_model` | <class 'str'> | `'dstefa/roberta-base_topic_classification_nyt_news'` | Huggingface model ID to predict topic label. |
-| `zh_to_en_hf_model` | typing.Optional[str] | `'Helsinki-NLP/opus-mt-zh-en'` | Translation model from Chinese to English. |
+| `zh_to_en_hf_model` | typing.Optional[str] | `'Helsinki-NLP/opus-mt-zh-en'` | Translation model from Chinese to English. If not None, translate the query from Chinese to English. |
 | `model_params` | typing.Dict | `{}` | model param for hf_model. |
 | `zh_to_en_model_params` | typing.Dict | `{}` | model param for zh_to_hf_model. |
-| `label_key` | <class 'str'> | `'query_topic_label'` | The key name in the meta field to store the |
-| `score_key` | <class 'str'> | `'query_topic_label_score'` | The key name in the meta field to store the |
+| `label_key` | <class 'str'> | `'query_topic_label'` | The key name in the meta field to store the output label. It is 'query_topic_label' in default. |
+| `score_key` | <class 'str'> | `'query_topic_label_score'` | The key name in the meta field to store the corresponding label score. It is 'query_topic_label_score' in default. |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示

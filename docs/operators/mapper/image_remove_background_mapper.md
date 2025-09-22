@@ -15,12 +15,12 @@ Tags 标签: cpu, image
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `alpha_matting` | <class 'bool'> | `False` | (bool, optional) |
-| `alpha_matting_foreground_threshold` | <class 'int'> | `240` | (int, optional) |
-| `alpha_matting_background_threshold` | <class 'int'> | `10` | (int, optional) |
-| `alpha_matting_erode_size` | <class 'int'> | `10` | (int, optional) |
-| `bgcolor` | typing.Optional[typing.Tuple[int, int, int, int]] | `None` | (Optional[Tuple[int, int, int, int]], optional) |
-| `save_dir` | <class 'str'> | `None` | The directory where generated image files will be stored. |
+| `alpha_matting` | <class 'bool'> | `False` | (bool, optional) Flag indicating whether to use alpha matting. Defaults to False. |
+| `alpha_matting_foreground_threshold` | <class 'int'> | `240` | (int, optional) Foreground threshold for alpha matting. Defaults to 240. |
+| `alpha_matting_background_threshold` | <class 'int'> | `10` | (int, optional) Background threshold for alpha matting. Defaults to 10. |
+| `alpha_matting_erode_size` | <class 'int'> | `10` | (int, optional) Erosion size for alpha matting. Defaults to 10. |
+| `bgcolor` | typing.Optional[typing.Tuple[int, int, int, int]] | `None` | (Optional[Tuple[int, int, int, int]], optional) Background color for the cutout image. Defaults to None. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated image files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

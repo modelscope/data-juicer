@@ -16,12 +16,12 @@ Tags 标签: cpu, vllm, hf, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_model` | <class 'str'> | `'alibaba-pai/pai-qwen1_5-7b-doc2qa'` | Huggingface model ID. |
-| `max_num` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The max num of returned QA sample for each text. |
-| `output_pattern` | typing.Optional[str] | `None` | Regular expression pattern to extract |
+| `max_num` | typing.Optional[typing.Annotated[int, Gt(gt=0)]] | `None` | The max num of returned QA sample for each text. Not limit if it is None. |
+| `output_pattern` | typing.Optional[str] | `None` | Regular expression pattern to extract questions and answers from model response. |
 | `enable_vllm` | <class 'bool'> | `False` | Whether to use vllm for inference acceleration. |
 | `model_params` | typing.Optional[typing.Dict] | `None` | Parameters for initializing the model. |
-| `sampling_params` | typing.Optional[typing.Dict] | `None` | Sampling parameters for text generation, |
-| `kwargs` |  | `''` | Extra keyword arguments. |
+| `sampling_params` | typing.Optional[typing.Dict] | `None` | Sampling parameters for text generation, e.g {'temperature': 0.9, 'top_p': 0.95} |
+| `kwargs` |  | `''` | Extra keyword arguments. The default data format parsed by this interface is as follows: Model Input:     蒙古国的首都是乌兰巴托（Ulaanbaatar）     冰岛的首都是雷克雅未克（Reykjavik） Model Output:     蒙古国的首都是乌兰巴托（Ulaanbaatar）     冰岛的首都是雷克雅未克（Reykjavik）     Human: 请问蒙古国的首都是哪里？     Assistant: 你好，根据提供的信息，蒙古国的首都是乌兰巴托（Ulaanbaatar）。     Human: 冰岛的首都是哪里呢？     Assistant: 冰岛的首都是雷克雅未克（Reykjavik）。     ... |
 
 ## 📊 Effect demonstration 效果演示
 not available 暂无
