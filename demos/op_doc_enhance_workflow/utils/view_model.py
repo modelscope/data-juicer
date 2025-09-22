@@ -172,6 +172,8 @@ def _render_meta(meta: Dict[str, Any]) -> str:
     def should_expand_list(lst: list) -> bool:
         if any(isinstance(x, dict) for x in lst):
             return True
+        if any(len(str(x)) < 5 for x in lst):
+            return False
         return len(lst) > 3
 
     def render_list_items(lst: list, level: int) -> str:
@@ -180,7 +182,7 @@ def _render_meta(meta: Dict[str, Any]) -> str:
             return ""
         if not should_expand_list(lst):
             rows.append(
-                f"<tr><td colspan='2' style='{td_block_style(level)}'>{escape(', '.join(map(str, lst)))}</td></tr>"
+                f"<tr><td colspan='2' style='{td_block_style(level)}'>{escape(str(lst))}</td></tr>"
             )
             return "".join(rows)
 
@@ -194,7 +196,7 @@ def _render_meta(meta: Dict[str, Any]) -> str:
                 rows.append(f"<tr><td colspan='2' style='{td_block_style(level)}'>{content}</td></tr>")
             else:
                 rows.append(
-                    f"<tr><td colspan='2' style='{td_block_style(level)}'>• {escape(str(item))}</td></tr>"
+                    f"<tr><td colspan='2' style='{td_block_style(level)}'>{escape(str(item))}</td></tr>"
                 )
         return "".join(rows)
 
@@ -211,7 +213,7 @@ def _render_meta(meta: Dict[str, Any]) -> str:
                     rows.append(
                         f"<tr>"
                         f"<td style='{td_key_style(level)}'>{escape(str(ck))}</td>"
-                        f"<td style='{td_val_style()}'>{escape(', '.join(map(str, cv)) if cv else '')}</td>"
+                        f"<td style='{td_val_style()}'>{escape(str(cv))}</td>"
                         f"</tr>"
                     )
                 continue
@@ -233,7 +235,7 @@ def _render_meta(meta: Dict[str, Any]) -> str:
             rows.append(
                 f"<tr>"
                 f"<td style='{td_key_style(level)}'>{escape(str(ck))}</td>"
-                f"<td style='{td_val_style()}'>{escape('' if cv is None else str(cv))}</td>"
+                f"<td style='{td_val_style()}'>{escape('None' if cv is None else str(cv))}</td>"
                 f"</tr>"
             )
         return "".join(rows)
@@ -252,7 +254,7 @@ def _render_meta(meta: Dict[str, Any]) -> str:
             out_rows.append(
                 f"<tr>"
                 f"<td style='{td_key_style(0)}'>{escape(str(k))}</td>"
-                f"<td style='{td_val_style()}'>{escape('' if v is None else str(v))}</td>"
+                f"<td style='{td_val_style()}'>{escape('None' if v is None else str(v))}</td>"
                 f"</tr>"
             )
 
