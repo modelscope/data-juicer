@@ -2,7 +2,7 @@ import sys
 
 from data_juicer.utils.constant import Fields
 
-from ..base_op import NON_STATS_FILTERS, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 
 
 def is_number(s):
@@ -18,7 +18,6 @@ def is_number(s):
 OP_NAME = "specified_numeric_field_filter"
 
 
-@NON_STATS_FILTERS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class SpecifiedNumericFieldFilter(Filter):
     """Filter samples based on a specified numeric field value.

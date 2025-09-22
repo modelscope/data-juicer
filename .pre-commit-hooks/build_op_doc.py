@@ -25,21 +25,30 @@ sources and file formats, and allow for flexible extension to custom datasets.
 算子 (Operator) 是协助数据修改、清理、过滤、去重等基本流程的集合。我们支持广泛的数据来源和文件格式，并支持对自定义数据集的灵活扩展。
 
 This page offers a basic description of the operators (OPs) in Data-Juicer.
-Users can refer to the
-[API documentation](https://modelscope.github.io/data-juicer/) for the specific
-parameters of each operator. Users can refer to and run the unit tests
-(`tests/ops/...`) for [examples of operator-wise usage](../tests/ops) as well
-as the effects of each operator when applied to built-in test data samples.
-Besides, you can try to use agent to automatically route suitable OPs and
-call them. E.g., refer to
-[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb),
- [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
+Users can consult the
+[API documentation](https://modelscope.github.io/data-juicer/en/main/api.html)
+for the operator API reference. To learn more about each operator, click its
+adjacent 'info' link to access the operator's details page, which includes its
+detailed parameters, effect demonstrations, and links to relevant unit tests
+and source code.
 
-这个页面提供了OP的基本描述，用户可以参考[API文档](https://modelscope.github.io/data-juicer/)更细致了解每个
-OP的具体参数，并且可以查看、运行单元测试 (`tests/ops/...`)，来体验
-[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。例如，参考
-[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb),
- [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
+Additionally, the 'Reference' column in the table is intended to cite research,
+libraries, or resource links that the operator's design or implementation is
+based on. We welcome contributions of known or relevant reference sources to
+enrich this section.
+
+Users can also refer to and run the unit tests (`tests/ops/...`) for
+[examples of operator-wise usage](../tests/ops) as well as the effects of each
+operator when applied to built-in test data samples. Besides, you can try to
+use agent to automatically route suitable OPs and call them. E.g., refer to
+[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb), [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
+
+这个页面提供了Data-Juicer中算子的基本描述。算子的API参考，用户可以直接查阅[API文档](https://modelscope.github.io/data-juicer/en/main/api.html)。
+要详细了解每个算子，请点击其旁的info链接进入算子详情页，其中包含了算子参数、效果演示，以及相关单元测试和源码的链接。
+
+此外，表格中的『参考』（Reference）列则用于注明算子设计或实现所依据的研究、库或资料链接，欢迎您提供已知或相关的参考来源，共同完善此部分内容。
+
+用户还可以查看、运行单元测试 (`tests/ops/...`)，来体验[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。例如，参考[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb), [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
 """
 
 DOC_CONTRIBUTING = """

@@ -47,6 +47,8 @@ class DefaultExecutor(ExecutorBase):
 
         self.adapter = Adapter(self.cfg)
 
+        self.np = self.cfg.get("np", None) or 1
+
         # only enable it when using cache
         if self.cfg.use_cache:
             logger.info(f"Using cache compression method: " f"[{self.cfg.cache_compress}]")
@@ -63,7 +65,7 @@ class DefaultExecutor(ExecutorBase):
         if self.cfg.use_checkpoint:
             logger.info("Preparing checkpoint manager...")
             self.ckpt_dir = os.path.join(self.work_dir, "ckpt")
-            self.ckpt_manager = CheckpointManager(self.ckpt_dir, self.cfg.process, self.cfg.np)
+            self.ckpt_manager = CheckpointManager(self.ckpt_dir, self.cfg.process, self.np)
             if self.ckpt_manager.ckpt_available:
                 logger.info("Found existed dataset checkpoint.")
                 self.cfg.process = self.ckpt_manager.get_left_process_list()
@@ -75,7 +77,7 @@ class DefaultExecutor(ExecutorBase):
             self.cfg.export_type,
             self.cfg.export_shard_size,
             self.cfg.export_in_parallel,
-            self.cfg.np,
+            self.np,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
             **self.cfg.export_extra_args,
@@ -112,7 +114,7 @@ class DefaultExecutor(ExecutorBase):
         else:
             logger.info("Loading dataset from dataset builder...")
             if load_data_np is None:
-                load_data_np = self.cfg.np
+                load_data_np = self.np
             dataset = self.dataset_builder.load_dataset(num_proc=load_data_np)
 
         # 2. extract processes and optimize their orders
@@ -202,7 +204,7 @@ class DefaultExecutor(ExecutorBase):
         else:
             logger.info("Loading dataset from dataset builder...")
             if load_data_np is None:
-                load_data_np = self.cfg.np
+                load_data_np = self.np
             dataset = self.dataset_builder.load_dataset(num_proc=load_data_np)
 
         # Perform sampling based on the specified algorithm

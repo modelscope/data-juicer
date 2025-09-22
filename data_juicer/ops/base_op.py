@@ -228,10 +228,9 @@ class OP:
         # Local import to avoid logger being serialized in multiprocessing
         from loguru import logger
 
-        if self.num_proc:
-            return self.num_proc
-
         op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.use_cuda(), self.gpu_required)
+        if self.num_proc is not None:
+            op_proc = min(op_proc, self.num_proc)
         logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
         return op_proc
 

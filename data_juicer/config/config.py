@@ -674,12 +674,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     from data_juicer.utils.resource_utils import cpu_count
 
     sys_cpu_count = cpu_count()
-    if not cfg.get("np", None):
-        cfg.np = sys_cpu_count
-        logger.warning(
-            f"Number of processes `np` is not set, " f"set it to cpu count [{sys_cpu_count}] as default value."
-        )
-    if cfg.np > sys_cpu_count:
+    if cfg.get("np", None) and cfg.np > sys_cpu_count:
         logger.warning(
             f"Number of processes `np` is set as [{cfg.np}], which "
             f"is larger than the cpu count [{sys_cpu_count}]. Due "
@@ -754,7 +749,7 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "audio_key": cfg.get("audio_key", "audios"),
         "video_key": cfg.get("video_key", "videos"),
         "image_bytes_key": cfg.get("image_bytes_key", "image_bytes"),
-        "num_proc": cfg.np,
+        "num_proc": cfg.get("np", None),
         "turbo": cfg.get("turbo", False),
         "skip_op_error": cfg.get("skip_op_error", True),
         "work_dir": cfg.work_dir,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
 
@@ -152,12 +153,20 @@ class RayDataset(DJDataset):
         return self
 
     def _run_single_op(self, op):
+        # TODO: optimize auto proc
         auto_parallel = False
         if op.num_proc:
             op_proc = op.num_proc
         else:
             auto_parallel = True
-            op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, op.use_cuda(), op.gpu_required)
+            op_proc = sys.maxsize
+        auto_op_proc = calculate_np(op._name, op.mem_required, op.cpu_required, op.use_cuda(), op.gpu_required)
+        op_proc = min(op_proc, auto_op_proc)
+
+        # use ray default parallelism in cpu mode if op.num_proc is not specified
+        if op.use_cuda() or not auto_parallel:
+            logger.info(f"Op [{op._name}] running with number of procs:{op_proc}")
+
         num_gpus = op.gpu_required if op.gpu_required else get_num_gpus(op, op_proc)
 
         if op._name in TAGGING_OPS.modules and Fields.meta not in self.data.columns():
