@@ -16,7 +16,7 @@ Tags 标签: cpu, text
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_diffusion` | <class 'str'> | `'stabilityai/stable-diffusion-xl-base-1.0'` | diffusion model name on huggingface to generate the image. |
-| `trust_remote_code` |  | `False` |  |
+| `trust_remote_code` |  | `False` | whether to trust the remote code of HF models. |
 | `torch_dtype` | <class 'str'> | `'fp32'` | the floating point type used to load the diffusion model. |
 | `num_inference_steps` | <class 'float'> | `50` | The larger the value, the better the image generation quality; however, this also increases the time required for generation. |
 | `guidance_scale` | <class 'float'> | `7.5` | A higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality. Guidance scale is enabled when |

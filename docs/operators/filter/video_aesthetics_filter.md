@@ -16,7 +16,7 @@ Tags 标签: cpu, hf, video
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_scorer_model` | <class 'str'> | `''` | Huggingface model name for the aesthetics predictor. By default, we will use 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', refer to pypi.org/project/simple-aesthetics-predictor |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `min_score` | <class 'float'> | `0.4` | Min score for the predicted aesthetics in a video. |
 | `max_score` | <class 'float'> | `1.0` | Max score for the predicted aesthetics in a video. |
 | `frame_sampling_method` | <class 'str'> | `'uniform'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "uniform" with frame_num=3, considering that the number of keyframes can be large while their difference is usually small in terms of their aesthetics. |

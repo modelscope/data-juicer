@@ -16,7 +16,7 @@ Tags 标签: cpu, hf, multimodal
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_owlvit` | <class 'str'> | `'google/owlvit-base-patch32'` | Owl-ViT model name on huggingface to locate the phrases extracted from the text. |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `min_recall` | <class 'float'> | `0.1` | The min phrase grounding recall to keep samples. |
 | `max_recall` | <class 'float'> | `1.0` | The max phrase grounding recall to keep samples. |
 | `horizontal_flip` | <class 'bool'> | `False` | Flip image horizontally (left to right). |

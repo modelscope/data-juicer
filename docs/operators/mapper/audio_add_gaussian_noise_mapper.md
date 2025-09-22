@@ -17,8 +17,8 @@ Tags 标签: cpu, audio
 |--------|------|--------|------|
 | `min_amplitude` | <class 'float'> | `0.001` | float unit: linear amplitude. Default: 0.001. Minimum noise amplification factor. |
 | `max_amplitude` | <class 'float'> | `0.015` | float unit: linear amplitude. Default: 0.015. Maximum noise amplification factor. |
-| `p` | <class 'float'> | `0.5` | float range: [0.0, 1.0].  Default: 0.5. The probability of applying this transform. save_dir: str. Default: None.     The directory where generated audio files will be stored.     If not specified, outputs will be saved in the same directory as their corresponding input files.     This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
-| `save_dir` | <class 'str'> | `None` |  |
+| `p` | <class 'float'> | `0.5` | float range: [0.0, 1.0].  Default: 0.5. The probability of applying this transform. |
+| `save_dir` | <class 'str'> | `None` | str. Default: None. The directory where generated audio files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

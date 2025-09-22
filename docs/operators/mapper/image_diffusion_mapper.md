@@ -16,7 +16,7 @@ Tags 标签: cpu, hf, multimodal
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_diffusion` | <class 'str'> | `'CompVis/stable-diffusion-v1-4'` | diffusion model name on huggingface to generate the image. |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `torch_dtype` | <class 'str'> | `'fp32'` | the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16'] |
 | `revision` | <class 'str'> | `'main'` | The specific model version to use. It can be a branch name, a tag name, a commit id, or any identifier allowed by Git. |
 | `strength` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `0.8` | Indicates extent to transform the reference image. Must be between 0 and 1. image is used as a starting point and more noise is added the higher the strength. The number of denoising steps depends on the amount of noise initially added. When strength is 1, added noise is maximum and the denoising process runs for the full number of iterations specified in num_inference_steps. A value of 1 essentially ignores image. |

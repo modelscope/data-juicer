@@ -16,7 +16,7 @@ Tags 标签: cpu, hf, multimodal
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_clip` |  | `'openai/clip-vit-base-patch32'` | clip model name on huggingface to compute the similarity between frame image and text. It's kind of language-related. For example, for Chinese datasets, ChineseCLIP might be a better choice. |
-| `trust_remote_code` |  | `False` |  |
+| `trust_remote_code` |  | `False` | whether to trust the remote code of HF models. |
 | `min_score` | <class 'float'> | `0.1` | the min similarity to keep samples. |
 | `max_score` | <class 'float'> | `1.0` | the max similarity to keep samples. |
 | `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes". |

@@ -31,7 +31,7 @@ Tags 标签: cpu, vllm, hf, api
 |--------|------|--------|------|
 | `api_or_hf_model` | <class 'str'> | `'Qwen/Qwen2.5-7B-Instruct'` | API or huggingface model name. |
 | `gen_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of new prompts to generate. |
-| `max_example_num` | typing.Annotated[int, Gt(gt=0)] | `3` |  |
+| `max_example_num` | typing.Annotated[int, Gt(gt=0)] | `3` | Maximum number of example prompts to include as context when generating new optimized prompts. |
 | `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If it's set to False, there will be only generated texts in the final datasets and the original texts will be removed. It's True in default. |
 | `retry_num` | <class 'int'> | `3` | how many times to retry to generate the prompt if the parsed generated prompt is empty. It's 3 in default. |
 | `api_endpoint` | typing.Optional[str] | `None` | URL endpoint for the API. |

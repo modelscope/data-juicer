@@ -76,9 +76,6 @@ class ExtractEntityAttributeMapper(Mapper):
         """
         Initialization method.
 
-        :param min_len: The min text length in the filtering. samples
-            will be filtered if their text length is below this
-            parameter.
         :param api_model: API model name.
         :param query_entities: Entity list to be queried.
         :param query_attributes: Attribute list to be queried.
