@@ -15,10 +15,10 @@ Tags 标签: cpu, audio
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `min_amplitude` | <class 'float'> | `0.001` | float unit: linear amplitude. |
-| `max_amplitude` | <class 'float'> | `0.015` | float unit: linear amplitude. |
-| `p` | <class 'float'> | `0.5` | float range: [0.0, 1.0].  Default: 0.5. |
-| `save_dir` | <class 'str'> | `None` |  |
+| `min_amplitude` | <class 'float'> | `0.001` | float unit: linear amplitude. Default: 0.001. Minimum noise amplification factor. |
+| `max_amplitude` | <class 'float'> | `0.015` | float unit: linear amplitude. Default: 0.015. Maximum noise amplification factor. |
+| `p` | <class 'float'> | `0.5` | float range: [0.0, 1.0].  Default: 0.5. The probability of applying this transform. |
+| `save_dir` | <class 'str'> | `None` | str. Default: None. The directory where generated audio files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

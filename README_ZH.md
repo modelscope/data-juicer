@@ -42,28 +42,26 @@ https://github.com/user-attachments/assets/a45f0eee-0f0e-4ffe-9a42-d9a55370089d
 ----
 
 ## 新消息
-- 🛠️ [2025-08-09] **新增作业管理与监控功能**：我们新增了全面的作业监控功能，包括[处理快照工具](data_juicer/utils/job/snapshot.py)，提供详细的JSON格式作业状态分析、进度跟踪和检查点信息。同时引入了[资源感知分区](data_juicer/core/executor/partition_size_optimizer.py)功能，用于分布式处理资源的自动优化，以及增强的日志系统，提供集中化的日志轮转和保留策略。
-- 🛠️ [2025-06-04] 如何在"经验时代"处理反馈数据？我们提出了 [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826)，该框架利用 Data-Juicer 为 RFT 场景量身定制数据处理管道。
+- 🎉 [2025-09-19] 我们的 [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for and with Foundation Models](https://arxiv.org/abs/2501.14755) 已被接收为 **NeurIPS'25 Spotlight**（处于所有投稿中的前 3.1%）！
+- 🎉 [2025-09-19] 我们关于数据配比/选择/合成的两个工作：[Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://arxiv.org/abs/2502.04380) 和 [MindGYM: What Matters in Question Synthesis for Thinking-Centric Fine-Tuning?](https://arxiv.org/abs/2503.09499)，已被 **NeurIPS'25** 接收！
+- 🛠️ [2025-06-04] 如何在“经验时代”处理反馈数据？我们提出了 [Trinity-RFT: A General-Purpose and Unified Framework for Reinforcement Fine-Tuning of LLMs](https://arxiv.org/abs/2505.17826)，该框架利用 Data-Juicer 为 RFT 场景量身定制数据处理管道。
 - 🎉 [2025-06-04] 我们的 [Data-Model Co-development 综述](https://ieeexplore.ieee.org/document/11027559) 已被 IEEE Transactions on Pattern Analysis and Machine Intelligence（**TPAMI**）接收！欢迎探索并贡献[awesome-list](https://modelscope.github.io/data-juicer/en/main/docs/awesome_llm_data.html)。
 - 🔎 [2025-06-04] 我们推出了 [DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?](https://www.arxiv.org/abs/2505.16915) 一项合成基准测试，揭示了大模型虽擅长处理短描述，但在长提示下性能显著下降的问题。
 - 🎉 [2025-05-06] 我们的 [Data-Juicer Sandbox](https://arxiv.org/abs/2407.11784) 已被接收为 **ICML'25 Spotlight**（处于所有投稿中的前 2.6%）！
 - 💡 [2025-03-13] 我们提出[MindGYM: What Matters in Question Synthesis for Thinking-Centric Fine-Tuning?](https://arxiv.org/abs/2503.09499)。一种新的数据合成方法鼓励大模型自我合成高质量、低方差数据，实现高效SFT（如仅使用 *400 个样本* 即可在 [MathVision](https://mathllm.github.io/mathvision/#leaderboard) 上获得 *16%* 的增益）。
 - 🤝 [2025-02-28] DJ 已被集成到 [Ray官方 Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) 和 [Example Gallery](https://docs.ray.io/en/latest/ray-more-libs/data_juicer_distributed_data_processing.html)。此外，我们在 DJ2.0 中的流式 JSON 加载补丁已被 [Apache Arrow 官方集成](https://github.com/apache/arrow/pull/45084)。
-- 🎉  [2025-02-27] 我们的对比数据合成工作， [ImgDiff](https://arxiv.org/pdf/2408.04594)， 已被 **CVPR'25** 接收！
+- 🎉 [2025-02-27] 我们的对比数据合成工作， [ImgDiff](https://arxiv.org/pdf/2408.04594)， 已被 **CVPR'25** 接收！
 - 💡 [2025-02-05] 我们提出了一种新的数据选择方法 [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380)，该方法基于理论指导，将数据多样性建模为奖励信号，在 7 个基准测试中，微调 SOTA LLMs 取得了更好的整体表现。
-- 🚀 [2025-01-11] 我们发布了 2.0 版论文 [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755)。DJ现在可以使用阿里云集群中 50 个 Ray 节点上的 6400 个 CPU 核心在 2.1 小时内处理 70B 数据样本，并使用 8 个 Ray 节点上的 1280 个 CPU 核心在 2.8 小时内对 5TB 数据进行重复数据删除。
-- 🛠️ [2025-01-03] 我们通过 20 多个相关的新 [OP](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2) 以及与 LLaMA-Factory 和 ModelScope-Swift 兼容的统一 [数据集格式](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) 更好地支持Post-Tuning场景。
+- 🎉 [2025-01-11] 我们发布了 2.0 版论文 [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for and with Foundation Models](https://arxiv.org/abs/2501.14755)。DJ现在可以使用阿里云集群中 50 个 Ray 节点上的 6400 个 CPU 核心在 2.1 小时内处理 70B 数据样本，并使用 8 个 Ray 节点上的 1280 个 CPU 核心在 2.8 小时内对 5TB 数据进行重复数据删除。
 
 <details>
 <summary> History News:
 </summary>>
 
+- [2025-01-03] 我们通过 20 多个相关的新 [OP](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2) 以及与 LLaMA-Factory 和 ModelScope-Swift 兼容的统一 [数据集格式](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) 更好地支持Post-Tuning场景。
 - [2024-12-17] 我们提出了 *HumanVBench*，它包含 16 个以人为中心的任务，使用合成数据，从内在情感和外在表现的角度对22个视频 MLLM 的能力进行基准测试。请参阅我们的 [论文](https://arxiv.org/abs/2412.17574) 中的更多详细信息，并尝试使用它 [评估](https://github.com/modelscope/data-juicer/tree/HumanVBench) 您的模型。
-
 - [2024-11-22] 我们发布 DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0)，其中我们重构了 Data-Juicer 的 *Operator*、*Dataset*、*Sandbox* 和许多其他模块以提高可用性，例如支持容错、FastAPI 和自适应资源管理。
-
 - [2024-08-25] 我们在 KDD'2024 中提供了有关多模态 LLM 数据处理的[教程](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)。
-
 - [2024-08-09] 我们提出了Img-Diff，它通过*对比数据合成*来增强多模态大型语言模型的性能，在[MMVP benchmark](https://tsb0601.github.io/mmvp_blog/)中比GPT-4V高出12个点。 更多细节请参阅我们的 [论文](https://arxiv.org/abs/2408.04594), 以及从 [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) 和 [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff)下载这份数据集。
 - [2024-07-24] "天池 Better Synth 多模态大模型数据合成赛"——第四届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532251)，了解赛事详情。
 - [2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox_ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
@@ -178,10 +176,10 @@ Data-Juicer 的发展离不开社区的参与和反馈，非常欢迎各方面�
 }
 
 @article{djv2,
-  title={Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models},
-  author={Chen, Daoyuan and Huang, Yilun and Pan, Xuchen and Jiang, Nana and Wang, Haibin and Ge, Ce and Chen, Yushuo and Zhang, Wenhao and Ma, Zhijian and Zhang, Yilei and Huang, Jun and Lin, Wei and Li, Yaliang and Ding, Bolin and Zhou, Jingren},
-  journal={arXiv preprint arXiv:2501.14755},
-  year={2024}
+  title={Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for and with Foundation Models},
+  author={Chen, Daoyuan and Huang, Yilun and Pan, Xuchen and Jiang, Nana and Wang, Haibin and Zhang, Yilei and Ge, Ce and Chen, Yushuo and Zhang, Wenhao and Ma, Zhijian and Huang, Jun and Lin, Wei and Li, Yaliang and Ding, Bolin and Zhou, Jingren},
+  journal={Advances in Neural Information Processing Systems},
+  year={2025}
 }
 ```
 <details>
@@ -194,13 +192,13 @@ Data-Juicer 的发展离不开社区的参与和反馈，非常欢迎各方面�
  
 - (TPAMI'25) [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
 
+- (NeurIPS'25) [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://arxiv.org/abs/2502.04380)
+
+- (NeurIPS'25) [MindGYM: What Matters in Question Synthesis for Thinking-Centric Fine-Tuning?](https://arxiv.org/abs/2503.09499)
+
 - (Benchmark Data) [HumanVBench: Exploring Human-Centric Video Understanding Capabilities of MLLMs with Synthetic Benchmark Data](https://arxiv.org/abs/2412.17574)
  
 - (Benchmark Data) [DetailMaster: Can Your Text-to-Image Model Handle Long Prompts?](https://www.arxiv.org/abs/2505.16915)
-
-- (Data Synthesis) [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380)
-
-- (Data Synthesis) [MindGYM: What Matters in Question Synthesis for Thinking-Centric Fine-Tuning?](https://arxiv.org/abs/2503.09499)
 
 - (Data Scaling) [BiMix: A Bivariate Data Mixing Law for Language Model Pretraining](https://arxiv.org/abs/2405.14908)
 

@@ -47,7 +47,7 @@ class AudioAddGaussianNoiseMapper(Mapper):
             Default: 0.015. Maximum noise amplification factor.
         :param p: float range: [0.0, 1.0].  Default: 0.5.
             The probability of applying this transform.
-        save_dir: str. Default: None.
+        :param save_dir: str. Default: None.
             The directory where generated audio files will be stored.
             If not specified, outputs will be saved in the same directory as their corresponding input files.
             This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable.

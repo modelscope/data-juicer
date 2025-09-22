@@ -17,16 +17,16 @@ Tags 标签: cpu, vllm, hf
 |--------|------|--------|------|
 | `hf_model` | <class 'str'> | `'Qwen/Qwen2.5-7B-Instruct'` | Huggingface model ID. |
 | `seed_file` | <class 'str'> | `''` | Path to the seed file in chatml format. |
-| `example_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of selected examples. |
-| `similarity_threshold` | <class 'float'> | `0.7` | The similarity score threshold |
+| `example_num` | typing.Annotated[int, Gt(gt=0)] | `3` | The number of selected examples. Randomly select N examples from "seed_file" and put them into prompt as QA examples. |
+| `similarity_threshold` | <class 'float'> | `0.7` | The similarity score threshold between the generated samples and the seed examples. Range from 0 to 1. Samples with similarity score less than this threshold will be kept. |
 | `system_prompt` | typing.Optional[str] | `None` | System prompt for guiding the generation task. |
-| `input_template` | typing.Optional[str] | `None` | Template for building the input prompt. It must |
-| `example_template` | typing.Optional[str] | `None` | Template for formatting one QA example. It |
-| `qa_pair_template` | typing.Optional[str] | `None` | Template for formatting a single QA pair |
-| `output_pattern` | typing.Optional[str] | `None` | Regular expression pattern to extract questions |
+| `input_template` | typing.Optional[str] | `None` | Template for building the input prompt. It must include one placeholder '{}', which will be replaced by `example_num` formatted examples defined by `example_template`. |
+| `example_template` | typing.Optional[str] | `None` | Template for formatting one QA example. It must include one placeholder '{}', which will be replaced by one formatted qa_pair. |
+| `qa_pair_template` | typing.Optional[str] | `None` | Template for formatting a single QA pair within each example. Must include two placeholders '{}' for the question and answer. |
+| `output_pattern` | typing.Optional[str] | `None` | Regular expression pattern to extract questions and answers from model response. |
 | `enable_vllm` | <class 'bool'> | `False` | Whether to use vllm for inference acceleration. |
 | `model_params` | typing.Optional[typing.Dict] | `None` | Parameters for initializing the model. |
-| `sampling_params` | typing.Optional[typing.Dict] | `None` | Sampling parameters for text generation. |
+| `sampling_params` | typing.Optional[typing.Dict] | `None` | Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95} |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
 ## 📊 Effect demonstration 效果演示

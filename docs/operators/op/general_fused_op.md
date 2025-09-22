@@ -24,6 +24,6 @@ Tags 标签: cpu
 not available 暂无
 
 ## 🔗 related links 相关链接
-- [source code 源代码](../../../data_juicer/ops/op/general_fused_op.py)
+- [source code 源代码](../../../data_juicer/ops/op_fusion.py)
 - [unit test 单元测试]()
 - [Return operator list 返回算子列表](../../Operators.md)

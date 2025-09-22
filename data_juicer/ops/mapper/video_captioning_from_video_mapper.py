@@ -71,6 +71,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
 
         :param hf_video_blip: video-blip model name on huggingface
             to generate caption
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param caption_num: how many candidate captions to generate
             for each video
         :param keep_candidate_mode: retain strategy for the generated

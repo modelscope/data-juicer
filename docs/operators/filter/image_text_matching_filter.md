@@ -15,14 +15,14 @@ Tags 标签: cpu, hf, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_blip` | <class 'str'> | `'Salesforce/blip-itm-base-coco'` | blip model name on huggingface to compute |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `hf_blip` | <class 'str'> | `'Salesforce/blip-itm-base-coco'` | blip model name on huggingface to compute the matching score between image and text. |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `min_score` | <class 'float'> | `0.003` | The min matching score to keep samples. |
 | `max_score` | <class 'float'> | `1.0` | The max matching score to keep samples. |
 | `horizontal_flip` | <class 'bool'> | `False` | Flip image horizontally (left to right). |
 | `vertical_flip` | <class 'bool'> | `False` | Flip image vertically (top to bottom). |
-| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of |
-| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to |
+| `any_or_all` | <class 'str'> | `'any'` | keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
+| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one text corresponds to multiple images in a chunk. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 
