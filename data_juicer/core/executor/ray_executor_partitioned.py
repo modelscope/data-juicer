@@ -9,6 +9,7 @@ This module implements a streamlined partitioned execution strategy for Ray mode
 """
 
 import os
+import shutil
 import time
 from dataclasses import dataclass
 from enum import Enum
@@ -31,6 +32,22 @@ from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
 
 ray = LazyLoader("ray")
+
+
+class TempDirManager:
+    """Context manager for temporary directory cleanup."""
+
+    def __init__(self, tmp_dir):
+        self.tmp_dir = tmp_dir
+
+    def __enter__(self):
+        os.makedirs(self.tmp_dir, exist_ok=True)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if os.path.exists(self.tmp_dir):
+            logger.info(f"Removing tmp dir {self.tmp_dir} ...")
+            shutil.rmtree(self.tmp_dir)
 
 
 # Note: Using Ray Data's built-in map_batches for parallel processing instead of custom remote functions
@@ -76,6 +93,9 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         self.work_dir = self.cfg.work_dir
         self.adapter = Adapter(self.cfg)
         self.job_id = self.cfg.get("job_id", None)
+
+        # Initialize temporary directory for Ray operations
+        self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # Initialize EventLoggingMixin for job management and event logging
         EventLoggingMixin.__init__(self, cfg)
@@ -351,6 +371,14 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
         Returns:
             Processed dataset
         """
+        # Use TempDirManager to ensure cleanup of temporary files
+        with TempDirManager(self.tmp_dir):
+            return self._run_impl(load_data_np, skip_return)
+
+    def _run_impl(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
+        """
+        Internal implementation of the run method.
+        """
         job_start_time = time.time()
 
         # Check if user provided a job_id (indicating resumption attempt)
@@ -452,6 +480,16 @@ class PartitionedRayExecutor(ExecutorBase, EventLoggingMixin, DAGExecutionMixin)
             return None
 
         return final_dataset
+
+    def cleanup_temp_files(self):
+        """Manually clean up temporary files from previous runs."""
+        tmp_base_dir = os.path.join(self.work_dir, ".tmp")
+        if os.path.exists(tmp_base_dir):
+            logger.info(f"Cleaning up temporary files in {tmp_base_dir}")
+            shutil.rmtree(tmp_base_dir)
+            logger.info("✅ Temporary files cleaned up successfully")
+        else:
+            logger.info("No temporary files found to clean up")
 
     def _process_with_simple_partitioning(self, dataset: RayDataset, ops: List):
         """
