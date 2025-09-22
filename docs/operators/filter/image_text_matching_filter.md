@@ -16,7 +16,7 @@ Tags 标签: cpu, hf, multimodal
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_blip` | <class 'str'> | `'Salesforce/blip-itm-base-coco'` | blip model name on huggingface to compute the matching score between image and text. |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `min_score` | <class 'float'> | `0.003` | The min matching score to keep samples. |
 | `max_score` | <class 'float'> | `1.0` | The max matching score to keep samples. |
 | `horizontal_flip` | <class 'bool'> | `False` | Flip image horizontally (left to right). |

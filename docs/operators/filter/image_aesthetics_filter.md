@@ -16,7 +16,7 @@ Tags 标签: cpu, hf, image
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_scorer_model` | <class 'str'> | `''` | Huggingface model name for the aesthetics predictor. By default, we will use 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', refer to pypi.org/project/simple-aesthetics-predictor |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `min_score` | <class 'float'> | `0.5` | Min score for the predicted aesthetics in an image. |
 | `max_score` | <class 'float'> | `1.0` | Max score for the predicted aesthetics in an image. |
 | `any_or_all` | <class 'str'> | `'any'` | Keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |

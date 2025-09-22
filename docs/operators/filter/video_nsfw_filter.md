@@ -16,8 +16,8 @@ Tags 标签: cpu, hf, video
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_nsfw_model` | <class 'str'> | `'Falconsai/nsfw_image_detection'` | nsfw detection model name on huggingface. |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
-| `min_score` | <class 'float'> | `0.0` |  |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
+| `min_score` | <class 'float'> | `0.0` | the nsfw score threshold for samples. range from 0 to 1. Samples with nsfw score greater than this threshold will be kept. |
 | `max_score` | <class 'float'> | `0.5` | the nsfw score threshold for samples. range from 0 to 1. Samples with nsfw score less than this threshold will be kept. |
 | `frame_sampling_method` | <class 'str'> | `'all_keyframes'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames (the number of which depends on the duration of the video) and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes". |
 | `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. |

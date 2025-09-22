@@ -16,7 +16,7 @@ Tags 标签: cpu, hf, multimodal
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
 | `hf_clip` | <class 'str'> | `'openai/clip-vit-base-patch32'` | clip model name on huggingface to compute the similarity between image and text. |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `min_score` | <class 'float'> | `0.1` | The min similarity to keep samples. |
 | `max_score` | <class 'float'> | `1.0` | The max similarity to keep samples. |
 | `horizontal_flip` | <class 'bool'> | `False` | Flip image horizontally (left to right). |

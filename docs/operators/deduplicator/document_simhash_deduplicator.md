@@ -23,7 +23,7 @@ Tags 标签: cpu, text
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `tokenization` | <class 'str'> | `'space'` |  |
+| `tokenization` | <class 'str'> | `'space'` | tokenization method for sample texts |
 | `window_size` | typing.Annotated[int, Gt(gt=0)] | `6` | window size of shingling |
 | `lowercase` | <class 'bool'> | `True` | whether to convert text to lower case first |
 | `ignore_pattern` | typing.Optional[str] | `None` | whether to ignore sub-strings with specific pattern when computing simhash |
