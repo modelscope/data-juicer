@@ -191,8 +191,8 @@ class OP:
             self.accelerator = self._accelerator
 
         # parameters to determine the number of procs for this op
-        self.num_proc = kwargs.get("num_proc", None)
-        self.cpu_required = kwargs.get("cpu_required", 1)
+        self.num_proc = kwargs.get("num_proc", -1)  # -1 means automatic calculation of concurrency
+        self.cpu_required = kwargs.get("cpu_required", 0)
         self.gpu_required = kwargs.get("gpu_required", 0)
         self.mem_required = kwargs.get("mem_required", 0)
         if isinstance(self.mem_required, str):
@@ -228,8 +228,10 @@ class OP:
         # Local import to avoid logger being serialized in multiprocessing
         from loguru import logger
 
-        op_proc = calculate_np(self._name, self.mem_required, self.cpu_required, self.use_cuda(), self.gpu_required)
-        if self.num_proc is not None:
+        op_proc = calculate_np(
+            self._name, self.mem_required, self.cpu_required or 1, self.use_cuda(), self.gpu_required
+        )
+        if self.num_proc is not None and self.num_proc != -1:
             op_proc = min(op_proc, self.num_proc)
         logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
         return op_proc

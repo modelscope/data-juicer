@@ -58,19 +58,13 @@ def get_ray_nodes_info(cfg=None):
         try:
             gpus_memory, free_gpus_memory = [], []
             nvidia_smi_output = subprocess.check_output(
-                ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"]
+                ["nvidia-smi", "--query-gpu=memory.free,memory.total", "--format=csv,noheader,nounits"]
             ).decode("utf-8")
 
             for line in nvidia_smi_output.strip().split("\n"):
-                free_gpus_memory.append(int(line))
-
-            nvidia_smi_output = subprocess.check_output(
-                ["nvidia-smi", "--query-gpu=memory.total", "--format=csv,noheader,nounits"]
-            ).decode("utf-8")
-
-            for line in nvidia_smi_output.strip().split("\n"):
-                gpus_memory.append(int(line))
-
+                free_mem_str, total_mem_str = line.split(", ")
+                free_gpus_memory.append(int(free_mem_str))
+                gpus_memory.append(int(total_mem_str))
         except Exception:
             # no gpu
             gpus_memory, free_gpus_memory = [], []
