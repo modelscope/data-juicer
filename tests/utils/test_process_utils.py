@@ -150,13 +150,21 @@ class CalculateNpTest(DataJuicerTestCaseBase):
 class CalculateRayNPTest(DataJuicerTestCaseBase):
 
     def setUp(self):
-        self.mock_op = lambda use_cuda: MagicMock(
+
+        def _use_auto_proc(num_proc, use_cuda):
+            if not use_cuda:  # ray task
+                return num_proc == -1
+            else:
+                return not num_proc or num_proc == -1
+
+        self.mock_op = lambda use_cuda, num_proc=-1: MagicMock(
             cpu_required=0,
             mem_required=0,
             gpu_required=None,
-            num_proc=-1,  # auto
+            num_proc=num_proc,
             _name="test_op",
-            use_cuda=lambda: use_cuda
+            use_cuda=lambda: use_cuda,
+            use_auto_proc=lambda: _use_auto_proc(num_proc, use_cuda)
         )
         
         # Common patchers
@@ -213,8 +221,7 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
 
     def test_user_specified_num_proc(self):
         """Test user-specified num_proc takes priority"""
-        op = self.mock_op(use_cuda=False)
-        op.num_proc = 2
+        op = self.mock_op(use_cuda=False, num_proc=2)
         op.cpu_required = 1
         
         calculate_ray_np([op])
@@ -224,8 +231,7 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
     
     def test_user_specified_num_proc_to_none_in_task(self):
         """Test user-specified num_proc takes priority"""
-        op = self.mock_op(use_cuda=False)
-        op.num_proc = None
+        op = self.mock_op(use_cuda=False, num_proc=None)
         op.cpu_required = 1
         
         calculate_ray_np([op])
@@ -234,9 +240,8 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
         self.assertEqual(op.gpu_required, None)
 
     def test_num_proc_check(self):
-        op = self.mock_op(use_cuda=False)
+        op = self.mock_op(use_cuda=False, num_proc=(1, 2))
         op._name = 'op1'
-        op.num_proc = (1, 2)
         op.cpu_required = 1
         
         with self.assertRaises(ValueError) as cm:
@@ -248,9 +253,8 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
 
     def test_mixed_ops_resource_allocation(self):
         """Test mixed operators with fixed and auto scaling"""
-        fixed_op = self.mock_op(use_cuda=False)
+        fixed_op = self.mock_op(use_cuda=False, num_proc=4)  # concurrency max=4, min=1
         fixed_op._name = 'op1'
-        fixed_op.num_proc = 4  # concurrency max=4, min=1
         fixed_op.cpu_required = 1
         
         auto_op = self.mock_op(use_cuda=False)
@@ -266,9 +270,8 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
 
     def test_insufficient_resources(self):
         """Test resource overallocation exception"""
-        op1 = self.mock_op(use_cuda=False)
+        op1 = self.mock_op(use_cuda=False, num_proc=5)
         op1._name = 'op1'
-        op1.num_proc = 5  # concurrency max=5, min=1
         op1.cpu_required = 2
         
         op2 = self.mock_op(use_cuda=False)
@@ -310,9 +313,8 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
         op2_cuda.gpu_required = 0.5
         op2_cuda._name = 'op2_cuda'
 
-        op3_cuda = self.mock_op(use_cuda=True)
+        op3_cuda = self.mock_op(use_cuda=True, num_proc=(5, 10))
         op3_cuda.gpu_required = 0.2
-        op3_cuda.num_proc = (5, 10)
         op3_cuda._name = 'op3_cuda'
 
         op1_cpu = self.mock_op(use_cuda=False)
@@ -323,9 +325,8 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
         op2_cpu.cpu_required = 5
         op2_cpu._name = 'op2_cpu'
 
-        op3_cpu = self.mock_op(use_cuda=False)
+        op3_cpu = self.mock_op(use_cuda=False, num_proc=10)  # concurrency max=10, min=1
         op3_cpu.cpu_required = 0.2
-        op3_cpu.num_proc = 10  # concurrency max=10, min=1
         op3_cpu._name = 'op3_cpu'
 
         op4_cpu = self.mock_op(use_cuda=False)

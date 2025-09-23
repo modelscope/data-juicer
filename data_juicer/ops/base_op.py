@@ -8,6 +8,7 @@ from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens, size_to_bytes
 from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.process_utils import calculate_np
+from data_juicer.utils.ray_utils import is_ray_mode
 from data_juicer.utils.registry import Registry
 from data_juicer.utils.resource_utils import is_cuda_available
 
@@ -215,6 +216,12 @@ class OP:
                 method = wrap_func_with_nested_access(method)
                 setattr(self, name, method)
 
+    def use_auto_proc(self):
+        if is_ray_mode() and not self.use_cuda():  # ray task
+            return self.num_proc == -1
+        else:
+            return not self.num_proc or self.num_proc == -1
+
     def is_batched_op(self):
         return self._batched_op
 
@@ -231,7 +238,7 @@ class OP:
         op_proc = calculate_np(
             self._name, self.mem_required, self.cpu_required or 1, self.use_cuda(), self.gpu_required
         )
-        if self.num_proc is not None and self.num_proc != -1:
+        if not self.use_auto_proc():
             op_proc = min(op_proc, self.num_proc)
         logger.debug(f"Op [{self._name}] running with number of procs:{op_proc}")
         return op_proc

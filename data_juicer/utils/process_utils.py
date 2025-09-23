@@ -283,8 +283,6 @@ def calculate_ray_np(operators):
             if not gpu_req:
                 gpu_req = math.ceil(gpu_required_frac * total_gpu * 100) / 100
 
-            auto_proc = False if (op.num_proc and op.num_proc != -1) else True
-
         # CPU operator calculations
         else:
             if cpu_req or mem_req:
@@ -307,8 +305,6 @@ def calculate_ray_np(operators):
                         f"Use ``concurrency=n`` to control maximum number of workers to use,  but got: {op.num_proc}."
                     )
 
-            auto_proc = False if op.num_proc != -1 else True
-
         resource_configs[op._name] = {
             "cpu_required": cpu_req,
             "gpu_required": gpu_req,
@@ -317,7 +313,7 @@ def calculate_ray_np(operators):
             "cpu_required_frac": cpu_required_frac,
             "gpu_required_frac": gpu_required_frac,
             "num_proc": tuple(op.num_proc) if isinstance(op.num_proc, list) else op.num_proc,
-            "auto_proc": auto_proc,
+            "auto_proc": op.use_auto_proc(),
             "is_actor": op.use_cuda(),
         }
 
