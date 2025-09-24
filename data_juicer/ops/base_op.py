@@ -193,9 +193,9 @@ class OP:
 
         # parameters to determine the number of procs for this op
         self.num_proc = kwargs.get("num_proc", -1)  # -1 means automatic calculation of concurrency
-        self.cpu_required = kwargs.get("cpu_required", 0)
-        self.gpu_required = kwargs.get("gpu_required", 0)
-        self.mem_required = kwargs.get("mem_required", 0)
+        self.cpu_required = kwargs.get("cpu_required", None)
+        self.gpu_required = kwargs.get("gpu_required", None)
+        self.mem_required = kwargs.get("mem_required", None)
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 

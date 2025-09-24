@@ -266,9 +266,8 @@ def calculate_ray_np(operators):
             gpu_mem_req = op.mem_required
             if not gpu_req and not gpu_mem_req:
                 logger.warning(
-                    f"The required cuda memory and gpu of Op[{op._name}] "
-                    f"has not been specified. "
-                    f"Please specify the `mem_required` field or `gpu_required` field in the "
+                    f"Neither the required cuda memory nor gpu of Op[{op._name}] is specified. "
+                    f"We recommend specifying the `mem_required` field or `gpu_required` field in the "
                     f"config file. You can reference the `config_all.yaml` file."
                     f"Set the `gpu_required` to 1 now."
                 )
@@ -290,12 +289,12 @@ def calculate_ray_np(operators):
                     cpu_req / total_cpu if cpu_req else 0, mem_req / available_mem if mem_req else 0
                 )
             else:
-                logger.warning(
-                    f"The required memory and cpu of Op[{op._name}] "
-                    f"has not been specified. "
-                    f"We recommend specifying the `mem_required` field or `cpu_required` field in the "
-                    f"config file. You can reference the `config_all.yaml` file."
-                )
+                if op.use_auto_proc():
+                    logger.warning(
+                        f"Neither the required memory nor cpu of Op[{op._name}] is specified. "
+                        f"We recommend specifying the `cpu_required` field in the "
+                        f"config file. You can reference the `config_all.yaml` file."
+                    )
                 # Default to single CPU if no requirements specified
                 cpu_required_frac = 1 / total_cpu
             if op.num_proc:
