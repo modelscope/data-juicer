@@ -61,15 +61,15 @@ def get_min_cuda_memory():
 def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=0):
     """Calculate the optimum number of processes for the given OP automatically。"""
 
-    if not use_cuda and gpu_required > 0:
+    if not use_cuda and gpu_required:
         raise ValueError(
             f"Op[{name}] attempted to request GPU resources (gpu_required={gpu_required}), "
             "but appears to lack GPU support. If you have verified this operator support GPU acceleration, "
             'please explicitly set its property: `_accelerator = "cuda"`.'
         )
 
-    eps = 1e-9  # about 1 byte
     cpu_num = cpu_count()
+    auto_proc_from_mem = auto_proc_from_gpu = auto_proc_from_cpu = sys.maxsize
 
     if use_cuda:
         cuda_mems_available = [m / 1024 for m in available_gpu_memories()]  # GB
@@ -84,11 +84,15 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
                 f"Set the auto `num_proc` to number of GPUs {auto_num_proc}."
             )
         else:
-            auto_proc_from_mem = sum(
-                [math.floor(mem_available / (mem_required + eps)) for mem_available in cuda_mems_available]
-            )
-            auto_proc_from_gpu = math.floor(gpu_count / (gpu_required + eps))
-            auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
+            if mem_required:
+                auto_proc_from_mem = sum(
+                    [math.floor(mem_available / mem_required) for mem_available in cuda_mems_available]
+                )
+            if gpu_required:
+                auto_proc_from_gpu = math.floor(gpu_count / gpu_required)
+            if cpu_required:
+                auto_proc_from_cpu = math.floor(cpu_num / cpu_required)
+
             auto_num_proc = min(auto_proc_from_mem, auto_proc_from_gpu, auto_proc_from_cpu)
             if auto_num_proc < 1:
                 auto_num_proc = len(available_memories())  # set to the number of available nodes
@@ -101,8 +105,11 @@ def calculate_np(name, mem_required, cpu_required, use_cuda=False, gpu_required=
         return auto_num_proc
     else:
         mems_available = [m / 1024 for m in available_memories()]  # GB
-        auto_proc_from_mem = sum([math.floor(mem_available / (mem_required + eps)) for mem_available in mems_available])
-        auto_proc_from_cpu = math.floor(cpu_num / (cpu_required + eps))
+
+        if mem_required:
+            auto_proc_from_mem = sum([math.floor(mem_available / mem_required) for mem_available in mems_available])
+        if cpu_required:
+            auto_proc_from_cpu = math.floor(cpu_num / cpu_required)
 
         auto_num_proc = min(cpu_num, auto_proc_from_mem, auto_proc_from_cpu)
 
