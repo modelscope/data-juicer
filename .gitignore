@@ -9,6 +9,10 @@ py_data_juicer.egg-info/
 build/
 dist
 
+# log
+runs/
+logs/
+
 # others
 .DS_Store
 .idea/

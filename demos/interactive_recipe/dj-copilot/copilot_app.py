@@ -451,20 +451,7 @@ def run_query(
     # STAGE 2: Routing
     time_planning_start = time.perf_counter()
 
-    cur_query = copy.deepcopy(query)
-    try:
-        speak_list = cluster_similarity_planning(
-            query=cur_query,
-            rag_agents=rag_agents,
-            backup_agent=backup_agent,
-        )
-    except Exception as e:
-        speak_list = []
-        logger.query_error(
-            request_id=request_id,
-            location="copilot_app_run.run_query:find_speakers",
-            context={"planning_method_fail": str(e)},
-        )
+    speak_list = rag_agents # use all rag agents
 
     # if no RAG agent is found, use backup agent
     if len(speak_list) == 0:

@@ -14,13 +14,13 @@
   {
     "model_type": "async_dashscope_chat",
     "config_name": "async_qwen_config",
-    "model_name": "qwen-max",
+    "model_name": "qwen3-coder-plus",
     "api_key": ""
   },
   {
     "model_type": "dashscope_chat",
     "config_name": "qwen_config",
-    "model_name": "qwen-max",
+    "model_name": "qwen3-coder-plus",
     "api_key": ""
   },
   {
