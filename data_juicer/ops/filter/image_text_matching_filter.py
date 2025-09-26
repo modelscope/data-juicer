@@ -50,6 +50,7 @@ class ImageTextMatchingFilter(Filter):
 
         :param hf_blip: blip model name on huggingface to compute
             the matching score between image and text.
+        :param trust_remote_code: whether to trust the remote code of HF models.
         :param min_score: The min matching score to keep samples.
         :param max_score: The max matching score to keep samples.
         :param horizontal_flip: Flip image horizontally (left to right).

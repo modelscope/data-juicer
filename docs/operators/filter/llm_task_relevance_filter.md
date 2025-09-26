@@ -19,7 +19,7 @@ Tags 标签: cpu, vllm, hf, api
 | `min_score` | <class 'float'> | `0.5` | The lowest score threshold to keep the sample. |
 | `is_hf_model` | <class 'bool'> | `False` | Indicates if the model is from HuggingFace. |
 | `valid_dataset` | typing.Optional[typing.List[typing.Dict]] | `None` | The dataset to use for validation. |
-| `task_desc` | typing.Optional[str] | `None` | The description of the validation task. |
+| `task_desc` | typing.Optional[str] | `None` | The description of the validation task. If valid_dataset=None and task_desc=None, 'self.prepare_valid_feature' should be manually called before applying the filter. |
 | `n_shot` | typing.Optional[int] | `None` | The number of shots in validation. |
 | `kwargs` |  | `''` |  |
 

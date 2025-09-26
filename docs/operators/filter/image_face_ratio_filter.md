@@ -15,10 +15,10 @@ Tags 标签: cpu, image
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `cv_classifier` | <class 'str'> | `''` | OpenCV classifier path for face detection. |
+| `cv_classifier` | <class 'str'> | `''` | OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'. |
 | `min_ratio` | <class 'float'> | `0.0` | Min ratio for the largest face area in an image. |
 | `max_ratio` | <class 'float'> | `0.4` | Max ratio for the largest face area in an image. |
-| `any_or_all` | <class 'str'> | `'any'` | Keep this sample with 'any' or 'all' strategy of |
+| `any_or_all` | <class 'str'> | `'any'` | Keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition. |
 | `args` |  | `''` | Extra positional arguments. |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 

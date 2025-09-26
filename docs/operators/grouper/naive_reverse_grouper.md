@@ -23,7 +23,7 @@ Tags 标签: cpu
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `batch_meta_export_path` |  | `None` | the path to export the batch meta. |
+| `batch_meta_export_path` |  | `None` | the path to export the batch meta. Just drop the batch meta if it is None. |
 | `args` |  | `''` | extra args |
 | `kwargs` |  | `''` | extra args |
 

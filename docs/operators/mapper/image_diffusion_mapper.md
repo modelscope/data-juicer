@@ -15,17 +15,17 @@ Tags 标签: cpu, hf, multimodal
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_diffusion` | <class 'str'> | `'CompVis/stable-diffusion-v1-4'` | diffusion model name on huggingface to generate |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
-| `torch_dtype` | <class 'str'> | `'fp32'` | the floating point type used to load the diffusion |
-| `revision` | <class 'str'> | `'main'` | The specific model version to use. It can be a |
-| `strength` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `0.8` | Indicates extent to transform the reference image. |
-| `guidance_scale` | <class 'float'> | `7.5` | A higher guidance scale value encourages the |
-| `aug_num` | typing.Annotated[int, Gt(gt=0)] | `1` | The image number to be produced by stable-diffusion |
-| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If |
-| `caption_key` | typing.Optional[str] | `None` | the key name of fields in samples to store captions |
-| `hf_img2seq` | <class 'str'> | `'Salesforce/blip2-opt-2.7b'` | model name on huggingface to generate caption if |
-| `save_dir` | <class 'str'> | `None` | The directory where generated image files will be stored. |
+| `hf_diffusion` | <class 'str'> | `'CompVis/stable-diffusion-v1-4'` | diffusion model name on huggingface to generate the image. |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
+| `torch_dtype` | <class 'str'> | `'fp32'` | the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16'] |
+| `revision` | <class 'str'> | `'main'` | The specific model version to use. It can be a branch name, a tag name, a commit id, or any identifier allowed by Git. |
+| `strength` | typing.Annotated[float, FieldInfo(annotation=NoneType, required=True, metadata=[Ge(ge=0), Le(le=1)])] | `0.8` | Indicates extent to transform the reference image. Must be between 0 and 1. image is used as a starting point and more noise is added the higher the strength. The number of denoising steps depends on the amount of noise initially added. When strength is 1, added noise is maximum and the denoising process runs for the full number of iterations specified in num_inference_steps. A value of 1 essentially ignores image. |
+| `guidance_scale` | <class 'float'> | `7.5` | A higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality. Guidance scale is enabled when guidance_scale > 1. |
+| `aug_num` | typing.Annotated[int, Gt(gt=0)] | `1` | The image number to be produced by stable-diffusion model. |
+| `keep_original_sample` | <class 'bool'> | `True` | whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True by default. |
+| `caption_key` | typing.Optional[str] | `None` | the key name of fields in samples to store captions for each images. It can be a string if there is only one image in each sample. Otherwise, it should be a list. If it's none, ImageDiffusionMapper will produce captions for each images. |
+| `hf_img2seq` | <class 'str'> | `'Salesforce/blip2-opt-2.7b'` | model name on huggingface to generate caption if caption_key is None. |
+| `save_dir` | <class 'str'> | `None` | The directory where generated image files will be stored. If not specified, outputs will be saved in the same directory as their corresponding input files. This path can alternatively be defined by setting the `DJ_PRODUCED_DATA_DIR` environment variable. |
 | `args` |  | `''` |  |
 | `kwargs` |  | `''` |  |
 

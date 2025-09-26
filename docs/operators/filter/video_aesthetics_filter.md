@@ -15,14 +15,14 @@ Tags 标签: cpu, hf, video
 ## 🔧 Parameter Configuration 参数配置
 | name 参数名 | type 类型 | default 默认值 | desc 说明 |
 |--------|------|--------|------|
-| `hf_scorer_model` | <class 'str'> | `''` | Huggingface model name for the aesthetics |
-| `trust_remote_code` | <class 'bool'> | `False` |  |
+| `hf_scorer_model` | <class 'str'> | `''` | Huggingface model name for the aesthetics predictor. By default, we will use 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE', refer to pypi.org/project/simple-aesthetics-predictor |
+| `trust_remote_code` | <class 'bool'> | `False` | whether to trust the remote code of HF models. |
 | `min_score` | <class 'float'> | `0.4` | Min score for the predicted aesthetics in a video. |
 | `max_score` | <class 'float'> | `1.0` | Max score for the predicted aesthetics in a video. |
-| `frame_sampling_method` | <class 'str'> | `'uniform'` | sampling method of extracting frame |
-| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from |
-| `any_or_all` | <class 'str'> | `'any'` | Keep this sample with 'any' or 'all' strategy of |
-| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one sample corresponds to |
+| `frame_sampling_method` | <class 'str'> | `'uniform'` | sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "uniform" with frame_num=3, considering that the number of keyframes can be large while their difference is usually small in terms of their aesthetics. |
+| `frame_num` | typing.Annotated[int, Gt(gt=0)] | `3` | the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration. |
+| `any_or_all` | <class 'str'> | `'any'` | Keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition. |
+| `reduce_mode` | <class 'str'> | `'avg'` | reduce mode when one sample corresponds to multiple frames, must be one of ['avg','max', 'min']. 'avg': Take the average of multiple values 'max': Take the max of multiple values 'min': Take the min of multiple values |
 | `args` |  | `''` | Extra positional arguments. |
 | `kwargs` |  | `''` | Extra keyword arguments. |
 
