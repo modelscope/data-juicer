@@ -16,7 +16,7 @@ from data_juicer.utils.resource_utils import (
 
 # A safety fraction to avoid OOM by not allocating all available memory to operators.
 # This leaves some memory for Ray's overhead and other system processes.
-_OPS_MEMORY_LIMIT_FRACTION = 0.7
+_OPS_MEMORY_LIMIT_FRACTION = 1.0
 
 
 def setup_mp(method=None):
