@@ -36,6 +36,8 @@ class TestRayExporter(DataJuicerTestCaseBase):
         if osp.exists(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
 
+        super().tearDown()
+
     def _pop_raw_data_keys(self, keys):
         res = copy.deepcopy(self.data)
         for d_i in res:

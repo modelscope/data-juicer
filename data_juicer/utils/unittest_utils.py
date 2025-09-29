@@ -83,22 +83,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         # clear models in memory
         free_models()
 
-        # start ray
-        current_tag = getattr(cls, "current_tag", "standalone")
-        if current_tag.startswith("ray"):
-            ray = LazyLoader("ray")
-            if not ray.is_initialized():
-                logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{cls.__name__}")
-                ray.init(
-                    "auto",
-                    ignore_reinit_error=True,
-                    namespace=f"dj_dist_unittest_{cls.__name__}",
-                )
-
-            # erase existing resources
-            cls._cleanup_ray_data_state()
-            gc.collect()
-
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
         import multiprocess
@@ -119,11 +103,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             if os.path.exists(transformers.TRANSFORMERS_CACHE):
                 logger.info("CLEAN all TRANSFORMERS_CACHE")
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
-
-        current_tag = getattr(cls, "current_tag", "standalone")
-        if current_tag.startswith("ray"):
-            cls._cleanup_ray_data_state()
-            gc.collect()
 
     @classmethod
     def _cleanup_ray_data_state(cls):
@@ -148,9 +127,34 @@ class DataJuicerTestCaseBase(unittest.TestCase):
     def setUp(self):
         logger.info(f">>>>>>>>>> [Start Test]: {self.id()}")
 
+        # start ray
+        current_tag = getattr(self, "current_tag", "standalone")
+        if current_tag.startswith("ray"):
+            ray = LazyLoader("ray")
+            if not ray.is_initialized():
+                subprocess.run(["ray", "start", "--head"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{self.id()}")
+                ray.init(
+                    "auto",
+                    ignore_reinit_error=True,
+                    namespace=f"dj_dist_unittest_{self.id()}",
+                )
+
+            # erase existing resources
+            self._cleanup_ray_data_state()
+            gc.collect()
+
     def tearDown(self) -> None:
         # clear models in memory
         free_models()
+
+        current_tag = getattr(self, "current_tag", "standalone")
+        if current_tag.startswith("ray"):
+            ray = LazyLoader("ray")
+            self._cleanup_ray_data_state()
+            gc.collect()
+            ray.shutdown()
+            subprocess.run(["ray", "stop"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.
