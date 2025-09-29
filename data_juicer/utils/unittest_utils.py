@@ -115,6 +115,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             if hasattr(ray.data._internal.execution.streaming_executor, "_execution_context"):
                 ray.data._internal.execution.streaming_executor._execution_context = None
 
+            # trigger gc.collect() on all workers in the cluster
             ray._private.internal_api.global_gc()
 
             # clean up stats manager
