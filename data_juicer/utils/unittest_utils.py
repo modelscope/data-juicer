@@ -130,9 +130,13 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         # start ray
         current_tag = getattr(self, "current_tag", "standalone")
         if current_tag.startswith("ray"):
+            # restart the ray cluster
+            from data_juicer.utils.ray_utils import start_ray_head
+
+            start_ray_head()
+
             ray = LazyLoader("ray")
             if not ray.is_initialized():
-                subprocess.run(["ray", "start", "--head"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{self.id()}")
                 ray.init(
                     "auto",
@@ -154,7 +158,10 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             self._cleanup_ray_data_state()
             gc.collect()
             ray.shutdown()
-            subprocess.run(["ray", "stop"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            from data_juicer.utils.ray_utils import stop_ray_cluster
+
+            stop_ray_cluster()
 
     def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.

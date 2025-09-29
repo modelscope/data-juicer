@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 import psutil
 from loguru import logger
@@ -135,3 +136,68 @@ def ray_available_gpu_memories():
         available_gpu_mems.extend(info["free_gpus_memory"])
 
     return available_gpu_mems
+
+
+def is_ray_running() -> bool:
+    """
+    Check if there are any ray clusters running with `ray status` command.
+    """
+    try:
+        subprocess.run(["ray", "status"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, timeout=10)
+        return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return False
+
+
+def stop_ray_cluster():
+    """
+    Stop the current ray cluster and clean up the temporary files.
+    """
+    if not is_ray_running():
+        logger.info("No Ray cluster is running.")
+        return
+
+    logger.info("Stopping existing Ray cluster...")
+    try:
+        subprocess.run(["ray", "stop", "--force"], timeout=30, check=True)
+    except Exception as e:
+        logger.warning(f"Warning: Failed to stop Ray cleanly: {e}")
+
+    # clean up the temporary files
+    try:
+        subprocess.run(["rm", "-rf", "/tmp/ray"], check=True)
+        logger.info("Cleaned up /tmp/ray")
+    except subprocess.CalledProcessError:
+        pass
+
+    time.sleep(2)
+
+
+def start_ray_head():
+    """
+    Start the new ray head node cluster.
+    """
+    if is_ray_running():
+        logger.info("Ray cluster is already running. Stopping the current cluster...")
+        stop_ray_cluster()
+
+    logger.info("Starting new Ray head node...")
+    cmd = [
+        "ray",
+        "start",
+        "--head",
+        "--port=6379",
+        "--include-dashboard=true",
+        "--dashboard-host=0.0.0.0",
+    ]
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    if result.returncode != 0:
+        raise RuntimeError(f"Failed to start Ray head node:\n{result.stdout}\n{result.stderr}")
+
+    time.sleep(3)
+
+    if is_ray_running():
+        logger.info("Ray head node started successfully.")
+    else:
+        logger.warning("Failed to start Ray head node.")
