@@ -115,6 +115,8 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             if hasattr(ray.data._internal.execution.streaming_executor, "_execution_context"):
                 ray.data._internal.execution.streaming_executor._execution_context = None
 
+            ray._private.internal_api.global_gc()
+
             # clean up stats manager
             from ray.data._internal.stats import StatsManager
 
@@ -130,11 +132,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         # start ray
         current_tag = getattr(self, "current_tag", "standalone")
         if current_tag.startswith("ray"):
-            # restart the ray cluster
-            from data_juicer.utils.ray_utils import start_ray_head
-
-            start_ray_head()
-
             ray = LazyLoader("ray")
             if not ray.is_initialized():
                 logger.info(f">>>>>>>>>>>>>>>>>>>> [Init Ray]: dj_dist_unittest_{self.id()}")
@@ -154,14 +151,8 @@ class DataJuicerTestCaseBase(unittest.TestCase):
 
         current_tag = getattr(self, "current_tag", "standalone")
         if current_tag.startswith("ray"):
-            ray = LazyLoader("ray")
             self._cleanup_ray_data_state()
             gc.collect()
-            ray.shutdown()
-
-            from data_juicer.utils.ray_utils import stop_ray_cluster
-
-            stop_ray_cluster()
 
     def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.

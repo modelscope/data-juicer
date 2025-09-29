@@ -173,7 +173,7 @@ def stop_ray_cluster():
     time.sleep(2)
 
 
-def start_ray_head():
+def start_ray_head(port=6379):
     """
     Start the new ray head node cluster.
     """
@@ -186,7 +186,7 @@ def start_ray_head():
         "ray",
         "start",
         "--head",
-        "--port=6379",
+        f"--port={port}",
         "--include-dashboard=true",
         "--dashboard-host=0.0.0.0",
     ]
