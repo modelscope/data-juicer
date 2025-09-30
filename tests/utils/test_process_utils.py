@@ -156,16 +156,20 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
                 return num_proc == -1
             else:
                 return not num_proc or num_proc == -1
+            
+        def create_mock_op(use_cuda, num_proc=-1):
+            op = MagicMock(
+                cpu_required=None,
+                mem_required=None,
+                gpu_required=None,
+                num_proc=num_proc,
+                _name="test_op",
+                use_cuda=lambda: use_cuda,
+            )
+            op.use_auto_proc = lambda: _use_auto_proc(op.num_proc, use_cuda)
+            return op
 
-        self.mock_op = lambda use_cuda, num_proc=-1: MagicMock(
-            cpu_required=0,
-            mem_required=0,
-            gpu_required=None,
-            num_proc=num_proc,
-            _name="test_op",
-            use_cuda=lambda: use_cuda,
-            use_auto_proc=lambda: _use_auto_proc(num_proc, use_cuda)
-        )
+        self.mock_op = create_mock_op
         
         # Common patchers
         self.ray_cpu_patcher = patch(
@@ -205,7 +209,7 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
         op.cpu_required = 1
         
         calculate_ray_np([op])
-        self.assertEqual(op.num_proc, 64)  # 64 CPUs / 1 per op
+        self.assertEqual(op.num_proc, None)
         self.assertEqual(op.cpu_required, 1)
         self.assertEqual(op.gpu_required, None)
 
@@ -217,7 +221,7 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
         calculate_ray_np([op])
         self.assertEqual(op.num_proc, 8)  # Only 1 op and 8 GPU available
         self.assertEqual(op.gpu_required, 1)
-        self.assertEqual(op.cpu_required, 0)
+        self.assertEqual(op.cpu_required, None)
 
     def test_user_specified_num_proc(self):
         """Test user-specified num_proc takes priority"""
@@ -265,7 +269,7 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
 
         self.assertEqual(fixed_op.cpu_required, 1)
         self.assertEqual(fixed_op.num_proc, 4)
-        self.assertEqual(auto_op.num_proc, 63)
+        self.assertEqual(auto_op.num_proc, None)
         self.assertEqual(auto_op.cpu_required, 1)
 
     def test_insufficient_resources(self):
@@ -344,48 +348,47 @@ class CalculateRayNPTest(DataJuicerTestCaseBase):
         # fixed gpu: 
         #   op3_cuda: (1, 2) # (5*0.2, 10*0.2)
 
-        # remaining max cpu: 100-0.2=99.8
         # remaining gpu: (3, 4)
 
-        # auto gpu: 0.29: 0.5  remaining min gpu = 3
-        # find_optimal_concurrency([0.29, 0.5], 3) = [3, 4]
+        # auto gpu: 0.2: 0.5  remaining min gpu = 3
+        # find_optimal_concurrency([0.2, 0.5], 3) = [2, 5]
 
-        self.assertEqual(op1_cuda.num_proc, (3, 14)) # min=3, max=4/(2/7)
+        self.assertEqual(op1_cuda.num_proc, (2, 20)) # min=2, max=4/(2/10)
         self.assertEqual(op1_cuda.cpu_required, 1)
-        self.assertEqual(op1_cuda.gpu_required, 0.29)  # 2GB / 10GB * 0.7
+        self.assertEqual(op1_cuda.gpu_required, 0.2)  # 2GB / 10GB * 1.0
         self.assertEqual(op1_cuda.mem_required, 2)
 
-        self.assertEqual(op2_cuda.num_proc, (4, 8))  # min=4, max=4/0.5
-        self.assertEqual(op2_cuda.cpu_required, 0)
+        self.assertEqual(op2_cuda.num_proc, (5, 8))  # min=4, max=4/0.5
+        self.assertEqual(op2_cuda.cpu_required, None)
         self.assertEqual(op2_cuda.gpu_required, 0.5)
-        self.assertEqual(op2_cuda.mem_required, 0)
+        self.assertEqual(op2_cuda.mem_required, None)
 
         # fixed gpu
         self.assertEqual(op3_cuda.num_proc, (5, 10))
-        self.assertEqual(op3_cuda.cpu_required, 0)
+        self.assertEqual(op3_cuda.cpu_required, None)
         self.assertEqual(op3_cuda.gpu_required, 0.2)
-        self.assertEqual(op3_cuda.mem_required, 0)
+        self.assertEqual(op3_cuda.mem_required, None)
 
-        self.assertEqual(op1_cpu.num_proc, 11)  # 99.8 / (8/(128 * 0.7) * 100 )
-        self.assertEqual(op1_cpu.cpu_required, 0)
+        self.assertEqual(op1_cpu.num_proc, None)
+        self.assertEqual(op1_cpu.cpu_required, None)
         self.assertEqual(op1_cpu.gpu_required, None)
         self.assertEqual(op1_cpu.mem_required, 8) 
 
-        self.assertEqual(op2_cpu.num_proc, 19) # 99.8 / 5
+        self.assertEqual(op2_cpu.num_proc, None)
         self.assertEqual(op2_cpu.cpu_required, 5)
         self.assertEqual(op2_cpu.gpu_required, None)
-        self.assertEqual(op2_cpu.mem_required, 0)
+        self.assertEqual(op2_cpu.mem_required, None)
 
         # fixed cpu
         self.assertEqual(op3_cpu.num_proc, 10)
         self.assertEqual(op3_cpu.cpu_required, 0.2)
         self.assertEqual(op3_cpu.gpu_required, None)
-        self.assertEqual(op3_cpu.mem_required, 0)
+        self.assertEqual(op3_cpu.mem_required, None)
 
-        self.assertEqual(op4_cpu.num_proc, 99)
-        self.assertEqual(op4_cpu.cpu_required, 0)
+        self.assertEqual(op4_cpu.num_proc, None)
+        self.assertEqual(op4_cpu.cpu_required, None)
         self.assertEqual(op4_cpu.gpu_required, None)
-        self.assertEqual(op4_cpu.mem_required, 0)
+        self.assertEqual(op4_cpu.mem_required, None)
 
 
 if __name__ == '__main__':

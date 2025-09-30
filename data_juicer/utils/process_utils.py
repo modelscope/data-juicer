@@ -280,7 +280,8 @@ def calculate_ray_np(operators):
                 )
                 gpu_req = 1
 
-            cpu_required_frac = cpu_req / total_cpu if cpu_req else 0
+            # if no cpu is specified, ray will apply for 1 cpu by default
+            cpu_required_frac = cpu_req / total_cpu if cpu_req else 1 / total_cpu
             gpu_required_frac = max(
                 gpu_req / total_gpu if gpu_req else 0,
                 gpu_mem_req / available_gpu_mem if gpu_mem_req else 0,
@@ -302,7 +303,7 @@ def calculate_ray_np(operators):
                         f"We recommend specifying the `cpu_required` field in the "
                         f"config file. You can reference the `config_all.yaml` file."
                     )
-                # Default to single CPU if no requirements specified
+                # if no cpu is specified, ray will apply for 1 cpu by default
                 cpu_required_frac = 1 / total_cpu
             if op.num_proc:
                 if not isinstance(op.num_proc, int):
@@ -310,6 +311,9 @@ def calculate_ray_np(operators):
                         f"Op[{op._name}] is running with cpu resource, ``num_proc`` is expected to be set as an integer. "
                         f"Use ``concurrency=n`` to control maximum number of workers to use,  but got: {op.num_proc}."
                     )
+            # set concurrency to none, using the default autoscaler of ray to ensure performance
+            if op.num_proc == -1:
+                op.num_proc = None
 
         resource_configs[op._name] = {
             "cpu_required": cpu_req,
@@ -333,19 +337,16 @@ def calculate_ray_np(operators):
             auto_resource_frac_map[op_name] = (cfg["cpu_required_frac"], cfg["gpu_required_frac"])
         else:
             num_proc = cfg["num_proc"]
-
-            # support the task concurrency to be specified as None value
-            if not cfg["is_actor"] and not num_proc:
-                continue
-
             if cfg["is_actor"]:
                 min_proc = num_proc[0] if isinstance(num_proc, (tuple, list)) else num_proc
             else:
                 min_proc = 1  # when ``fn`` is a function, , only the maximum concurrency can be specified
             max_proc = num_proc[1] if isinstance(num_proc, (tuple, list)) else num_proc
             fixed_min_cpu += cfg["cpu_required_frac"] * min_proc
-            fixed_max_cpu += cfg["cpu_required_frac"] * max_proc
             fixed_min_gpu += cfg["gpu_required_frac"] * min_proc
+            if not max_proc:  # when num_proc is none, at least one process will be started
+                max_proc = min_proc  # 1
+            fixed_max_cpu += cfg["cpu_required_frac"] * max_proc
             fixed_max_gpu += cfg["gpu_required_frac"] * max_proc
 
     # Validate resource availability
