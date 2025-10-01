@@ -837,16 +837,6 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
     timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
     if not load_configs_only:
         export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
-        # log_dir = os.path.join(cfg.work_dir, "log")  # Remove legacy log_dir
-
-        print(f"work_dir: {cfg.work_dir}")
-        print(f"event_log_dir: {cfg.event_log_dir}")
-        print(f"checkpoint_dir: {cfg.checkpoint_dir}")
-        print(f"export_path: {cfg.export_path}")
-        print(f"dataset_path: {cfg.dataset_path}")
-        print(f"partition_dir: {cfg.partition_dir}")
-        # print(f"log_dir: {log_dir}")  # Remove legacy log_dir print
-        print(f"export_rel_path: {export_rel_path}")
 
         if not os.path.exists(cfg.event_log_dir):
             os.makedirs(cfg.event_log_dir, exist_ok=True)
@@ -1519,6 +1509,25 @@ def get_init_configs(cfg: Union[Namespace, Dict], load_configs_only: bool = True
     temp_file = os.path.join(temp_dir, "job_dj_config.json")
     if isinstance(cfg, Namespace):
         cfg = namespace_to_dict(cfg)
+
+    # Remove internal attributes that are not part of the configuration schema
+    # to avoid validation errors when re-initializing the config
+    if isinstance(cfg, dict):
+        cfg = cfg.copy()
+        # Remove internal attributes that are added during config processing
+        internal_attrs = [
+            "_user_provided_job_id",
+            "_same_yaml_config",
+            "job_dir",
+            "metadata_dir",
+            "results_dir",
+            "event_log_file",
+            "job_summary_file",
+            "backed_up_config_path",
+        ]
+        for attr in internal_attrs:
+            cfg.pop(attr, None)
+
     # create a temp config file
     with open(temp_file, "w") as f:
         json.dump(prepare_cfgs_for_export(cfg), f)
