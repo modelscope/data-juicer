@@ -11,15 +11,15 @@ class ExecutorFactory:
         if executor_type in ("local", "default"):
             return DefaultExecutor
         elif executor_type == "ray":
-            return RayExecutor()
+            return RayExecutor
         elif executor_type == "ray_partitioned":
-            return PartitionedRayExecutor()
+            return PartitionedRayExecutor
 
         # TODO: add nemo support
         #  elif executor_type == "nemo":
-        #    return NemoExecutor()
+        #    return NemoExecutor
         # TODO: add dask support
         #  elif executor_type == "dask":
-        #    return DaskExecutor()
+        #    return DaskExecutor
         else:
             raise ValueError("Unsupported executor type")
