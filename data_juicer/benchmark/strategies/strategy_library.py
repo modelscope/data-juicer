@@ -68,31 +68,23 @@ class StrategyLibrary:
 
     def _initialize_strategies(self):
         """Initialize all available strategies."""
-        from .config_strategies import (
-            AdaptiveBatchSizeStrategy,
-            BaselineStrategy,
-            MemoryOptimizationStrategy,
-            OpFusionStrategy,
-            ParallelProcessingStrategy,
-        )
+        from .config_strategies import BaselineStrategy, CoreOptimizerStrategy
 
-        # Baseline Strategy
+        # Baseline Strategy (no optimizations)
         self.strategies["baseline"] = BaselineStrategy()
 
-        # Operator Fusion Strategies
-        self.strategies["op_fusion_greedy"] = OpFusionStrategy("op_fusion_greedy", "greedy")
-        self.strategies["op_fusion_probe"] = OpFusionStrategy("op_fusion_probe", "probe")
+        # Core Optimizer Strategies - these configure the actual optimizer
+        self.strategies["mapper_fusion"] = CoreOptimizerStrategy(
+            "mapper_fusion", "Enable mapper operation fusion", ["mapper_fusion"]
+        )
+        self.strategies["filter_fusion"] = CoreOptimizerStrategy(
+            "filter_fusion", "Enable filter operation fusion", ["filter_fusion"]
+        )
+        self.strategies["full_optimization"] = CoreOptimizerStrategy(
+            "full_optimization", "Enable all core optimizations", ["mapper_fusion", "filter_fusion"]
+        )
 
-        # Batch Size Strategies
-        self.strategies["adaptive_batch_size"] = AdaptiveBatchSizeStrategy()
-
-        # Memory Optimization Strategies
-        self.strategies["memory_efficient"] = MemoryOptimizationStrategy()
-
-        # Parallel Processing Strategies
-        self.strategies["max_parallelism"] = ParallelProcessingStrategy()
-
-        # Additional strategies (simplified implementations)
+        # Additional configuration-based strategies (not core optimizer)
         class SimpleStrategy(OptimizationStrategy):
             def __init__(self, name, description, strategy_type, apply_func, impact_dict):
                 super().__init__(name, description)
@@ -106,6 +98,7 @@ class StrategyLibrary:
             def get_expected_impact(self):
                 return self._impact_dict
 
+        # Configuration-only strategies (not core optimizer)
         self.strategies["large_batch_size"] = SimpleStrategy(
             "large_batch_size",
             "Use large batch sizes for better throughput",
@@ -139,42 +132,6 @@ class StrategyLibrary:
                 "performance": "Improved throughput through distributed processing",
                 "memory": "Distributed memory usage across nodes",
                 "complexity": "Moderate configuration complexity",
-            },
-        )
-
-        self.strategies["aggressive_caching"] = SimpleStrategy(
-            "aggressive_caching",
-            "Enable aggressive caching of intermediate results",
-            StrategyType.CACHING,
-            lambda config: {**config, "cache_intermediate": True},
-            {
-                "performance": "Improved performance through caching",
-                "memory": "Higher memory usage for caching",
-                "complexity": "Minimal configuration complexity",
-            },
-        )
-
-        self.strategies["fast_algorithms"] = SimpleStrategy(
-            "fast_algorithms",
-            "Use faster but potentially less accurate algorithms",
-            StrategyType.ALGORITHM,
-            lambda config: {**config, "use_fast_algorithms": True},
-            {
-                "performance": "Improved speed with potentially reduced accuracy",
-                "memory": "Standard memory usage",
-                "complexity": "Minimal configuration complexity",
-            },
-        )
-
-        self.strategies["vectorized_ops"] = SimpleStrategy(
-            "vectorized_ops",
-            "Use vectorized operations where possible",
-            StrategyType.ALGORITHM,
-            lambda config: {**config, "vectorized_operations": True},
-            {
-                "performance": "Improved performance through vectorization",
-                "memory": "Standard memory usage",
-                "complexity": "Minimal configuration complexity",
             },
         )
 

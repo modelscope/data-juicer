@@ -33,34 +33,34 @@ Examples:
   python -m data_juicer.benchmark.utils.benchmark_cli ab-test \\
     --strategies baseline,mapper_fusion \\
     --workload text_simple \\
-    --output-dir results/
+    --output-dir outputs/benchmark/
 
   # Run workload suite test
   python -m data_juicer.benchmark.utils.benchmark_cli workload-suite \\
     --workloads text_simple,image_simple \\
     --strategies baseline,mapper_fusion \\
-    --output-dir results/
+    --output-dir outputs/benchmark/
 
   # Run single benchmark with custom dataset and config
   python -m data_juicer.benchmark.utils.benchmark_cli single \\
     --dataset /path/to/your/dataset.jsonl \\
     --config /path/to/your/config.yaml \\
     --strategy baseline \\
-    --output-dir results/
+    --output-dir outputs/benchmark/
 
   # Run benchmark with production text dataset and simple config
   python -m data_juicer.benchmark.utils.benchmark_cli single \\
     --modality text \\
     --config-type simple \\
     --strategy baseline \\
-    --output-dir results/
+    --output-dir outputs/benchmark/
 
   # Run benchmark with production text dataset and production config
   python -m data_juicer.benchmark.utils.benchmark_cli single \\
     --modality text \\
     --config-type production \\
     --strategy mapper_fusion \\
-    --output-dir results/
+    --output-dir outputs/benchmark/
 
   # Run benchmark with 10% sampling
   python -m data_juicer.benchmark.utils.benchmark_cli single \\
@@ -69,7 +69,7 @@ Examples:
     --strategy baseline \\
     --sample-ratio 0.1 \\
     --sample-method random \\
-    --output-dir results/
+    --output-dir outputs/benchmark/
             """,
         )
 
@@ -80,7 +80,7 @@ Examples:
         ab_parser.add_argument("--strategies", required=True, help="Comma-separated list of strategies to test")
         ab_parser.add_argument("--workload", required=True, help="Workload to use for testing")
         ab_parser.add_argument("--iterations", type=int, default=3, help="Number of iterations per strategy")
-        ab_parser.add_argument("--output-dir", default="benchmark_results", help="Output directory for results")
+        ab_parser.add_argument("--output-dir", default="outputs/benchmark", help="Output directory for results")
         ab_parser.add_argument("--timeout", type=int, default=3600, help="Timeout in seconds")
 
         # Workload suite command
@@ -88,7 +88,7 @@ Examples:
         suite_parser.add_argument("--workloads", required=True, help="Comma-separated list of workloads to test")
         suite_parser.add_argument("--strategies", required=True, help="Comma-separated list of strategies to test")
         suite_parser.add_argument("--iterations", type=int, default=3, help="Number of iterations per strategy")
-        suite_parser.add_argument("--output-dir", default="benchmark_results", help="Output directory for results")
+        suite_parser.add_argument("--output-dir", default="outputs/benchmark", help="Output directory for results")
         suite_parser.add_argument("--timeout", type=int, default=3600, help="Timeout in seconds")
 
         # Single benchmark command
@@ -114,7 +114,7 @@ Examples:
         # Sampling and other options
         single_parser.add_argument("--strategy", required=True, help="Strategy to test")
         single_parser.add_argument("--iterations", type=int, default=3, help="Number of iterations")
-        single_parser.add_argument("--output-dir", default="benchmark_results", help="Output directory for results")
+        single_parser.add_argument("--output-dir", default="outputs/benchmark", help="Output directory for results")
         single_parser.add_argument("--timeout", type=int, default=3600, help="Timeout in seconds")
         single_parser.add_argument(
             "--sample-ratio",
@@ -123,6 +123,61 @@ Examples:
             help="Sample ratio (0.1 = 10 percent of dataset, 1.0 = full dataset)",
         )
         single_parser.add_argument(
+            "--sample-method", choices=["random", "first", "last"], default="random", help="Sampling method"
+        )
+
+        # A/B test optimization command
+        ab_opt_parser = subparsers.add_parser(
+            "ab-optimization", help="Run A/B test comparing baseline vs optimized strategies"
+        )
+
+        # Dataset options for A/B test
+        ab_opt_parser.add_argument("--dataset", help="Path to custom dataset")
+        ab_opt_parser.add_argument(
+            "--modality",
+            choices=["text", "image", "video", "audio"],
+            help="Use production dataset for specified modality",
+        )
+
+        # Config options for A/B test
+        ab_opt_parser.add_argument("--config", help="Path to custom configuration file")
+        ab_opt_parser.add_argument(
+            "--config-type",
+            choices=["simple", "production"],
+            default="simple",
+            help="Use simple or production config for the modality",
+        )
+
+        # Optimization strategy options
+        ab_opt_parser.add_argument(
+            "--optimizations",
+            nargs="+",
+            choices=["mapper_fusion", "filter_fusion", "full_optimization"],
+            default=["mapper_fusion"],
+            help="Optimization strategies to test (default: mapper_fusion)",
+        )
+        ab_opt_parser.add_argument(
+            "--baseline-name",
+            default="baseline",
+            help="Name for baseline strategy (default: baseline)",
+        )
+        ab_opt_parser.add_argument(
+            "--optimized-name",
+            default="optimized",
+            help="Name for optimized strategy (default: optimized)",
+        )
+
+        # Sampling and other options
+        ab_opt_parser.add_argument("--iterations", type=int, default=3, help="Number of iterations per strategy")
+        ab_opt_parser.add_argument("--output-dir", default="outputs/benchmark", help="Output directory for results")
+        ab_opt_parser.add_argument("--timeout", type=int, default=3600, help="Timeout in seconds")
+        ab_opt_parser.add_argument(
+            "--sample-ratio",
+            type=float,
+            default=1.0,
+            help="Sample ratio (0.1 = 10 percent of dataset, 1.0 = full dataset)",
+        )
+        ab_opt_parser.add_argument(
             "--sample-method", choices=["random", "first", "last"], default="random", help="Sampling method"
         )
 
@@ -151,6 +206,8 @@ Examples:
                 return self._run_workload_suite(parsed_args)
             elif parsed_args.command == "single":
                 return self._run_single_benchmark(parsed_args)
+            elif parsed_args.command == "ab-optimization":
+                return self._run_ab_optimization(parsed_args)
             elif parsed_args.command == "list":
                 return self._list_options(parsed_args)
             else:
