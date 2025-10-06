@@ -31,21 +31,44 @@ class BenchmarkCLI:
 Examples:
   # Run A/B test with specific strategies
   python -m data_juicer.benchmark.utils.benchmark_cli ab-test \\
-    --strategies op_fusion_greedy,adaptive_batch_size \\
+    --strategies baseline,mapper_fusion \\
     --workload text_simple \\
     --output-dir results/
 
   # Run workload suite test
   python -m data_juicer.benchmark.utils.benchmark_cli workload-suite \\
     --workloads text_simple,image_simple \\
-    --strategies op_fusion_greedy,ray_optimized \\
+    --strategies baseline,mapper_fusion \\
     --output-dir results/
 
-  # Run single benchmark
+  # Run single benchmark with custom dataset and config
   python -m data_juicer.benchmark.utils.benchmark_cli single \\
-    --dataset demos/data/text_data.jsonl \\
-    --config configs/demo/process.yaml \\
-    --strategy op_fusion_greedy \\
+    --dataset /path/to/your/dataset.jsonl \\
+    --config /path/to/your/config.yaml \\
+    --strategy baseline \\
+    --output-dir results/
+
+  # Run benchmark with production text dataset and simple config
+  python -m data_juicer.benchmark.utils.benchmark_cli single \\
+    --modality text \\
+    --config-type simple \\
+    --strategy baseline \\
+    --output-dir results/
+
+  # Run benchmark with production text dataset and production config
+  python -m data_juicer.benchmark.utils.benchmark_cli single \\
+    --modality text \\
+    --config-type production \\
+    --strategy mapper_fusion \\
+    --output-dir results/
+
+  # Run benchmark with 10% sampling
+  python -m data_juicer.benchmark.utils.benchmark_cli single \\
+    --modality text \\
+    --config-type production \\
+    --strategy baseline \\
+    --sample-ratio 0.1 \\
+    --sample-method random \\
     --output-dir results/
             """,
         )
@@ -70,12 +93,38 @@ Examples:
 
         # Single benchmark command
         single_parser = subparsers.add_parser("single", help="Run single benchmark")
-        single_parser.add_argument("--dataset", required=True, help="Path to dataset")
-        single_parser.add_argument("--config", required=True, help="Path to configuration file")
+
+        # Dataset options
+        single_parser.add_argument("--dataset", help="Path to custom dataset")
+        single_parser.add_argument(
+            "--modality",
+            choices=["text", "image", "video", "audio"],
+            help="Use production dataset for specified modality",
+        )
+
+        # Config options
+        single_parser.add_argument("--config", help="Path to custom configuration file")
+        single_parser.add_argument(
+            "--config-type",
+            choices=["simple", "production"],
+            default="simple",
+            help="Use simple or production config for the modality",
+        )
+
+        # Sampling and other options
         single_parser.add_argument("--strategy", required=True, help="Strategy to test")
         single_parser.add_argument("--iterations", type=int, default=3, help="Number of iterations")
         single_parser.add_argument("--output-dir", default="benchmark_results", help="Output directory for results")
         single_parser.add_argument("--timeout", type=int, default=3600, help="Timeout in seconds")
+        single_parser.add_argument(
+            "--sample-ratio",
+            type=float,
+            default=1.0,
+            help="Sample ratio (0.1 = 10 percent of dataset, 1.0 = full dataset)",
+        )
+        single_parser.add_argument(
+            "--sample-method", choices=["random", "first", "last"], default="random", help="Sampling method"
+        )
 
         # List command
         list_parser = subparsers.add_parser("list", help="List available options")
@@ -219,18 +268,29 @@ Examples:
         from ..core.benchmark_runner import BenchmarkConfig, BenchmarkRunner
         from ..strategies.strategy_library import STRATEGY_LIBRARY
 
-        # Create strategy config
-        strategy = STRATEGY_LIBRARY.create_strategy_config(args.strategy)
+        # Determine dataset and config paths
+        dataset_path, config_path = self._resolve_dataset_and_config(args)
+
+        # Get the actual strategy and apply it to get the configuration changes
+        strategy_obj = STRATEGY_LIBRARY.get_strategy(args.strategy)
+        if strategy_obj:
+            # Apply the strategy to get the actual config changes
+            strategy_config = strategy_obj.apply_to_config({})
+        else:
+            # Fallback to basic config
+            strategy_config = {}
 
         # Create benchmark config
         benchmark_config = BenchmarkConfig(
-            dataset_path=args.dataset,
-            config_path=args.config,
+            dataset_path=dataset_path,
+            config_path=config_path,
             output_dir=args.output_dir,
             iterations=args.iterations,
             timeout_seconds=args.timeout,
             strategy_name=args.strategy,
-            strategy_config=strategy.__dict__,
+            strategy_config=strategy_config,
+            sample_ratio=args.sample_ratio,
+            sample_method=args.sample_method,
         )
 
         # Run benchmark
@@ -247,6 +307,41 @@ Examples:
             print(f"  Retention: {metrics.data_retention_rate:.1%}")
 
         return 0
+
+    def _resolve_dataset_and_config(self, args):
+        """Resolve dataset and config paths based on arguments."""
+        # Validate arguments
+        if not args.dataset and not args.modality:
+            raise ValueError("Either --dataset or --modality must be specified")
+        if not args.config and not args.modality:
+            raise ValueError("Either --config or --modality must be specified")
+
+        # Determine dataset path
+        if args.dataset:
+            dataset_path = args.dataset
+        else:  # args.modality is specified
+            # Use production dataset for the specified modality
+            dataset_path = f"perf_bench_data/{args.modality}/"
+            if args.modality == "text":
+                dataset_path += "wiki-10k.jsonl"
+            elif args.modality == "image":
+                dataset_path += "10k.jsonl"
+            elif args.modality == "video":
+                dataset_path += "msr_vtt_train.jsonl"
+            elif args.modality == "audio":
+                dataset_path += "audio-10k.jsonl"
+
+        # Determine config path
+        if args.config:
+            config_path = args.config
+        else:  # args.modality is specified
+            # Use production or simple config for the specified modality
+            if args.config_type == "production":
+                config_path = f"tests/benchmark_performance/configs/{args.modality}.yaml"
+            else:  # simple
+                config_path = "configs/demo/process.yaml"
+
+        return dataset_path, config_path
 
     def _list_options(self, args) -> int:
         """List available options."""

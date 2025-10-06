@@ -29,6 +29,8 @@ class BenchmarkConfig:
     timeout_seconds: int = 3600
     strategy_name: str = "baseline"
     strategy_config: Dict[str, Any] = None
+    sample_ratio: float = 1.0
+    sample_method: str = "random"
 
 
 class BenchmarkRunner:
@@ -116,13 +118,68 @@ class BenchmarkRunner:
 
         # Apply strategy-specific modifications
         if self.config.strategy_config:
-            base_config = self.config_manager.apply_strategy_config(base_config, self.config.strategy_config)
+            # Check if this is a core optimizer strategy
+            if self.config.strategy_config.get("enable_core_optimizer"):
+                # For core optimizer strategies, we need to modify the pipeline
+                # Add a note to the config that core optimizer should be enabled
+                base_config["_benchmark_optimizer_enabled"] = True
+                base_config["_benchmark_optimizer_strategies"] = self.config.strategy_config.get(
+                    "optimizer_strategies", []
+                )
+            else:
+                # For regular config strategies, apply them directly
+                base_config = self.config_manager.apply_strategy_config(base_config, self.config.strategy_config)
+
+        # Apply sampling if needed
+        if self.config.sample_ratio < 1.0:
+            base_config = self._apply_sampling_config(base_config)
 
         # Save modified configuration
         config_output_path = os.path.join(self.config.output_dir, f"config_{self.config.strategy_name}.yaml")
         self.config_manager.save_config(base_config, config_output_path)
 
         return config_output_path
+
+    def _apply_sampling_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply sampling configuration to the config."""
+        # If sampling is enabled, we'll need to create a sampled dataset
+        if self.config.sample_ratio < 1.0:
+            sampled_dataset_path = self._create_sampled_dataset()
+            config["dataset_path"] = sampled_dataset_path
+
+        return config
+
+    def _create_sampled_dataset(self) -> str:
+        """Create a sampled version of the dataset."""
+        import random
+
+        # Read the original dataset
+        with open(self.config.dataset_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        total_samples = len(lines)
+        sample_size = int(total_samples * self.config.sample_ratio)
+
+        # Sample the data based on method
+        if self.config.sample_method == "random":
+            sampled_lines = random.sample(lines, sample_size)
+        elif self.config.sample_method == "first":
+            sampled_lines = lines[:sample_size]
+        elif self.config.sample_method == "last":
+            sampled_lines = lines[-sample_size:]
+        else:
+            raise ValueError(f"Unknown sampling method: {self.config.sample_method}")
+
+        # Create sampled dataset file
+        sampled_path = os.path.join(
+            self.config.output_dir, f"sampled_dataset_{self.config.sample_ratio}_{self.config.sample_method}.jsonl"
+        )
+
+        with open(sampled_path, "w", encoding="utf-8") as f:
+            f.writelines(sampled_lines)
+
+        logger.info(f"Created sampled dataset: {sampled_path} ({sample_size}/{total_samples} samples)")
+        return sampled_path
 
     def _execute_benchmark(self, config_file: str) -> Optional[Dict[str, Any]]:
         """Execute the actual benchmark using data-juicer."""
@@ -136,8 +193,8 @@ class BenchmarkRunner:
                 config_file,
                 "--dataset_path",
                 self.config.dataset_path,
-                "--output_dir",
-                os.path.join(self.config.output_dir, "output"),
+                "--export_path",
+                os.path.join(self.config.output_dir, "output.jsonl"),
             ]
 
             logger.debug(f"Executing command: {' '.join(cmd)}")
