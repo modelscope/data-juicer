@@ -40,120 +40,131 @@ class WorkloadSuite:
         self._initialize_workloads()
 
     def _initialize_workloads(self):
-        """Initialize all available workloads."""
+        """Initialize all available workloads using production datasets and configs."""
 
-        # Text workloads
+        # Text workloads - Production Wikipedia dataset
         self.workloads["text_simple"] = WorkloadDefinition(
             name="text_simple",
             description="Simple text processing with basic filters",
-            dataset_path="demos/data/text_data.jsonl",
+            dataset_path="perf_bench_data/text/wiki-10k.jsonl",
             config_path="configs/demo/process.yaml",
-            expected_samples=1000,
+            expected_samples=10000,
             modality="text",
             complexity="simple",
-            estimated_duration_minutes=2,
+            estimated_duration_minutes=5,
             resource_requirements={"memory_gb": 2, "cpu_cores": 2},
         )
 
-        self.workloads["text_complex"] = WorkloadDefinition(
-            name="text_complex",
-            description="Complex text processing with multiple operations",
-            dataset_path="demos/data/text_data.jsonl",
-            config_path="configs/demo/process.yaml",
-            expected_samples=1000,
+        self.workloads["text_production"] = WorkloadDefinition(
+            name="text_production",
+            description="Production text processing with ML operations",
+            dataset_path="perf_bench_data/text/wiki-10k.jsonl",
+            config_path="tests/benchmark_performance/configs/text.yaml",
+            expected_samples=10000,
             modality="text",
             complexity="complex",
-            estimated_duration_minutes=10,
-            resource_requirements={"memory_gb": 8, "cpu_cores": 8},
+            estimated_duration_minutes=40,
+            resource_requirements={"memory_gb": 8, "cpu_cores": 12, "gpu": True},
         )
 
-        # Image workloads
+        # Image workloads - Production image dataset
         self.workloads["image_simple"] = WorkloadDefinition(
             name="image_simple",
             description="Simple image processing",
-            dataset_path="demos/data/image_data.jsonl",
+            dataset_path="perf_bench_data/image/10k.jsonl",
             config_path="configs/demo/process.yaml",
-            expected_samples=500,
+            expected_samples=10000,
             modality="image",
             complexity="simple",
-            estimated_duration_minutes=5,
+            estimated_duration_minutes=10,
             resource_requirements={"memory_gb": 4, "cpu_cores": 4, "gpu": True},
         )
 
-        self.workloads["image_complex"] = WorkloadDefinition(
-            name="image_complex",
-            description="Complex image processing with ML models",
-            dataset_path="demos/data/image_data.jsonl",
-            config_path="configs/demo/process.yaml",
-            expected_samples=500,
+        self.workloads["image_production"] = WorkloadDefinition(
+            name="image_production",
+            description="Production image processing with ML models",
+            dataset_path="perf_bench_data/image/10k.jsonl",
+            config_path="tests/benchmark_performance/configs/image.yaml",
+            expected_samples=10000,
             modality="image",
             complexity="complex",
-            estimated_duration_minutes=20,
-            resource_requirements={"memory_gb": 16, "cpu_cores": 8, "gpu": True},
+            estimated_duration_minutes=30,
+            resource_requirements={"memory_gb": 16, "cpu_cores": 12, "gpu": True},
         )
 
-        # Video workloads
+        # Video workloads - Production MSR-VTT dataset
         self.workloads["video_simple"] = WorkloadDefinition(
             name="video_simple",
             description="Simple video processing",
-            dataset_path="demos/data/video_data.jsonl",
+            dataset_path="perf_bench_data/video/msr_vtt_train.jsonl",
             config_path="configs/demo/process.yaml",
-            expected_samples=100,
+            expected_samples=1000,
             modality="video",
             complexity="simple",
-            estimated_duration_minutes=15,
+            estimated_duration_minutes=20,
             resource_requirements={"memory_gb": 8, "cpu_cores": 8, "gpu": True},
         )
 
-        self.workloads["video_complex"] = WorkloadDefinition(
-            name="video_complex",
-            description="Complex video processing with frame analysis",
-            dataset_path="demos/data/video_data.jsonl",
-            config_path="configs/demo/process.yaml",
-            expected_samples=100,
+        self.workloads["video_production"] = WorkloadDefinition(
+            name="video_production",
+            description="Production video processing with frame analysis",
+            dataset_path="perf_bench_data/video/msr_vtt_train.jsonl",
+            config_path="tests/benchmark_performance/configs/video.yaml",
+            expected_samples=1000,
             modality="video",
             complexity="complex",
-            estimated_duration_minutes=45,
+            estimated_duration_minutes=60,
             resource_requirements={"memory_gb": 32, "cpu_cores": 16, "gpu": True},
         )
 
-        # Audio workloads
+        # Audio workloads - Production audio dataset
         self.workloads["audio_simple"] = WorkloadDefinition(
             name="audio_simple",
             description="Simple audio processing",
-            dataset_path="demos/data/audio_data.jsonl",
+            dataset_path="perf_bench_data/audio/audio-10k.jsonl",
             config_path="configs/demo/process.yaml",
-            expected_samples=200,
+            expected_samples=10000,
             modality="audio",
             complexity="simple",
-            estimated_duration_minutes=8,
+            estimated_duration_minutes=15,
             resource_requirements={"memory_gb": 4, "cpu_cores": 4},
         )
 
-        # Multimodal workloads
-        self.workloads["multimodal_medium"] = WorkloadDefinition(
-            name="multimodal_medium",
-            description="Medium complexity multimodal processing",
-            dataset_path="demos/data/multimodal_data.jsonl",
-            config_path="configs/demo/process.yaml",
-            expected_samples=300,
-            modality="multimodal",
-            complexity="medium",
+        self.workloads["audio_production"] = WorkloadDefinition(
+            name="audio_production",
+            description="Production audio processing with quality filters",
+            dataset_path="perf_bench_data/audio/audio-10k.jsonl",
+            config_path="tests/benchmark_performance/configs/audio.yaml",
+            expected_samples=10000,
+            modality="audio",
+            complexity="complex",
             estimated_duration_minutes=25,
-            resource_requirements={"memory_gb": 16, "cpu_cores": 8, "gpu": True},
+            resource_requirements={"memory_gb": 8, "cpu_cores": 8},
         )
 
-        # Performance stress tests
-        self.workloads["stress_test"] = WorkloadDefinition(
-            name="stress_test",
-            description="High-volume stress test",
-            dataset_path="demos/data/large_dataset.jsonl",
-            config_path="configs/demo/process.yaml",
+        # Performance stress tests - Using production datasets
+        self.workloads["stress_test_text"] = WorkloadDefinition(
+            name="stress_test_text",
+            description="High-volume text stress test",
+            dataset_path="perf_bench_data/text/wiki-10k.jsonl",
+            config_path="tests/benchmark_performance/configs/text.yaml",
             expected_samples=10000,
             modality="text",
             complexity="complex",
             estimated_duration_minutes=60,
-            resource_requirements={"memory_gb": 32, "cpu_cores": 16},
+            resource_requirements={"memory_gb": 32, "cpu_cores": 16, "gpu": True},
+        )
+
+        self.workloads["stress_test_image"] = WorkloadDefinition(
+            name="stress_test_image",
+            description="High-volume image stress test",
+            dataset_path="perf_bench_data/image/10k.jsonl",
+            config_path="tests/benchmark_performance/configs/image.yaml",
+            expected_samples=10000,
+            modality="image",
+            complexity="complex",
+            estimated_duration_minutes=90,
+            resource_requirements={"memory_gb": 32, "cpu_cores": 16, "gpu": True},
         )
 
     def get_workload(self, name: str) -> Optional[WorkloadDefinition]:
