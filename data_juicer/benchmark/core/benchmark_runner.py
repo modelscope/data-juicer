@@ -208,8 +208,15 @@ class BenchmarkRunner:
                 logger.error(f"Benchmark execution failed: {result.stderr}")
                 return None
 
-            # Parse output for metrics
-            return self._parse_benchmark_output(result.stdout)
+            # Log the subprocess output for debugging
+            logger.info("=== Subprocess STDOUT ===")
+            logger.info(result.stdout)
+            logger.info("=== Subprocess STDERR ===")
+            logger.info(result.stderr)
+            logger.info("=== End Subprocess Output ===")
+
+            # Parse output for metrics (data-juicer logs to stderr, not stdout)
+            return self._parse_benchmark_output(result.stderr)
 
         except subprocess.TimeoutExpired:
             logger.error(f"Benchmark timed out after {self.config.timeout_seconds} seconds")
@@ -220,25 +227,52 @@ class BenchmarkRunner:
 
     def _parse_benchmark_output(self, output: str) -> Dict[str, Any]:
         """Parse benchmark output to extract metrics."""
-        # This is a simplified parser - in practice, you'd want more robust parsing
         metrics = {}
 
-        # Look for common patterns in data-juicer output
+        # Look for patterns in data-juicer output
         lines = output.split("\n")
+
+        # Track sample counts through processing steps
+        initial_samples = None
+        final_samples = None
+
         for line in lines:
-            if "processed" in line.lower() and "samples" in line.lower():
-                # Try to extract sample count
+            # Look for initial sample count (after filtering empty text)
+            if "samples left after filtering empty text" in line:
                 try:
-                    # This is a simplified extraction - would need more robust parsing
+                    # Extract number from line like "10000 samples left after filtering empty text"
                     parts = line.split()
-                    for i, part in enumerate(parts):
-                        if part.isdigit() and i > 0:
-                            metrics["samples_processed"] = int(part)
+                    for part in parts:
+                        if part.isdigit():
+                            initial_samples = int(part)
                             break
                 except Exception as e:
-                    logger.error(f"Error parsing benchmark output: {e}")
-                    pass
+                    logger.error(f"Error parsing initial samples: {e}")
 
+            # Look for final sample count (last "Left X samples" in processing)
+            if "Left" in line and "samples" in line and "Done in" in line:
+                try:
+                    # Extract number from line like "Left 1000 samples"
+                    parts = line.split()
+                    for i, part in enumerate(parts):
+                        if part == "Left" and i + 1 < len(parts):
+                            if parts[i + 1].isdigit():
+                                final_samples = int(parts[i + 1])
+                                break
+                except Exception as e:
+                    logger.error(f"Error parsing final samples: {e}")
+
+        # Set metrics based on what we found
+        if initial_samples is not None:
+            metrics["samples_processed"] = initial_samples
+        if final_samples is not None:
+            metrics["samples_retained"] = final_samples
+
+        logger.info(f"=== Metrics Parsing Results ===")
+        logger.info(f"Initial samples found: {initial_samples}")
+        logger.info(f"Final samples found: {final_samples}")
+        logger.info(f"Parsed metrics: {metrics}")
+        logger.info(f"=== End Metrics Parsing ===")
         return metrics
 
     def _get_config_hash(self) -> str:
