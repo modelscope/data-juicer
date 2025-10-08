@@ -5,6 +5,7 @@ Main benchmark runner for executing performance tests.
 
 import hashlib
 import os
+import shutil
 import subprocess
 import time
 from dataclasses import dataclass
@@ -184,6 +185,9 @@ class BenchmarkRunner:
     def _execute_benchmark(self, config_file: str) -> Optional[Dict[str, Any]]:
         """Execute the actual benchmark using data-juicer."""
         try:
+            # Clean up output directory before running benchmark
+            self._cleanup_output_directory()
+
             # Build command
             cmd = [
                 "python",
@@ -191,11 +195,13 @@ class BenchmarkRunner:
                 "data_juicer.tools.process_data",
                 "--config",
                 config_file,
-                "--dataset_path",
-                self.config.dataset_path,
                 "--export_path",
                 os.path.join(self.config.output_dir, "output.jsonl"),
             ]
+
+            # Only add dataset_path if it's provided (config might have it instead)
+            if self.config.dataset_path:
+                cmd.extend(["--dataset_path", self.config.dataset_path])
 
             logger.debug(f"Executing command: {' '.join(cmd)}")
 
@@ -216,7 +222,7 @@ class BenchmarkRunner:
             logger.info("=== End Subprocess Output ===")
 
             # Parse output for metrics (data-juicer logs to stderr, not stdout)
-            return self._parse_benchmark_output(result.stderr)
+            return self._parse_benchmark_output(result.stdout)
 
         except subprocess.TimeoutExpired:
             logger.error(f"Benchmark timed out after {self.config.timeout_seconds} seconds")
@@ -225,22 +231,161 @@ class BenchmarkRunner:
             logger.error(f"Error executing benchmark: {e}")
             return None
 
+    def _cleanup_output_directory(self):
+        """Clean up the output directory before running benchmark to prevent multiple outputs."""
+        try:
+
+            output_path = os.path.join(self.config.output_dir, "output.jsonl")
+
+            # Remove existing output directory if it exists
+            if os.path.exists(output_path):
+                logger.info(f"Cleaning up existing output directory: {output_path}")
+                if os.path.isdir(output_path):
+                    shutil.rmtree(output_path)
+                else:
+                    os.remove(output_path)
+                logger.info("Output directory cleaned up successfully")
+            else:
+                logger.info("No existing output directory to clean up")
+
+        except Exception as e:
+            logger.warning(f"Failed to clean up output directory: {e}")
+            # Don't fail the benchmark if cleanup fails
+
+    def _get_config_hash(self) -> str:
+        """Generate hash of current configuration."""
+        config_str = f"{self.config.dataset_path}_{self.config.config_path}_{self.config.strategy_name}"
+        if self.config.strategy_config:
+            config_str += str(sorted(self.config.strategy_config.items()))
+
+        return hashlib.md5(config_str.encode()).hexdigest()[:8]
+
     def _parse_benchmark_output(self, output: str) -> Dict[str, Any]:
         """Parse benchmark output to extract metrics."""
+
+        # Try file-based metrics first (more reliable)
+        file_metrics = self._get_file_based_metrics()
+        if file_metrics:
+            logger.info(f"=== File-Based Metrics ===")
+            logger.info(f"Initial samples: {file_metrics.get('samples_processed', 'N/A')}")
+            logger.info(f"Final samples: {file_metrics.get('samples_retained', 'N/A')}")
+            logger.info(f"Retention rate: {file_metrics.get('retention_rate', 'N/A')}")
+            logger.info(f"=== End File-Based Metrics ===")
+            return file_metrics
+
+        # Fallback to text parsing (less reliable)
+        logger.info("File-based metrics not available, falling back to text parsing...")
+        return self._parse_text_output(output)
+
+    def _get_file_based_metrics(self) -> Optional[Dict[str, Any]]:
+        """Get metrics by counting actual files (more reliable than text parsing)."""
+        try:
+            # Get initial dataset size
+            initial_samples = self._count_input_records()
+
+            # Get final dataset size from output files
+            final_samples = self._count_output_records()
+
+            if initial_samples is None or final_samples is None:
+                logger.warning("Could not determine initial or final sample counts from files")
+                return None
+
+            retention_rate = final_samples / initial_samples if initial_samples > 0 else 0
+
+            return {
+                "samples_processed": initial_samples,
+                "samples_retained": final_samples,
+                "retention_rate": retention_rate,
+            }
+
+        except Exception as e:
+            logger.error(f"Error getting file-based metrics: {e}")
+            return None
+
+    def _count_input_records(self) -> Optional[int]:
+        """Count records in the input dataset."""
+        try:
+            import subprocess
+
+            import yaml
+
+            # Get dataset path - either from config or from config file
+            dataset_path = self.config.dataset_path
+            if dataset_path is None:
+                # Try to extract dataset_path from config file
+                try:
+                    with open(self.config.config_path, "r") as f:
+                        config_data = yaml.safe_load(f)
+                        dataset_path = config_data.get("dataset_path")
+                except Exception as e:
+                    logger.warning(f"Could not read dataset_path from config file: {e}")
+                    return None
+
+            if dataset_path is None:
+                logger.warning("No dataset path available for counting input records")
+                return None
+
+            result = subprocess.run(["wc", "-l", dataset_path], capture_output=True, text=True, timeout=30)
+            if result.returncode == 0:
+                return int(result.stdout.split()[0])
+        except Exception as e:
+            logger.error(f"Error counting input records: {e}")
+        return None
+
+    def _count_output_records(self) -> Optional[int]:
+        """Count records in the output files."""
+        try:
+            import os
+            import subprocess
+
+            output_dir = os.path.join(self.config.output_dir, "output.jsonl")
+            if not os.path.exists(output_dir):
+                logger.warning(f"Output directory not found: {output_dir}")
+                return None
+
+            # Count all JSON files in the output directory
+            result = subprocess.run(
+                ["find", output_dir, "-name", "*.json", "-exec", "wc", "-l", "{}", "+"],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+
+            if result.returncode == 0:
+                # Parse the output to get total count
+                lines = result.stdout.strip().split("\n")
+
+                # Check if we have a "total" line (from using + syntax)
+                for line in lines:
+                    if "total" in line.lower():
+                        parts = line.split()
+                        if parts and parts[0].isdigit():
+                            return int(parts[0])
+
+                # Fallback: sum individual counts (for \; syntax)
+                total = 0
+                for line in lines:
+                    if line.strip() and "total" not in line.lower():
+                        parts = line.split()
+                        if parts and parts[0].isdigit():
+                            total += int(parts[0])
+                return total
+
+        except Exception as e:
+            logger.error(f"Error counting output records: {e}")
+        return None
+
+    def _parse_text_output(self, output: str) -> Dict[str, Any]:
+        """Fallback text parsing method (less reliable)."""
         metrics = {}
-
-        # Look for patterns in data-juicer output
         lines = output.split("\n")
-
-        # Track sample counts through processing steps
         initial_samples = None
         final_samples = None
 
         for line in lines:
-            # Look for initial sample count (after filtering empty text)
+            # Look for initial sample count patterns
             if "samples left after filtering empty text" in line:
                 try:
-                    # Extract number from line like "10000 samples left after filtering empty text"
                     parts = line.split()
                     for part in parts:
                         if part.isdigit():
@@ -249,10 +394,9 @@ class BenchmarkRunner:
                 except Exception as e:
                     logger.error(f"Error parsing initial samples: {e}")
 
-            # Look for final sample count (last "Left X samples" in processing)
+            # Look for final sample count patterns
             if "Left" in line and "samples" in line and "Done in" in line:
                 try:
-                    # Extract number from line like "Left 1000 samples"
                     parts = line.split()
                     for i, part in enumerate(parts):
                         if part == "Left" and i + 1 < len(parts):
@@ -262,23 +406,14 @@ class BenchmarkRunner:
                 except Exception as e:
                     logger.error(f"Error parsing final samples: {e}")
 
-        # Set metrics based on what we found
         if initial_samples is not None:
             metrics["samples_processed"] = initial_samples
         if final_samples is not None:
             metrics["samples_retained"] = final_samples
 
-        logger.info(f"=== Metrics Parsing Results ===")
+        logger.info(f"=== Text Parsing Results ===")
         logger.info(f"Initial samples found: {initial_samples}")
         logger.info(f"Final samples found: {final_samples}")
         logger.info(f"Parsed metrics: {metrics}")
-        logger.info(f"=== End Metrics Parsing ===")
+        logger.info(f"=== End Text Parsing ===")
         return metrics
-
-    def _get_config_hash(self) -> str:
-        """Generate hash of current configuration."""
-        config_str = f"{self.config.dataset_path}_{self.config.config_path}_{self.config.strategy_name}"
-        if self.config.strategy_config:
-            config_str += str(sorted(self.config.strategy_config.items()))
-
-        return hashlib.md5(config_str.encode()).hexdigest()[:8]

@@ -368,15 +368,14 @@ Examples:
     def _resolve_dataset_and_config(self, args):
         """Resolve dataset and config paths based on arguments."""
         # Validate arguments
-        if not args.dataset and not args.modality:
-            raise ValueError("Either --dataset or --modality must be specified")
         if not args.config and not args.modality:
             raise ValueError("Either --config or --modality must be specified")
 
         # Determine dataset path
+        dataset_path = None
         if args.dataset:
             dataset_path = args.dataset
-        else:  # args.modality is specified
+        elif args.modality:
             # Use production dataset for the specified modality
             dataset_path = f"perf_bench_data/{args.modality}/"
             if args.modality == "text":
@@ -387,6 +386,8 @@ Examples:
                 dataset_path += "msr_vtt_train.jsonl"
             elif args.modality == "audio":
                 dataset_path += "audio-10k.jsonl"
+        # If neither --dataset nor --modality is specified, dataset_path will be None
+        # and the config file should contain the dataset_path field
 
         # Determine config path
         if args.config:
