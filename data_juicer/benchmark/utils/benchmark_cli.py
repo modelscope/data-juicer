@@ -31,14 +31,16 @@ class BenchmarkCLI:
 Examples:
   # Run A/B test with specific strategies
   python -m data_juicer.benchmark.utils.benchmark_cli ab-test \\
-    --strategies baseline,mapper_fusion \\
+    --baseline baseline \\
+    --target-strategies mapper_fusion,filter_fusion \\
     --workload text_simple \\
     --output-dir outputs/benchmark/
 
   # Run workload suite test
   python -m data_juicer.benchmark.utils.benchmark_cli workload-suite \\
     --workloads text_simple,image_simple \\
-    --strategies baseline,mapper_fusion \\
+    --baseline baseline \\
+    --target-strategies mapper_fusion,full_optimization \\
     --output-dir outputs/benchmark/
 
   # Run single benchmark with custom dataset and config
@@ -77,7 +79,12 @@ Examples:
 
         # A/B test command
         ab_parser = subparsers.add_parser("ab-test", help="Run A/B test between strategies")
-        ab_parser.add_argument("--strategies", required=True, help="Comma-separated list of strategies to test")
+        ab_parser.add_argument("--baseline", required=True, help="Baseline strategy name")
+        ab_parser.add_argument(
+            "--target-strategies",
+            required=True,
+            help="Comma-separated list of target strategies to test against baseline",
+        )
         ab_parser.add_argument("--workload", required=True, help="Workload to use for testing")
         ab_parser.add_argument("--iterations", type=int, default=3, help="Number of iterations per strategy")
         ab_parser.add_argument("--output-dir", default="outputs/benchmark", help="Output directory for results")
@@ -86,7 +93,12 @@ Examples:
         # Workload suite command
         suite_parser = subparsers.add_parser("workload-suite", help="Run tests across multiple workloads")
         suite_parser.add_argument("--workloads", required=True, help="Comma-separated list of workloads to test")
-        suite_parser.add_argument("--strategies", required=True, help="Comma-separated list of strategies to test")
+        suite_parser.add_argument("--baseline", required=True, help="Baseline strategy name")
+        suite_parser.add_argument(
+            "--target-strategies",
+            required=True,
+            help="Comma-separated list of target strategies to test against baseline",
+        )
         suite_parser.add_argument("--iterations", type=int, default=3, help="Number of iterations per strategy")
         suite_parser.add_argument("--output-dir", default="outputs/benchmark", help="Output directory for results")
         suite_parser.add_argument("--timeout", type=int, default=3600, help="Timeout in seconds")
@@ -228,8 +240,9 @@ Examples:
         from data_juicer.benchmark.strategies.strategy_library import STRATEGY_LIBRARY
         from data_juicer.benchmark.workloads.workload_suite import WORKLOAD_SUITE
 
-        # Parse strategies
-        strategy_names = [s.strip() for s in args.strategies.split(",")]
+        # Parse baseline and target strategies
+        baseline_name = args.baseline.strip()
+        target_strategy_names = [s.strip() for s in args.target_strategies.split(",")]
 
         # Get workload
         workload = WORKLOAD_SUITE.get_workload(args.workload)
@@ -238,8 +251,8 @@ Examples:
             return 1
 
         # Create strategy configs
-        baseline = STRATEGY_LIBRARY.create_strategy_config(strategy_names[0])
-        test_strategies = [STRATEGY_LIBRARY.create_strategy_config(name) for name in strategy_names[1:]]
+        baseline = STRATEGY_LIBRARY.create_strategy_config(baseline_name)
+        test_strategies = [STRATEGY_LIBRARY.create_strategy_config(name) for name in target_strategy_names]
 
         # Create A/B test config
         ab_config = ABTestConfig(
@@ -278,9 +291,10 @@ Examples:
         from data_juicer.benchmark.strategies.strategy_library import STRATEGY_LIBRARY
         from data_juicer.benchmark.workloads.workload_suite import WORKLOAD_SUITE
 
-        # Parse workloads and strategies
+        # Parse workloads, baseline and target strategies
         workload_names = [w.strip() for w in args.workloads.split(",")]
-        strategy_names = [s.strip() for s in args.strategies.split(",")]
+        baseline_name = args.baseline.strip()
+        target_strategy_names = [s.strip() for s in args.target_strategies.split(",")]
 
         # Get workloads
         workloads = []
@@ -292,8 +306,8 @@ Examples:
             workloads.append(workload)
 
         # Create strategy configs
-        baseline = STRATEGY_LIBRARY.create_strategy_config(strategy_names[0])
-        test_strategies = [STRATEGY_LIBRARY.create_strategy_config(name) for name in strategy_names[1:]]
+        baseline = STRATEGY_LIBRARY.create_strategy_config(baseline_name)
+        test_strategies = [STRATEGY_LIBRARY.create_strategy_config(name) for name in target_strategy_names]
 
         # Run workload suite test
         ab_test = StrategyABTest(

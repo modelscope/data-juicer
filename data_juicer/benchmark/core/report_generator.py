@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
+import numpy as np
 from loguru import logger
 
 from .metrics_collector import BenchmarkMetrics
@@ -20,6 +21,23 @@ class ReportGenerator:
     def __init__(self, output_dir: str):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def _convert_numpy_types(self, obj):
+        """Convert numpy types to Python native types for JSON serialization."""
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {key: self._convert_numpy_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_numpy_types(item) for item in obj]
+        else:
+            return obj
 
     def generate_ab_test_report(
         self,
@@ -283,7 +301,36 @@ class ReportGenerator:
                 "confidence_level": comparison.confidence_level,
                 "p_value": comparison.p_value,
                 "summary": comparison.summary,
+                # Note: baseline_metrics and test_metrics are excluded as they contain non-serializable BenchmarkMetrics objects
             }
 
-        with open(json_file, "w") as f:
-            json.dump(data, f, indent=2)
+        try:
+            # Convert numpy types to Python native types
+            data = self._convert_numpy_types(data)
+            with open(json_file, "w") as f:
+                json.dump(data, f, indent=2)
+            logger.info(f"Successfully saved JSON data to {json_file}")
+        except Exception as e:
+            logger.error(f"Failed to save JSON data to {json_file}: {e}")
+            # Try to save a minimal version without problematic fields
+            try:
+                minimal_data = {
+                    "timestamp": data["timestamp"],
+                    "results": data["results"],
+                    "comparisons": {
+                        name: {
+                            "baseline_name": comp.baseline_name,
+                            "test_name": comp.test_name,
+                            "speedup": comp.speedup,
+                            "summary": comp.summary,
+                        }
+                        for name, comp in comparisons.items()
+                    },
+                }
+                minimal_data = self._convert_numpy_types(minimal_data)
+                with open(json_file, "w") as f:
+                    json.dump(minimal_data, f, indent=2)
+                logger.warning(f"Saved minimal JSON data to {json_file}")
+            except Exception as e2:
+                logger.error(f"Failed to save even minimal JSON data: {e2}")
+                raise
