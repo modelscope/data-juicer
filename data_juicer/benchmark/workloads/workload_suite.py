@@ -142,29 +142,29 @@ class WorkloadSuite:
             resource_requirements={"memory_gb": 8, "cpu_cores": 8},
         )
 
-        # Performance stress tests - Using production datasets
-        self.workloads["stress_test_text"] = WorkloadDefinition(
-            name="stress_test_text",
-            description="High-volume text stress test",
-            dataset_path="perf_bench_data/text/wiki-10k.jsonl",
-            config_path="tests/benchmark_performance/configs/text.yaml",
-            expected_samples=10000,
+        # C4 dataset stress tests - Local vs Ray execution
+        self.workloads["stress_test_text_c4_local"] = WorkloadDefinition(
+            name="stress_test_text_c4_local",
+            description="C4 dataset stress test with local execution (16 processes)",
+            dataset_path="perf_bench_data/text/c4-train.00000-of-01024.jsonl",
+            config_path="tests/benchmark_performance/configs/text-c4-local.yaml",
+            expected_samples=100000,  # C4 dataset is much larger
             modality="text",
             complexity="complex",
-            estimated_duration_minutes=60,
-            resource_requirements={"memory_gb": 32, "cpu_cores": 16, "gpu": True},
+            estimated_duration_minutes=120,  # Longer due to C4 dataset size
+            resource_requirements={"memory_gb": 64, "cpu_cores": 16, "gpu": False},
         )
 
-        self.workloads["stress_test_image"] = WorkloadDefinition(
-            name="stress_test_image",
-            description="High-volume image stress test",
-            dataset_path="perf_bench_data/image/10k.jsonl",
-            config_path="tests/benchmark_performance/configs/image.yaml",
-            expected_samples=10000,
-            modality="image",
+        self.workloads["stress_test_text_c4_ray"] = WorkloadDefinition(
+            name="stress_test_text_c4_ray",
+            description="C4 dataset stress test with Ray distributed execution",
+            dataset_path="perf_bench_data/text/c4-train.00000-of-01024.jsonl",
+            config_path="tests/benchmark_performance/configs/text-c4-ray.yaml",
+            expected_samples=100000,  # C4 dataset is much larger
+            modality="text",
             complexity="complex",
-            estimated_duration_minutes=90,
-            resource_requirements={"memory_gb": 32, "cpu_cores": 16, "gpu": True},
+            estimated_duration_minutes=90,  # Ray should be faster than local
+            resource_requirements={"memory_gb": 64, "cpu_cores": 32, "gpu": False},
         )
 
     def get_workload(self, name: str) -> Optional[WorkloadDefinition]:

@@ -1,6 +1,6 @@
-project_name: 'performance-benchmark-text-c4'
-dataset_path: 'perf_bench_data/text/c4-train.00000-of-01024.part.jsonl'
-export_path: 'outputs/performance_benchmark_text_c4/res.jsonl'
+project_name: 'performance-benchmark-text-c4-ray'
+dataset_path: 'perf_bench_data/text/c4-train.00000-of-01024.jsonl'
+export_path: 'outputs/performance_benchmark_text_c4_ray/res.jsonl'
 use_cache: false
 
 executor_type: ray
