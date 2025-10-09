@@ -41,7 +41,7 @@ class CalculateNpTest(DataJuicerTestCaseBase):
     
     def tearDown(self):
         os.environ[RAY_JOB_ENV_VAR] = self._ori_ray_job_env_value
-        return super().tearDown()
+        super().tearDown()
 
     def enable_ray_mode(self):
         os.environ[RAY_JOB_ENV_VAR] = '1'
