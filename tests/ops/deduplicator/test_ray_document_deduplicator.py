@@ -7,7 +7,6 @@ from data_juicer.ops.deduplicator.ray_document_deduplicator import \
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
-@unittest.skip('avoid oom')
 class RayDocumentDeduplicatorTest(DataJuicerTestCaseBase):
 
     def _run_doc_dedup(self, dataset: Dataset, target_list, op):

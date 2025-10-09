@@ -7,7 +7,6 @@ from data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator import \
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
-@unittest.skip('avoid oom')
 class RayBTSMinhashDeduplicatorTest(DataJuicerTestCaseBase):
 
     def _run_minhash_dedup(self, dataset: Dataset, target_list, op):

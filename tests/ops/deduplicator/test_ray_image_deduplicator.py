@@ -9,7 +9,6 @@ from data_juicer.ops.deduplicator.ray_image_deduplicator import RayImageDeduplic
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
-@unittest.skip('avoid oom')
 class RayImageDeduplicatorTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
