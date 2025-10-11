@@ -460,24 +460,31 @@ def generate_op_table_section(op_type, op_record_list, reference_op_record_dict)
     ]
     # only translate for the different descriptions
     dif_indices = [
-        i for i, record in enumerate(op_record_list) if record.desc != reference_op_record_dict[record.name].desc
+        i
+        for i, record in enumerate(op_record_list)
+        if record.name not in reference_op_record_dict or record.desc != reference_op_record_dict.get(record.name).desc
     ]
-    dif_descs = [op_record_list[i].desc for i in dif_indices]
-    ref_zh_descs = [reference_op_record_dict[op_record_list[i].name].desc_zh for i in dif_indices]
-    trans_zh_descs = None
-    if len(dif_descs) > 0:
+    zh_update_map = {}
+    if len(dif_indices) > 0:
+        dif_descs = [op_record_list[i].desc for i in dif_indices]
         trans_zh_descs = get_op_desc_in_en_zh_batched(dif_descs)
-    if trans_zh_descs is None:
-        # translation failed --> keep the old version
-        trans_zh_descs = ref_zh_descs
+        if trans_zh_descs is None:
+            # translation failed --> keep the old version
+            trans_zh_descs = [
+                (
+                    reference_op_record_dict.get(op_record_list[i].name).desc_zh
+                    if reference_op_record_dict.get(op_record_list[i].name)
+                    else "-"
+                )
+                for i in dif_indices
+            ]
+        zh_update_map = dict(zip(dif_indices, trans_zh_descs))
     for i, record in enumerate(op_record_list):
         tags = " ".join(replace_tags_with_icons(record.tags))
         info = record.info
         ref = record.ref
-        zh_desc = reference_op_record_dict[record.name].desc_zh
-        if i in dif_indices:
-            # the English description is changed --> use the latest version
-            zh_desc = trans_zh_descs[dif_indices.index(i)]
+        old_record = reference_op_record_dict.get(record.name)
+        zh_desc = zh_update_map.get(i, old_record.desc_zh if old_record else "-")
         op_row = f"| {record.name} " f"| {tags} " f"| {record.desc} {zh_desc.strip()} " f"| {info} " f"| {ref} |"
         table.append(op_row)
     doc.append("\n".join(table))
