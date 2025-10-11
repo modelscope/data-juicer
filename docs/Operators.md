@@ -7,13 +7,13 @@ sources and file formats, and allow for flexible extension to custom datasets.
 
 算子 (Operator) 是协助数据修改、清理、过滤、去重等基本流程的集合。我们支持广泛的数据来源和文件格式，并支持对自定义数据集的灵活扩展。
 
-This page offers a basic description of the operators (OPs) in Data-Juicer.
-Users can consult the
-[API documentation](https://modelscope.github.io/data-juicer/en/main/api.html)
+This page offers a basic description of the operators (OPs) in Data-Juicer. 
+Users can consult the 
+[API documentation](https://modelscope.github.io/data-juicer/en/main/api.html) 
 for the operator API reference. To learn more about each operator, click its
 adjacent 'info' link to access the operator's details page, which includes its
-detailed parameters, effect demonstrations, and links to relevant unit tests
-and source code.
+detailed parameters, effect demonstrations, and links to relevant unit tests 
+and source code. 
 
 Additionally, the 'Reference' column in the table is intended to cite research,
 libraries, or resource links that the operator's design or implementation is
@@ -46,7 +46,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [filter](#filter) | 54 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
-| [mapper](#mapper) | 86 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
+| [mapper](#mapper) | 83 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
 
 All the specific operators are listed below, each featured with several capability tags. 
@@ -121,7 +121,7 @@ All the specific operators are listed below, each featured with several capabili
 | language_id_score_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples in a specific language with a confidence score above a threshold. 过滤器以保留置信度高于阈值的特定语言的样本。 | [info](operators/filter/language_id_score_filter.md) | - |
 | llm_analysis_filter | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta | Base filter class for leveraging LLMs to analyze and filter data samples. 用于利用LLMs分析和过滤数据样本的基本筛选器类。 | [info](operators/filter/llm_analysis_filter.md) | - |
 | llm_difficulty_score_filter | 💻CPU 🟡Beta | Filter to keep samples with high difficulty scores estimated by an LLM. 过滤器以保留由LLM估计的高难度分数的样本。 | [info](operators/filter/llm_difficulty_score_filter.md) | - |
-| llm_perplexity_filter | 🚀GPU 🧩HF 🟡Beta | Filter to keep samples with perplexity scores within a specified range, computed using a specified LLM. 过滤器将困惑分数的样本保持在指定范围内，使用指定的LLM计算。 | [info](operators/filter/llm_perplexity_filter.md) | - |
+| llm_perplexity_filter | 🚀GPU 🧩HF 🟡Beta | Filter to keep samples with perplexity scores within a specified range, computed using a specified LLM. 过滤器将困惑分数的样本保留在指定范围内，使用指定的LLM计算。 | [info](operators/filter/llm_perplexity_filter.md) | - |
 | llm_quality_score_filter | 💻CPU 🟡Beta | Filter to keep samples with a high quality score estimated by a language model. 过滤器，以保留具有语言模型估计的高质量分数的样本。 | [info](operators/filter/llm_quality_score_filter.md) | - |
 | llm_task_relevance_filter | 💻CPU 🟡Beta | Filter to keep samples with high relevance scores to validation tasks estimated by an LLM. 过滤器以保留与LLM估计的验证任务具有高相关性分数的样本。 | [info](operators/filter/llm_task_relevance_filter.md) | - |
 | maximum_line_length_filter | 🔤Text 💻CPU 🟢Stable | Filter to keep samples with a maximum line length within a specified range. 筛选器将最大行长度的样本保持在指定范围内。 | [info](operators/filter/maximum_line_length_filter.md) | - |
@@ -181,16 +181,16 @@ All the specific operators are listed below, each featured with several capabili
 | audio_ffmpeg_wrapped_mapper | 📣Audio 💻CPU 🟢Stable | Wraps FFmpeg audio filters for processing audio files in a dataset. 包装FFmpeg音频过滤器，用于处理数据集中的音频文件。 | [info](operators/mapper/audio_ffmpeg_wrapped_mapper.md) | - |
 | calibrate_qa_mapper | 🔤Text 💻CPU 🔗API 🟢Stable | Calibrates question-answer pairs based on reference text using an API model. 使用API模型根据参考文本校准问答对。 | [info](operators/mapper/calibrate_qa_mapper.md) | - |
 | calibrate_query_mapper | 💻CPU 🟢Stable | Calibrate query in question-answer pairs based on reference text. 基于参考文本校准问答对中的查询。 | [info](operators/mapper/calibrate_query_mapper.md) | - |
-| calibrate_response_mapper | 💻CPU 🟢Stable | Calibrate response in question-answer pairs based on reference text. 根据参考文本校准问答对中的响应。 | [info](operators/mapper/calibrate_response_mapper.md) | - |
+| calibrate_response_mapper | 💻CPU 🟢Stable | Calibrate response in question-answer pairs based on reference text. 根据参考文本校准问答对中的回答。 | [info](operators/mapper/calibrate_response_mapper.md) | - |
 | chinese_convert_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to convert Chinese text between Traditional, Simplified, and Japanese Kanji. 映射器在繁体、简体和日文汉字之间转换中文文本。 | [info](operators/mapper/chinese_convert_mapper.md) | - |
 | clean_copyright_mapper | 🔤Text 💻CPU 🟢Stable | Cleans copyright comments at the beginning of text samples. 清除文本示例开头的版权注释。 | [info](operators/mapper/clean_copyright_mapper.md) | - |
 | clean_email_mapper | 🔤Text 💻CPU 🟢Stable | Cleans email addresses from text samples using a regular expression. 使用正则表达式从文本示例中清除电子邮件地址。 | [info](operators/mapper/clean_email_mapper.md) | - |
 | clean_html_mapper | 🔤Text 💻CPU 🟢Stable | Cleans HTML code from text samples, converting HTML to plain text. 从文本示例中清除HTML代码，将HTML转换为纯文本。 | [info](operators/mapper/clean_html_mapper.md) | - |
 | clean_ip_mapper | 🔤Text 💻CPU 🟢Stable | Cleans IPv4 and IPv6 addresses from text samples. 从文本示例中清除IPv4和IPv6地址。 | [info](operators/mapper/clean_ip_mapper.md) | - |
 | clean_links_mapper | 🔤Text 💻CPU 🟢Stable | Mapper to clean links like http/https/ftp in text samples. 映射器来清理链接，如文本示例中的http/https/ftp。 | [info](operators/mapper/clean_links_mapper.md) | - |
-| detect_character_attributes_mapper | 🚀GPU 🟡Beta | Takes an image, a caption, and main character names as input to extract the characters' attributes. 将图像、标题和主要角色名称作为输入以提取角色的属性。 | - | - |
-| detect_character_locations_mapper | 🚀GPU 🟡Beta | Given an image and a list of main character names, extract the bounding boxes for each present character. 给定图像和主要角色名称的列表，提取每个当前角色的边界框。 | - | - |
-| detect_main_character_mapper | 🚀GPU 🟡Beta | Extract all main character names based on the given image and its caption. 根据给定的图像及其标题提取所有主要角色名称。 | - | - |
+| detect_character_attributes_mapper | 🔮Multimodal 🚀GPU 🟡Beta | Takes an image, a caption, and main character names as input to extract the characters' attributes. 根据给定的图像、图像描述信息和（多个）角色名称，提取图像中主要角色的属性。 | - | [DetailMaster](https://arxiv.org/abs/2505.16915) |
+| detect_character_locations_mapper | 🔮Multimodal 🚀GPU 🟡Beta | Given an image and a list of main character names, extract the bounding boxes for each present character. 给定一张图像和主要角色的名称列表，提取每个在场角色的边界框。(YOLOE + MLLM) | - | [DetailMaster](https://arxiv.org/abs/2505.16915) |
+| detect_main_character_mapper | 🔮Multimodal 🚀GPU 🟡Beta | Extract all main character names based on the given image and its caption. 根据给定的图像及其图像描述，提取所有主要角色的名字。 | - | [DetailMaster](https://arxiv.org/abs/2505.16915) |
 | dialog_intent_detection_mapper | 💻CPU 🔗API 🟢Stable | Generates user's intent labels in a dialog by analyzing the history, query, and response. 通过分析历史记录、查询和响应，在对话框中生成用户的意图标签。 | [info](operators/mapper/dialog_intent_detection_mapper.md) | - |
 | dialog_sentiment_detection_mapper | 💻CPU 🔗API 🟢Stable | Generates sentiment labels and analysis for user queries in a dialog. 在对话框中为用户查询生成情绪标签和分析。 | [info](operators/mapper/dialog_sentiment_detection_mapper.md) | - |
 | dialog_sentiment_intensity_mapper | 💻CPU 🔗API 🟢Stable | Mapper to predict user's sentiment intensity in a dialog, ranging from -5 to 5. Mapper预测用户在对话框中的情绪强度，范围从-5到5。 | [info](operators/mapper/dialog_sentiment_intensity_mapper.md) | - |
@@ -208,7 +208,7 @@ All the specific operators are listed below, each featured with several capabili
 | generate_qa_from_examples_mapper | 🚀GPU 🌊vLLM 🧩HF 🟢Stable | Generates question and answer pairs from examples using a Hugging Face model. 使用拥抱面部模型从示例生成问题和答案对。 | [info](operators/mapper/generate_qa_from_examples_mapper.md) | - |
 | generate_qa_from_text_mapper | 🔤Text 🚀GPU 🌊vLLM 🧩HF 🟢Stable | Generates question and answer pairs from text using a specified model. 使用指定的模型从文本生成问题和答案对。 | [info](operators/mapper/generate_qa_from_text_mapper.md) | - |
 | image_blur_mapper | 🏞Image 💻CPU 🟢Stable | Blurs images in the dataset with a specified probability and blur type. 使用指定的概率和模糊类型对数据集中的图像进行模糊处理。 | [info](operators/mapper/image_blur_mapper.md) | - |
-| image_captioning_from_gpt4v_mapper | 🔮Multimodal 💻CPU 🟡Beta | Generates text captions for images using the GPT-4 Vision model. 使用GPT-4视觉模型生成图像的文本标题。 | [info](operators/mapper/image_captioning_from_gpt4v_mapper.md) | - |
+| image_captioning_from_gpt4v_mapper | 🔮Multimodal 💻CPU 🟡Beta | Generates text captions for images using the GPT-4 Vision model. 使用GPT-4视觉模型为图像生成文本标题。 | [info](operators/mapper/image_captioning_from_gpt4v_mapper.md) | - |
 | image_captioning_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Generates image captions using a Hugging Face model and appends them to samples. 使用拥抱面部模型生成图像标题，并将其附加到样本中。 | [info](operators/mapper/image_captioning_mapper.md) | - |
 | image_detection_yolo_mapper | 🏞Image 🚀GPU 🟡Beta | Perform object detection using YOLO on images and return bounding boxes and class labels. 使用YOLO对图像执行对象检测，并返回边界框和类标签。 | [info](operators/mapper/image_detection_yolo_mapper.md) | - |
 | image_diffusion_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Generate images using a diffusion model based on provided captions. 使用基于提供的字幕的扩散模型生成图像。 | [info](operators/mapper/image_diffusion_mapper.md) | - |
@@ -221,7 +221,7 @@ All the specific operators are listed below, each featured with several capabili
 | mllm_mapper | 🔮Multimodal 🚀GPU 🧩HF 🟢Stable | Mapper to use MLLMs for visual question answering tasks. Mapper使用MLLMs进行视觉问答任务。 | [info](operators/mapper/mllm_mapper.md) | - |
 | nlpaug_en_mapper | 🔤Text 💻CPU 🟢Stable | Augments English text samples using various methods from the nlpaug library. 使用nlpaug库中的各种方法增强英语文本样本。 | [info](operators/mapper/nlpaug_en_mapper.md) | - |
 | nlpcda_zh_mapper | 🔤Text 💻CPU 🟢Stable | Augments Chinese text samples using the nlpcda library. 使用nlpcda库扩充中文文本样本。 | [info](operators/mapper/nlpcda_zh_mapper.md) | - |
-| optimize_prompt_mapper | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta | Optimize prompts based on existing ones in the same batch. 根据同一批中的现有提示优化提示。 | [info](operators/mapper/optimize_prompt_mapper.md) | - |
+| optimize_prompt_mapper | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟡Beta | Optimize prompts based on existing ones in the same batch. 根据同一批次中的现有提示优化提示。 | [info](operators/mapper/optimize_prompt_mapper.md) | - |
 | optimize_qa_mapper | 🚀GPU 🌊vLLM 🧩HF 🔗API 🟢Stable | Mapper to optimize question-answer pairs. 映射器来优化问题-答案对。 | [info](operators/mapper/optimize_qa_mapper.md) | - |
 | optimize_query_mapper | 🚀GPU 🟢Stable | Optimize queries in question-answer pairs to make them more specific and detailed. 优化问答对中的查询，使其更加具体和详细。 | [info](operators/mapper/optimize_query_mapper.md) | - |
 | optimize_response_mapper | 🚀GPU 🟢Stable | Optimize response in question-answer pairs to be more detailed and specific. 优化问答对中的响应，使其更加详细和具体。 | [info](operators/mapper/optimize_response_mapper.md) | - |
@@ -229,7 +229,7 @@ All the specific operators are listed below, each featured with several capabili
 | punctuation_normalization_mapper | 🔤Text 💻CPU 🟢Stable | Normalizes unicode punctuations to their English equivalents in text samples. 将unicode标点规范化为文本示例中的英语等效项。 | [info](operators/mapper/punctuation_normalization_mapper.md) | - |
 | python_file_mapper | 💻CPU 🟢Stable | Executes a Python function defined in a file on input data. 对输入数据执行文件中定义的Python函数。 | [info](operators/mapper/python_file_mapper.md) | - |
 | python_lambda_mapper | 💻CPU 🟢Stable | Mapper for applying a Python lambda function to data samples. Mapper，用于将Python lambda函数应用于数据样本。 | [info](operators/mapper/python_lambda_mapper.md) | - |
-| query_intent_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts the user's intent label and corresponding score for a given query. 预测给定查询的用户意图标签和相应分数。 | [info](operators/mapper/query_intent_detection_mapper.md) | - |
+| query_intent_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts the user's intent label and corresponding score for a given query. 为给定查询预测用户的意图标签和相应的分数。 | [info](operators/mapper/query_intent_detection_mapper.md) | - |
 | query_sentiment_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts user's sentiment label ('negative', 'neutral', 'positive') in a query. 在查询中预测用户的情绪标签 (“负面” 、 “中性” 、 “正面”)。 | [info](operators/mapper/query_sentiment_detection_mapper.md) | - |
 | query_topic_detection_mapper | 🚀GPU 🧩HF 🧩HF 🟢Stable | Predicts the topic label and its corresponding score for a given query. 预测给定查询的主题标签及其相应的分数。 | [info](operators/mapper/query_topic_detection_mapper.md) | - |
 | relation_identity_mapper | 🔤Text 💻CPU 🔗API 🟢Stable | Identify the relation between two entities in a given text. 确定给定文本中两个实体之间的关系。 | [info](operators/mapper/relation_identity_mapper.md) | - |
@@ -255,10 +255,10 @@ All the specific operators are listed below, each featured with several capabili
 | video_face_blur_mapper | 🎬Video 💻CPU 🟢Stable | Mapper to blur faces detected in videos. 映射器模糊在视频中检测到的人脸。 | [info](operators/mapper/video_face_blur_mapper.md) | - |
 | video_ffmpeg_wrapped_mapper | 🎬Video 💻CPU 🟢Stable | Wraps FFmpeg video filters for processing video files in a dataset. 包装FFmpeg视频过滤器，用于处理数据集中的视频文件。 | [info](operators/mapper/video_ffmpeg_wrapped_mapper.md) | - |
 | video_remove_watermark_mapper | 🎬Video 💻CPU 🟢Stable | Remove watermarks from videos based on specified regions. 根据指定区域从视频中删除水印。 | [info](operators/mapper/video_remove_watermark_mapper.md) | - |
-| video_resize_aspect_ratio_mapper | 🎬Video 💻CPU 🟢Stable | Resizes videos to fit within a specified aspect ratio range. 调整视频大小以适应指定的纵横比范围。 | [info](operators/mapper/video_resize_aspect_ratio_mapper.md) | - |
+| video_resize_aspect_ratio_mapper | 🎬Video 💻CPU 🟢Stable | Resizes videos to fit within a specified aspect ratio range. 调整视频大小以适应指定的宽高比范围。 | [info](operators/mapper/video_resize_aspect_ratio_mapper.md) | - |
 | video_resize_resolution_mapper | 🎬Video 💻CPU 🟢Stable | Resizes video resolution based on specified width and height constraints. 根据指定的宽度和高度限制调整视频分辨率。 | [info](operators/mapper/video_resize_resolution_mapper.md) | - |
-| video_split_by_duration_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits videos into segments based on a specified duration. 根据指定的持续时间将视频拆分为段。 | [info](operators/mapper/video_split_by_duration_mapper.md) | - |
-| video_split_by_key_frame_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits a video into segments based on key frames. 根据关键帧将视频分割成多个片段。 | [info](operators/mapper/video_split_by_key_frame_mapper.md) | - |
+| video_split_by_duration_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits videos into segments based on a specified duration. 根据指定的持续时间将视频拆分为多个片段。 | [info](operators/mapper/video_split_by_duration_mapper.md) | - |
+| video_split_by_key_frame_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits a video into segments based on key frames. 根据关键帧将视频分割为多个片段。 | [info](operators/mapper/video_split_by_key_frame_mapper.md) | - |
 | video_split_by_scene_mapper | 🔮Multimodal 💻CPU 🟢Stable | Splits videos into scene clips based on detected scene changes. 根据检测到的场景变化将视频拆分为场景剪辑。 | [info](operators/mapper/video_split_by_scene_mapper.md) | - |
 | video_tagging_from_audio_mapper | 🎬Video 🚀GPU 🧩HF 🟢Stable | Generates video tags from audio streams using the Audio Spectrogram Transformer. 使用音频频谱图转换器从音频流生成视频标签。 | [info](operators/mapper/video_tagging_from_audio_mapper.md) | - |
 | video_tagging_from_frames_mapper | 🎬Video 🚀GPU 🟢Stable | Generates video tags from frames extracted from videos. 从视频中提取的帧生成视频标签。 | [info](operators/mapper/video_tagging_from_frames_mapper.md) | - |
@@ -268,11 +268,11 @@ All the specific operators are listed below, each featured with several capabili
 
 | Operator 算子 | Tags 标签 | Description 描述 | Details 详情 | Reference 参考 |
 |----------|------|-------------|-------------|-------------|
-| frequency_specified_field_selector | 💻CPU 🟢Stable | Selector to filter samples based on the frequency of a specified field. - | [info](operators/selector/frequency_specified_field_selector.md) | - |
-| random_selector | 💻CPU 🟢Stable | Randomly selects a subset of samples from the dataset. - | [info](operators/selector/random_selector.md) | - |
-| range_specified_field_selector | 💻CPU 🟢Stable | Selects a range of samples based on the sorted values of a specified field. - | [info](operators/selector/range_specified_field_selector.md) | - |
-| tags_specified_field_selector | 💻CPU 🟢Stable | Selector to filter samples based on the tags of a specified field. - | [info](operators/selector/tags_specified_field_selector.md) | - |
-| topk_specified_field_selector | 💻CPU 🟢Stable | Selects top samples based on the sorted values of a specified field. - | [info](operators/selector/topk_specified_field_selector.md) | - |
+| frequency_specified_field_selector | 💻CPU 🟢Stable | Selector to filter samples based on the frequency of a specified field. 选择器根据指定字段的频率过滤样本。 | [info](operators/selector/frequency_specified_field_selector.md) | - |
+| random_selector | 💻CPU 🟢Stable | Randomly selects a subset of samples from the dataset. 从数据集中随机选择样本子集。 | [info](operators/selector/random_selector.md) | - |
+| range_specified_field_selector | 💻CPU 🟢Stable | Selects a range of samples based on the sorted values of a specified field. 根据指定字段的排序值选择采样范围。 | [info](operators/selector/range_specified_field_selector.md) | - |
+| tags_specified_field_selector | 💻CPU 🟢Stable | Selector to filter samples based on the tags of a specified field. 选择器根据指定字段的标签过滤样本。 | [info](operators/selector/tags_specified_field_selector.md) | - |
+| topk_specified_field_selector | 💻CPU 🟢Stable | Selects top samples based on the sorted values of a specified field. 根据指定字段的排序值选择顶部样本。 | [info](operators/selector/topk_specified_field_selector.md) | - |
 
 
 ## Contributing  贡献
