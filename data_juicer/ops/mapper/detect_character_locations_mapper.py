@@ -1,3 +1,4 @@
+import json
 import os
 import random
 from typing import Dict, Optional
@@ -137,11 +138,11 @@ class DetectCharacterLocationsMapper(Mapper):
         bboxes_cls = results[0].boxes.cls.tolist()
 
         valid_main_character = []
-        seen = []
+        seen = set()
         for temp_bbox_idx in range(len(yoloe_bboxes)):
             if bboxes_cls[temp_bbox_idx] in seen:
                 continue
-            seen.append(bboxes_cls[temp_bbox_idx])
+            seen.add(bboxes_cls[temp_bbox_idx])
             temp_bbox_json = {}
             temp_bbox_json["main_character"] = samples["main_character_list"][int(bboxes_cls[temp_bbox_idx])]
             temp_bbox_json["yoloe_bbox"] = [
@@ -164,15 +165,20 @@ class DetectCharacterLocationsMapper(Mapper):
             output_text = self.fused_ops[0].process(mllm_sample)["text"][0].split("ASSISTANT:")[-1].strip()
             try:
                 output_text = output_text.replace("json", "").replace("```", "")
-                output_text = eval(output_text)
-                if output_text[0] <= 1 and output_text[1] <= 1 and output_text[2] <= 1 and output_text[3] <= 1:
-                    temp_character["llm_bbox"] = []
-                    temp_character["llm_bbox"].append(int(output_text[0] * now_image.size[0]))
-                    temp_character["llm_bbox"].append(int(output_text[1] * now_image.size[1]))
-                    temp_character["llm_bbox"].append(int(output_text[2] * now_image.size[0]))
-                    temp_character["llm_bbox"].append(int(output_text[3] * now_image.size[1]))
+                output_data = json.loads(output_text)
+                if (
+                    isinstance(output_data, list)
+                    and len(output_data) == 4
+                    and all(isinstance(x, (int, float)) and 0 <= x <= 1 for x in output_data)
+                ):
+                    temp_character["llm_bbox"] = [
+                        int(output_data[0] * now_image.size[0]),
+                        int(output_data[1] * now_image.size[1]),
+                        int(output_data[2] * now_image.size[0]),
+                        int(output_data[3] * now_image.size[1]),
+                    ]
                 final_bboxes.append(temp_character)
-            except Exception:
+            except (json.JSONDecodeError, TypeError):
                 continue
 
         final_filterd_character = []

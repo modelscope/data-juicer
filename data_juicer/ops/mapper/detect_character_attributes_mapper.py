@@ -1,3 +1,4 @@
+import json
 import os
 import random
 from typing import Dict, Optional
@@ -128,8 +129,8 @@ class DetectCharacterAttributesMapper(Mapper):
             mllm_sample = {"text": prompt, "images": samples["images"]}
             output_text = self.fused_ops[0].fused_ops[0].process(mllm_sample)["text"][0].split("ASSISTANT:")[-1].strip()
             try:
-                character_to_characteristics[temp_character] = eval(output_text)
-            except Exception:
+                character_to_characteristics[temp_character] = json.loads(output_text)
+            except json.JSONDecodeError:
                 character_to_characteristics[temp_character] = [output_text]
 
         image = Image.open(samples["images"][0])
@@ -211,8 +212,8 @@ class DetectCharacterAttributesMapper(Mapper):
             final_characteristic_list = []
             # filter
             try:
-                characteristic_list = eval(output_text)
-            except Exception:
+                characteristic_list = json.loads(output_text)
+            except json.JSONDecodeError:
                 characteristic_list = output_text
 
             if isinstance(characteristic_list, list):
@@ -287,23 +288,14 @@ class DetectCharacterAttributesMapper(Mapper):
             temp_character_json = {}
             temp_character_json["main_character"] = temp_character
             if temp_character in valid_character_in_bbox_dict:
-                temp_character_json["bbox"] = valid_character_in_bbox_dict[temp_character_with_bbox["main_character"]][
-                    "bbox"
-                ]
+                temp_character_json["bbox"] = valid_character_in_bbox_dict[temp_character]["bbox"]
 
-                if (
-                    len(
-                        valid_character_in_bbox_dict[temp_character_with_bbox["main_character"]][
-                            "final_characteristic_list"
-                        ]
-                    )
-                    == 0
-                ):
+                if len(valid_character_in_bbox_dict[temp_character]["final_characteristic_list"]) == 0:
                     temp_character_json["characteristic_list"] = character_to_characteristics[temp_character]
                 else:
-                    temp_character_json["characteristic_list"] = valid_character_in_bbox_dict[
-                        temp_character_with_bbox["main_character"]
-                    ]["final_characteristic_list"]
+                    temp_character_json["characteristic_list"] = valid_character_in_bbox_dict[temp_character][
+                        "final_characteristic_list"
+                    ]
 
             else:
                 temp_character_json["bbox"] = []

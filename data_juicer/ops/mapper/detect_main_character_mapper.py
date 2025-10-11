@@ -1,3 +1,4 @@
+import json
 from typing import Dict, Optional
 
 from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, UNFORKABLE, Mapper
@@ -78,11 +79,19 @@ class DetectMainCharacterMapper(Mapper):
 
         samples[Fields.meta]["main_character_list"] = []
         try:
-            result_json = "{" + result.replace("\n", "").replace("\\", "").split("{")[-1].split("}")[-2] + "}"
-            json_str = eval(result_json)
-            if json_str["count"] >= self.filter_min_character_num:
-                samples[Fields.meta]["main_character_list"] = json_str["main_character"]
-        except Exception:
+            result = result.replace("\n", "").replace("\\", "")
+            start = result.find("{")
+            end = result.rfind("}") + 1
+            if start != -1 and end > start:
+                result_json = result[start:end]
+                data = json.loads(result_json)
+                if data.get("count", 0) >= self.filter_min_character_num:
+                    samples[Fields.meta]["main_character_list"] = data.get("main_character", [])
+                else:
+                    samples[Fields.meta]["main_character_list"] = []
+            else:
+                samples[Fields.meta]["main_character_list"] = []
+        except (json.JSONDecodeError, KeyError):
             samples[Fields.meta]["main_character_list"] = []
 
         return samples
