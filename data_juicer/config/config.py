@@ -470,9 +470,10 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None, l
                 "--op_fusion",
                 type=bool,
                 default=False,
-                help="Whether to fuse operators that share the same intermediate "  # noqa: E251
-                "variables automatically. Op fusion might reduce the memory "
-                "requirements slightly but speed up the whole process.",
+                help="Whether to fuse operators that share the same intermediate "
+                "variables automatically. Op fusion increases memory usage "
+                "but significantly speeds up the whole process by avoiding "
+                "re-computation of shared intermediate variables.",
             )
             parser.add_argument(
                 "--fusion_strategy",
