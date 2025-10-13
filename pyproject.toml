@@ -138,6 +138,7 @@ dev = [
     "build",  # package building
     "black>=25.1.0",
     "flake8-black",
+    "docstring-parser>=0.16",
 ]
 
 # AI Services & APIs
