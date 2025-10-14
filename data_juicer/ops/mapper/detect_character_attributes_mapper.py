@@ -27,7 +27,6 @@ class DetectCharacterAttributesMapper(Mapper):
 
     def __init__(
         self,
-        mllm_mapper_args: Optional[Dict] = {},
         detect_character_locations_mapper_args: Optional[Dict] = {},
         *args,
         **kwargs,
@@ -35,10 +34,6 @@ class DetectCharacterAttributesMapper(Mapper):
         """
         Initialization method.
 
-        :param mllm_mapper_args: Arguments for multimodal language model mapper.
-            Controls the generation of captions for bounding box regions. Default empty dict
-            will use fixed values: max_new_tokens=256, temperature=0.2, top_p=None,
-            num_beams=1, hf_model="llava-hf/llava-v1.6-vicuna-7b-hf".
         :param detect_character_locations_mapper_args: Arguments for detect_character_locations_mapper_args.
             Controls the threshold for locating the main character.
             Default empty dict will use fixed values: default mllm_mapper_args,
