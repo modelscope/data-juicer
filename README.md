@@ -1,4 +1,5 @@
 # HumanVBench
+**Update (2025.10.15)**: We have updated the benchmark by adding new tasks constructed from original movie videos.
 ## HumanVBench Download and Evaluation
 You can download HumanVBench from HuggingFace(https://huggingface.co/datasets/datajuicer/HumanVBench) or ModelScope(https://www.modelscope.cn/datasets/Data-Juicer/HumanVBench).
 
