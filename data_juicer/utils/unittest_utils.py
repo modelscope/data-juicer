@@ -1,4 +1,3 @@
-import functools
 import gc
 import os
 import shutil
@@ -27,24 +26,7 @@ def TEST_TAG(*tags):
 
     def decorator(func):
         setattr(func, "__test_tags__", tags)
-
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            # Save the original current_tag if it exists
-            original_tag = getattr(self, "current_tag", "standalone")
-
-            # Set the current_tag to the first tag
-            if tags:
-                self.current_tag = tags[0]
-
-            try:
-                # Run the test method
-                return func(self, *args, **kwargs)
-            finally:
-                # Restore the original current_tag
-                self.current_tag = original_tag
-
-        return wrapper
+        return func
 
     return decorator
 
@@ -128,7 +110,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             pass
 
     def setUp(self):
-        logger.info(f">>>>>>>>>> [Start Test]: {self.id()}")
+        logger.info(f">>>>>>>>>> [Start Test]: {self.id()} in {getattr(self, 'current_tag', 'standalone')} mode")
 
         # start ray
         current_tag = getattr(self, "current_tag", "standalone")
