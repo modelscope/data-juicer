@@ -40,7 +40,7 @@ def check_and_initialize_ray(cfg=None):
         try:
             initialize_ray(cfg)
             return True
-        except:
+        except:  # noqa: E722
             return False
 
     return False
