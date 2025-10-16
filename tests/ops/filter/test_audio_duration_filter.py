@@ -22,6 +22,26 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
         self.assertDatasetEqual(res_list, target_list)
 
     @TEST_TAG("standalone", "ray")
+    def test_default_filter(self):
+        ds_list = [{
+            'audios': [self.aud1_path]
+        }, {
+            'audios': [self.aud2_path]
+        }, {
+            'audios': [self.aud3_path]
+        }]
+        tgt_list = [{
+            'audios': [self.aud1_path]
+        }, {
+            'audios': [self.aud2_path]
+        }, {
+            'audios': [self.aud3_path]
+        }]
+        dataset = self.generate_dataset(ds_list)
+        op = AudioDurationFilter()
+        self._run_audio_duration_filter(dataset, tgt_list, op)
+
+    @TEST_TAG("standalone", "ray")
     def test_filter_long_audios(self):
         ds_list = [{
             'audios': [self.aud1_path]

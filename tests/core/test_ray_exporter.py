@@ -11,7 +11,7 @@ from data_juicer.utils.mm_utils import load_images_byte
 
 
 class TestRayExporter(DataJuicerTestCaseBase):
-    current_tag = "ray"
+
     def setUp(self):
         """Set up test data"""
         super().setUp()
@@ -47,69 +47,69 @@ class TestRayExporter(DataJuicerTestCaseBase):
 
         return res
 
-    # @TEST_TAG('ray')
-    # def test_json_not_keep_stats_and_hashes(self):
-    #     import ray
-    #
-    #     out_path = osp.join(self.tmp_dir, 'outdata.json')
-    #     ray_exporter = RayExporter(
-    #         out_path,
-    #         keep_stats_in_res_ds=False,
-    #         keep_hashes_in_res_ds=False)
-    #     ray_exporter.export(self.dataset.data)
-    #
-    #     ds = ray.data.read_json(out_path)
-    #     data_list = ds.take_all()
-    #
-    #     self.assertListOfDictEqual(data_list, self._pop_raw_data_keys([Fields.stats, HashKeys.hash]))
-    #
-    # @TEST_TAG('ray')
-    # def test_jsonl_keep_stats_and_hashes(self):
-    #     import ray
-    #
-    #     out_path = osp.join(self.tmp_dir, 'outdata.jsonl')
-    #     ray_exporter = RayExporter(
-    #         out_path,
-    #         keep_stats_in_res_ds=True,
-    #         keep_hashes_in_res_ds=True)
-    #     ray_exporter.export(self.dataset.data)
-    #
-    #     ds = ray.data.read_json(out_path)
-    #     data_list = ds.take_all()
-    #
-    #     self.assertListOfDictEqual(data_list, self.data)
-    #
-    # @TEST_TAG('ray')
-    # def test_parquet_keep_stats(self):
-    #     import ray
-    #
-    #     out_path = osp.join(self.tmp_dir, 'outdata.parquet')
-    #     ray_exporter = RayExporter(
-    #         out_path,
-    #         keep_stats_in_res_ds=True,
-    #         keep_hashes_in_res_ds=False)
-    #     ray_exporter.export(self.dataset.data)
-    #
-    #     ds = ray.data.read_parquet(out_path)
-    #     data_list = ds.take_all()
-    #
-    #     self.assertListEqual(data_list, self._pop_raw_data_keys([HashKeys.hash]))
-    #
-    # @TEST_TAG('ray')
-    # def test_lance_keep_hashes(self):
-    #     import ray
-    #
-    #     out_path = osp.join(self.tmp_dir, 'outdata.lance')
-    #     ray_exporter = RayExporter(
-    #         out_path,
-    #         keep_stats_in_res_ds=False,
-    #         keep_hashes_in_res_ds=True)
-    #     ray_exporter.export(self.dataset.data)
-    #
-    #     ds = ray.data.read_lance(out_path)
-    #     data_list = ds.take_all()
-    #
-    #     self.assertListOfDictEqual(data_list, self._pop_raw_data_keys([Fields.stats]))
+    @TEST_TAG('ray')
+    def test_json_not_keep_stats_and_hashes(self):
+        import ray
+
+        out_path = osp.join(self.tmp_dir, 'outdata.json')
+        ray_exporter = RayExporter(
+            out_path,
+            keep_stats_in_res_ds=False,
+            keep_hashes_in_res_ds=False)
+        ray_exporter.export(self.dataset.data)
+
+        ds = ray.data.read_json(out_path)
+        data_list = ds.take_all()
+
+        self.assertListOfDictEqual(data_list, self._pop_raw_data_keys([Fields.stats, HashKeys.hash]))
+
+    @TEST_TAG('ray')
+    def test_jsonl_keep_stats_and_hashes(self):
+        import ray
+
+        out_path = osp.join(self.tmp_dir, 'outdata.jsonl')
+        ray_exporter = RayExporter(
+            out_path,
+            keep_stats_in_res_ds=True,
+            keep_hashes_in_res_ds=True)
+        ray_exporter.export(self.dataset.data)
+
+        ds = ray.data.read_json(out_path)
+        data_list = ds.take_all()
+
+        self.assertListOfDictEqual(data_list, self.data)
+
+    @TEST_TAG('ray')
+    def test_parquet_keep_stats(self):
+        import ray
+
+        out_path = osp.join(self.tmp_dir, 'outdata.parquet')
+        ray_exporter = RayExporter(
+            out_path,
+            keep_stats_in_res_ds=True,
+            keep_hashes_in_res_ds=False)
+        ray_exporter.export(self.dataset.data)
+
+        ds = ray.data.read_parquet(out_path)
+        data_list = ds.take_all()
+
+        self.assertListEqual(data_list, self._pop_raw_data_keys([HashKeys.hash]))
+
+    @TEST_TAG('ray')
+    def test_lance_keep_hashes(self):
+        import ray
+
+        out_path = osp.join(self.tmp_dir, 'outdata.lance')
+        ray_exporter = RayExporter(
+            out_path,
+            keep_stats_in_res_ds=False,
+            keep_hashes_in_res_ds=True)
+        ray_exporter.export(self.dataset.data)
+
+        ds = ray.data.read_lance(out_path)
+        data_list = ds.take_all()
+
+        self.assertListOfDictEqual(data_list, self._pop_raw_data_keys([Fields.stats]))
 
     @TEST_TAG('ray')
     def test_webdataset_multi_images(self):
