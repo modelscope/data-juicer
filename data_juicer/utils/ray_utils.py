@@ -37,8 +37,11 @@ def initialize_ray(cfg=None, force=False):
 
 def check_and_initialize_ray(cfg=None):
     if is_ray_mode():
-        initialize_ray(cfg)
-        return True
+        try:
+            initialize_ray(cfg)
+            return True
+        except:
+            return False
 
     return False
 
