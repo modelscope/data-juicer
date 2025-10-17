@@ -347,6 +347,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">size_to_bytes</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">free_models</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.process_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.ray_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_ray_mode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Registry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.resource_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_cuda_available</span>
 
@@ -549,10 +550,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_accelerator</span>
 
         <span class="c1"># parameters to determine the number of procs for this op</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_proc&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cpu_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cpu_required&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gpu_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpu_required&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mem_required&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_proc&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># -1 means automatic calculation of concurrency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cpu_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cpu_required&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gpu_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpu_required&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mem_required&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span> <span class="o">=</span> <span class="n">size_to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">3</span>
 
@@ -572,6 +573,15 @@
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
                 <span class="n">method</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OP.use_auto_proc">
+<a class="viewcode-back" href="../../../api/data_juicer.ops.base_op.html#data_juicer.ops.OP.use_auto_proc">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">use_auto_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_ray_mode</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">():</span>  <span class="c1"># ray task</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span></div>
 
 
 <div class="viewcode-block" id="OP.is_batched_op">
@@ -598,8 +608,10 @@
         <span class="c1"># Local import to avoid logger being serialized in multiprocessing</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
-        <span class="n">op_proc</span> <span class="o">=</span> <span class="n">calculate_np</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu_required</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu_required</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">op_proc</span> <span class="o">=</span> <span class="n">calculate_np</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_required</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu_required</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu_required</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_auto_proc</span><span class="p">():</span>
             <span class="n">op_proc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">op_proc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Op [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">] running with number of procs:</span><span class="si">{</span><span class="n">op_proc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">op_proc</span></div>

@@ -363,6 +363,70 @@
 <dd><p>Calculate the optimum number of processes for the given OP automatically。</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.process_utils.calculate_ray_np">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.process_utils.</span></span><span class="sig-name descname"><span class="pre">calculate_ray_np</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/utils/process_utils.html#calculate_ray_np"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.utils.process_utils.calculate_ray_np" title="Link to this definition">¶</a></dt>
+<dd><p>Automatically calculates optimal concurrency for Ray Data operator.
+This function handles both task and actor based operators, considering
+resource requirements and user specifications. The computation follows Ray Data's
+concurrency semantics while optimizing resource utilization.</p>
+<p>Key Concepts:
+- Resource Ratio: Individual operator's resource requirement (GPU/CPU/memory)</p>
+<blockquote>
+<div><p>compared to total cluster resources, using max(cpu_ratio, gpu_ratio, adjusted_mem_ratio)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Fixed Allocation: Portion of resources reserved by operators with user-specified num_proc</p></li>
+<li><p>Dynamic Allocation: Remaining resources distributed among auto-scaling operators</p></li>
+</ul>
+<p>Design Logic:
+1. User Specification Priority:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If user provides concurrency setting, directly return it</p></li>
+<li><p>Applies to both task and actor based operators</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Task Operators (equivalent to a cpu operator in dj):</dt><dd><ol class="loweralpha simple">
+<li><p>When unspecified: Return None to let Ray determine implicitly</p></li>
+<li><dl class="simple">
+<dt>Auto-calculation: Returns maximum concurrency based on available</dt><dd><p>resources and operator requirements</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Actor Operators (equivalent to a gpu operator in dj):</dt><dd><ol class="loweralpha simple">
+<li><dl class="simple">
+<dt>Mandatory concurrency - set required gpus to 1 if unspecified, and then refer to the following <cite>b</cite></dt><dd><p>to calculate automatically based on this setting</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Auto-calculation returns tuple (min_concurrency, max_concurrency):</dt><dd><ol class="lowerroman simple">
+<li><dl class="simple">
+<dt>Minimum: Ensures baseline resource allocation in remaining resources</dt><dd><p>when all operators are active simultaneously (proportionally)</p>
+</dd>
+</dl>
+</li>
+<li><p>Maximum: Allows full utilization of remaining resources by single
+operator when others are idle</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</dd></dl>
+
 </section>
 
         </article>
@@ -406,6 +470,7 @@
 <li><a class="reference internal" href="#data_juicer.utils.process_utils.setup_mp"><code class="docutils literal notranslate"><span class="pre">setup_mp()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.process_utils.get_min_cuda_memory"><code class="docutils literal notranslate"><span class="pre">get_min_cuda_memory()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.utils.process_utils.calculate_np"><code class="docutils literal notranslate"><span class="pre">calculate_np()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.utils.process_utils.calculate_ray_np"><code class="docutils literal notranslate"><span class="pre">calculate_ray_np()</span></code></a></li>
 </ul>
 </li>
 </ul>

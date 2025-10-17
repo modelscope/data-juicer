@@ -385,8 +385,11 @@
 <a class="viewcode-back" href="../../../api/data_juicer.utils.ray_utils.html#data_juicer.utils.ray_utils.check_and_initialize_ray">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_and_initialize_ray</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">is_ray_mode</span><span class="p">():</span>
-        <span class="n">initialize_ray</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">initialize_ray</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">return</span> <span class="kc">False</span></div>
 
@@ -407,22 +410,24 @@
         <span class="n">cpu_count</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">free_gpus_memory</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">gpus_memory</span><span class="p">,</span> <span class="n">free_gpus_memory</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
             <span class="n">nvidia_smi_output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;nvidia-smi&quot;</span><span class="p">,</span> <span class="s2">&quot;--query-gpu=memory.free&quot;</span><span class="p">,</span> <span class="s2">&quot;--format=csv,noheader,nounits&quot;</span><span class="p">]</span>
+                <span class="p">[</span><span class="s2">&quot;nvidia-smi&quot;</span><span class="p">,</span> <span class="s2">&quot;--query-gpu=memory.free,memory.total&quot;</span><span class="p">,</span> <span class="s2">&quot;--format=csv,noheader,nounits&quot;</span><span class="p">]</span>
             <span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">nvidia_smi_output</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
-                <span class="n">free_gpus_memory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
-
+                <span class="n">free_mem_str</span><span class="p">,</span> <span class="n">total_mem_str</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">)</span>
+                <span class="n">free_gpus_memory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">free_mem_str</span><span class="p">))</span>
+                <span class="n">gpus_memory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">total_mem_str</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="c1"># no gpu</span>
-            <span class="n">free_gpus_memory</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">gpus_memory</span><span class="p">,</span> <span class="n">free_gpus_memory</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;free_memory&quot;</span><span class="p">:</span> <span class="n">free_mem</span><span class="p">,</span>  <span class="c1"># MB</span>
             <span class="s2">&quot;cpu_count&quot;</span><span class="p">:</span> <span class="n">cpu_count</span><span class="p">,</span>
             <span class="s2">&quot;gpu_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">free_gpus_memory</span><span class="p">),</span>
+            <span class="s2">&quot;gpus_memory&quot;</span><span class="p">:</span> <span class="n">gpus_memory</span><span class="p">,</span>
             <span class="s2">&quot;free_gpus_memory&quot;</span><span class="p">:</span> <span class="n">free_gpus_memory</span><span class="p">,</span>  <span class="c1"># MB</span>
         <span class="p">}</span>
 
@@ -498,6 +503,20 @@
         <span class="n">available_gpu_mems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;free_gpus_memory&quot;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">available_gpu_mems</span></div>
+
+
+
+<div class="viewcode-block" id="ray_gpu_memories">
+<a class="viewcode-back" href="../../../api/data_juicer.utils.ray_utils.html#data_juicer.utils.ray_utils.ray_gpu_memories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ray_gpu_memories</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Total gpu memory of each gpu card for each alive node in MB.&quot;&quot;&quot;</span>
+    <span class="n">ray_nodes_info</span> <span class="o">=</span> <span class="n">get_ray_nodes_info</span><span class="p">()</span>
+
+    <span class="n">gpu_mems</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">nodeid</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">ray_nodes_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">gpu_mems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;gpus_memory&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">gpu_mems</span></div>
 
 </pre></div>
         </article>

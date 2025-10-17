@@ -370,6 +370,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAY_JOB_ENV_VAR</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.logger_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecialTokens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.ray_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_ray_mode</span>
 
 <span class="n">global_cfg</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">global_parser</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1105,7 +1106,6 @@
         <span class="s2">&quot;audio_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_key&quot;</span><span class="p">,</span> <span class="s2">&quot;audios&quot;</span><span class="p">),</span>
         <span class="s2">&quot;video_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_key&quot;</span><span class="p">,</span> <span class="s2">&quot;videos&quot;</span><span class="p">),</span>
         <span class="s2">&quot;image_bytes_key&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_bytes_key&quot;</span><span class="p">,</span> <span class="s2">&quot;image_bytes&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;num_proc&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;np&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="s2">&quot;turbo&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;turbo&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
         <span class="s2">&quot;skip_op_error&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skip_op_error&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
         <span class="s2">&quot;work_dir&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
@@ -1114,6 +1114,8 @@
         <span class="s2">&quot;video_special_token&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_special_token&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">),</span>
         <span class="s2">&quot;eoc_special_token&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;eoc_special_token&quot;</span><span class="p">,</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="p">),</span>
     <span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_ray_mode</span><span class="p">():</span>
+        <span class="n">op_attrs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;num_proc&quot;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;np&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)})</span>
     <span class="n">cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">update_op_attr</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">op_attrs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cfg</span></div>
