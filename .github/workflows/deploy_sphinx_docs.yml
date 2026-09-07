@@ -86,8 +86,6 @@ jobs:
           rm -rf docs/sphinx_doc
           mkdir -p docs
           cp -r /tmp/template/docs/sphinx_doc docs/
-          # Sphinx's package template includes links to all API submodules.
-          rm -f docs/sphinx_doc/_templates/package.rst_t
           echo "Restoring custom files..."
           cp -rf /tmp/custom_files/source/* docs/sphinx_doc/source
           printf '\nextensions.append("data_juicer_sphinx_theme")\n' >> docs/sphinx_doc/source/conf.py
