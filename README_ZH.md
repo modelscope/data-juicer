@@ -90,9 +90,8 @@ for s in res_ds:
 - 🎉 [2026-08-25] 我们发布了 [Juicer](docs/Juicer_ZH.md)，一个支持本地部署的数据精炼模型，可通过自然语言指令完成文本清洗、过滤与语义标注。欢迎下载[模型](https://huggingface.co/datajuicer/Juicer-35B-A3B)，并在 [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground) 中体验数据处理配方。
 
 <details open>
-<summary>[2026-09-01] Release v1.6.0: <b>Juicer 模型发布；集群感知自动分区；配置预检校验</b></summary>
+<summary>[2026-09-01] Release v1.6.0: <b>集群感知自动分区；配置预检校验；统一远程文件系统分发</b></summary>
 
-* 🧃 Juicer 模型发布 — 发布 [Juicer-35B-A3B](https://huggingface.co/datajuicer/Juicer-35B-A3B)（[ModelScope](https://www.modelscope.cn/models/Data-Juicer/Juicer-35B-A3B)），一个基于 Qwen3.6-35B-A3B 的自然语言数据精炼模型，可将清洗指令、过滤规则和语义标注需求编译为标记文本或规范 JSON。它支持原子、组合、顺序敏感与语义类精炼（PII、幻觉、量规、安全），并在 CDR-Bench 上完成评测。本地部署方式与 51 个展示用例请见[文档](docs/Juicer_ZH.md)与 [Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground)。
 * 🧮 集群感知自动分区 — `num_of_partitions: auto` 根据实时 Ray 集群拓扑推导分区数，并统一拓扑数据源，修正了节点数猜测与 driver 本地钳制问题。
 * ✅ 配置预检校验 — 新增 `preflight` 模块，在执行前就管道配置与算子字段需求对数据集 schema 进行校验，做到快速失败而非中途报错。
 * 🗄️ 统一远程文件系统分发 — 导出器现通过共享的 `fs_utils` 分发层解析 S3/HDFS/本地路径，为湖仓支持打下基础。

@@ -91,9 +91,8 @@ for s in res_ds:
 - 🎉 [2026-08-25] We release [Juicer](docs/Juicer.md), a locally deployable data-refinement model that follows natural-language instructions for text cleaning, filtering, and semantic labeling. Explore the [model](https://huggingface.co/datajuicer/Juicer-35B-A3B) and try recipes in the [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground).
 
 <details open>
-<summary>[2026-09-01] Release v1.6.0: <b>Juicer Model Release; Cluster-Aware Auto Partitioning; Config Preflight Validation</b></summary>
+<summary>[2026-09-01] Release v1.6.0: <b>Cluster-Aware Auto Partitioning; Config Preflight Validation; Unified Remote Filesystem Dispatch</b></summary>
 
-* 🧃 *Juicer Model Release* — Released [Juicer-35B-A3B](https://huggingface.co/datajuicer/Juicer-35B-A3B) ([ModelScope](https://www.modelscope.cn/models/Data-Juicer/Juicer-35B-A3B)), a natural-language data-refinement model built on Qwen3.6-35B-A3B that compiles cleaning instructions, filtering rules, and semantic-tagging requirements into tagged text or canonical JSON. It handles atomic, compositional, order-sensitive, and semantic refinement (PII, hallucination, rubric, safety), and is evaluated on CDR-Bench. See [docs](docs/Juicer.md) and the [Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground) for local deployment and 51 showcase cases.
 * 🧮 *Cluster-Aware Auto Partitioning* — `num_of_partitions: auto` derives partition count from live Ray cluster topology, with a single topology source that fixes guessed node counts and driver-local clamping.
 * ✅ *Config Preflight Validation* — New `preflight` module validates pipeline configs and OP field requirements against the dataset schema before execution, failing fast instead of erroring mid-run.
 * 🗄️ *Unified Remote Filesystem Dispatch* — Exporters now resolve S3/HDFS/local paths through a shared `fs_utils` dispatch layer, laying groundwork for lakehouse support.
