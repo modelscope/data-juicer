@@ -93,16 +93,6 @@ jobs:
           printf '\nextensions.append("data_juicer_sphinx_theme")\n' >> docs/sphinx_doc/source/conf.py
           echo "Done!"
           df -h
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - name: Build Ask-AI widget bundle
-        working-directory: repo
-        run: |
-          cd docs/sphinx_doc/source/_static
-          npm install
-          npm run build
       - name: Get git tags
         working-directory: repo
         run: |

@@ -6,7 +6,6 @@ linkify-it-py
 PyYAML
 
 # Imports used by the API modules in addition to the distributed/tools extras.
-Cython
 setuptools
 IPython
 fire

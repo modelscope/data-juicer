@@ -140,7 +140,7 @@ case "$cmd" in
     if ! command -v dj-process >/dev/null 2>&1; then
       echo "ERROR: dj-process not in PATH. 请先激活本仓库环境，例如:" >&2
       echo "  uv venv && source .venv/bin/activate && uv pip install -e ." >&2
-      echo "  见 demos/agent/minimal_configs/README.md" >&2
+      echo "  见 demos/agent/minimal_configs/README_ZH.md" >&2
       exit 1
     fi
     mkdir -p "$(dirname "$SMOKE_OUT")"
