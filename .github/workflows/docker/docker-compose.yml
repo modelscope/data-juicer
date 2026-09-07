@@ -12,7 +12,6 @@ services:
       - DATA_JUICER_CACHE_HOME=/data/dj
       - EASYOCR_MODULE_PATH=/data/EasyOCR
       - U2NET_HOME=/data/u2net
-      - DEEPFACE_HOME=/data
       - RAY_ADDRESS=auto
     working_dir: /workspace
     networks:
@@ -44,7 +43,6 @@ services:
       - DATA_JUICER_CACHE_HOME=/data/dj
       - EASYOCR_MODULE_PATH=/data/EasyOCR
       - U2NET_HOME=/data/u2net
-      - DEEPFACE_HOME=/data
     working_dir: /workspace
     volumes:
       - huggingface_cache:/data
