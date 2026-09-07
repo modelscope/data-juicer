@@ -29,7 +29,7 @@ Output includes:
 use_dag: null   # null keeps the executor default
 ```
 
-The default `null` preserves each executor's behavior: enabled for `ray` and `ray_partitioned`, disabled for `default`. Set `true` or `false` to override it.
+With `null`, DAG monitoring is enabled for `ray` and `ray_partitioned` and disabled for `default`. Set `true` to enable it or `false` to disable it.
 
 ## Resource-Aware Partitioning
 
@@ -49,7 +49,7 @@ The optimizer:
 
 ## Logging
 
-Logs are organized per job:
+Logs are organized per job. The layout below uses `log.txt` as an example; CLI runs generate filenames from the export path and timestamp.
 
 ```
 {job_dir}/
@@ -62,7 +62,9 @@ Logs are organized per job:
 └── job_summary.json           # Summary (on completion)
 ```
 
-Configure logging:
+Set `event_log_dir` in your recipe to choose the application log directory; it defaults to `<work_dir>/logs`. Machine-readable `events_*.jsonl` files are saved directly in `<work_dir>` for job tracking.
+
+To configure application logging in Python:
 ```python
 from data_juicer.utils.logger_utils import setup_logger
 
@@ -73,6 +75,8 @@ setup_logger(
     redirect=False
 )
 ```
+
+`setup_logger()` uses `save_dir` and `filename` to configure log output and writes separate files for each log level. Configure rotation and retention through your application's logging integration.
 
 ## API Reference
 
