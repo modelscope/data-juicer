@@ -87,10 +87,8 @@ for s in res_ds:
 
 ## 📰 动态
 
-- 🎉 [2026-08-25] 我们发布了 [Juicer](docs/Juicer_ZH.md)，一个支持本地部署的数据精炼模型，可通过自然语言指令完成文本清洗、过滤与语义标注。欢迎下载[模型](https://huggingface.co/datajuicer/Juicer-35B-A3B)，并在 [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground) 中体验数据处理配方。
-
 <details open>
-<summary>[2026-09-01] Release v1.6.0: <b>集群感知自动分区；配置预检校验；统一远程文件系统分发</b></summary>
+<summary>[2026-09-07] Release v1.6.0: <b>集群感知自动分区；配置预检校验；统一远程文件系统分发</b></summary>
 
 * 🧮 集群感知自动分区 — `num_of_partitions: auto` 根据实时 Ray 集群拓扑推导分区数，并统一拓扑数据源，修正了节点数猜测与 driver 本地钳制问题。
 * ✅ 配置预检校验 — 新增 `preflight` 模块，在执行前就管道配置与算子字段需求对数据集 schema 进行校验，做到快速失败而非中途报错。
@@ -99,6 +97,8 @@ for s in res_ds:
 * ⚡ 分词批次限制 — token 计数过滤器现会限制分词批大小，以控制长文本下的内存峰值。
 * 🔧 健壮性修复 — 防止不同文本列与分词配置之间发生融合过滤器上下文缓存冲突；修复 MinHash 状态复用与空 token 处理、去重器执行模式声明、无扩展名导出路径报错、文本空分块、gzip JSONL 的 HPO 采样、pandas 扩展 dtype 处理及回归测试收集阻塞；并更新外部模型依赖的维护分支地址。
 </details>
+
+- 🎉 [2026-08-25] 我们发布了 [Juicer](docs/Juicer_ZH.md)，一个支持本地部署的数据精炼模型，可通过自然语言指令完成文本清洗、过滤与语义标注。欢迎下载[模型](https://huggingface.co/datajuicer/Juicer-35B-A3B)，并在 [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground) 中体验数据处理配方。
 
 <details open>
 <summary>[2026-08-07] Release v1.5.5: <b>外部算子插件；HDFS I/O 与 Ray Data 优化；多节点弹性分片</b></summary>

@@ -88,10 +88,8 @@ for s in res_ds:
 
 ## 📰 News
 
-- 🎉 [2026-08-25] We release [Juicer](docs/Juicer.md), a locally deployable data-refinement model that follows natural-language instructions for text cleaning, filtering, and semantic labeling. Explore the [model](https://huggingface.co/datajuicer/Juicer-35B-A3B) and try recipes in the [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground).
-
 <details open>
-<summary>[2026-09-01] Release v1.6.0: <b>Cluster-Aware Auto Partitioning; Config Preflight Validation; Unified Remote Filesystem Dispatch</b></summary>
+<summary>[2026-09-07] Release v1.6.0: <b>Cluster-Aware Auto Partitioning; Config Preflight Validation; Unified Remote Filesystem Dispatch</b></summary>
 
 * 🧮 *Cluster-Aware Auto Partitioning* — `num_of_partitions: auto` derives partition count from live Ray cluster topology, with a single topology source that fixes guessed node counts and driver-local clamping.
 * ✅ *Config Preflight Validation* — New `preflight` module validates pipeline configs and OP field requirements against the dataset schema before execution, failing fast instead of erroring mid-run.
@@ -100,6 +98,8 @@ for s in res_ds:
 * ⚡ *Bounded Tokenizer Batches* — Token-count filters now cap tokenizer batch sizes to bound peak memory on long texts.
 * 🔧 *Robustness Fixes* — Prevented fused-filter context cache collisions across text columns and tokenizer settings; fixed MinHash state reuse and empty-token handling, deduplicator execution-mode declarations, extensionless export-path errors, empty text chunks, gzip JSONL HPO sampling, pandas extension-dtype handling, and regression test discovery; and updated maintenance fork URLs for external model dependencies.
 </details>
+
+- 🎉 [2026-08-25] We release [Juicer](docs/Juicer.md), a locally deployable data-refinement model that follows natural-language instructions for text cleaning, filtering, and semantic labeling. Explore the [model](https://huggingface.co/datajuicer/Juicer-35B-A3B) and try recipes in the [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground).
 
 <details open>
 <summary>[2026-08-07] Release v1.5.5: <b>External OP Plugins; HDFS I/O & Ray Data Optimizations; Elastic Multi-node Sharding</b></summary>
