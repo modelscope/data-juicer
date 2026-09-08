@@ -18,6 +18,3 @@ API
    api/data_juicer.analysis
    api/data_juicer.config
    api/data_juicer.format
-   api/data_juicer.download
-   api/data_juicer.tools
-   api/data_juicer.utils
