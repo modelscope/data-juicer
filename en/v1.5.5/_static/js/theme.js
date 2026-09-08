@@ -5,6 +5,13 @@
 (function() {
   'use strict';
 
+  function findHashTarget(hash) {
+    if (!hash || hash === '#') return null;
+    var id = hash.slice(1);
+    try { id = decodeURIComponent(id); } catch (err) { /* Keep literal malformed fragments. */ }
+    return document.getElementById(id);
+  }
+
   // ==================== Dark Mode ====================
   function syncPygmentsDark(theme) {
     var link = document.getElementById('pygments-dark-css');
@@ -118,7 +125,7 @@
     tocLinks.forEach(function(link) {
       var id = link.getAttribute('href');
       if (id && id.startsWith('#')) {
-        var heading = document.getElementById(id.slice(1));
+        var heading = findHashTarget(id);
         if (heading) headings.push({ el: heading, link: link });
       }
     });
@@ -339,9 +346,10 @@
       }).join('');
     }
 
+    var cacheKey = 'dj-versions:' + new URL(url, window.location.href).href;
     var cached = null;
     try {
-      cached = sessionStorage.getItem('dj-versions');
+      cached = sessionStorage.getItem(cacheKey);
     } catch (e) { /* sessionStorage unavailable */ }
     if (cached) {
       try { render(JSON.parse(cached)); return; } catch (e) { /* refetch below */ }
@@ -352,7 +360,7 @@
       return resp.json();
     }).then(function(data) {
       if (data && Array.isArray(data.versions) && data.versions.length) {
-        try { sessionStorage.setItem('dj-versions', JSON.stringify(data.versions)); } catch (e) {}
+        try { sessionStorage.setItem(cacheKey, JSON.stringify(data.versions)); } catch (e) {}
         render(data.versions);
       }
     }).catch(function() {});
@@ -459,6 +467,23 @@
           }
         }
 
+        // Section links are relative to the current page, just like the sidebar.
+        var sections = document.querySelector('.navbar-sections');
+        var newSections = newDoc.querySelector('.navbar-sections');
+        if (sections && newSections) sections.innerHTML = newSections.innerHTML;
+
+        // Keep version destinations in sync after navigating to a nested page.
+        var versionDropdown = document.querySelector('#version-dropdown');
+        var newVersionDropdown = newDoc.querySelector('#version-dropdown');
+        if (versionDropdown && newVersionDropdown) {
+          ['data-versions-url', 'data-link-prefix', 'data-page', 'data-current'].forEach(function(name) {
+            versionDropdown.setAttribute(name, newVersionDropdown.getAttribute(name) || '');
+          });
+          versionDropdown.querySelector('.dropdown-panel').innerHTML =
+            newVersionDropdown.querySelector('.dropdown-panel').innerHTML;
+          initVersionSwitcher();
+        }
+
         document.title = newDoc.title;
 
         if (aiPanelOpen) document.body.classList.add('ai-panel-open');
@@ -474,7 +499,7 @@
         // Handle hash scrolling
         var hashTarget = window.location.hash;
         if (hashTarget) {
-          var el = document.querySelector(hashTarget);
+          var el = findHashTarget(hashTarget);
           if (el) {
             el.scrollIntoView({ behavior: 'smooth' });
           }
@@ -516,7 +541,7 @@
       // Same-page hash link
       if (anchor.pathname === window.location.pathname && anchor.hash) {
         e.preventDefault();
-        var target = document.querySelector(anchor.hash);
+        var target = findHashTarget(anchor.hash);
         if (target) {
           target.scrollIntoView({ behavior: 'smooth' });
           history.pushState(null, '', anchor.hash);

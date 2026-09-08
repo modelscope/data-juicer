@@ -937,13 +937,7 @@ a:hover {
     font-size: 1.25rem;
   }
 
-  .search-trigger {
-    min-width: auto;
-  }
 
-  .search-trigger span {
-    display: none;
-  }
 }
 
 /* ==================== Scrollbar ==================== */
@@ -979,31 +973,21 @@ html:hover {
 .search-trigger {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 0.75rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.8125rem;
-  color: var(--text-tertiary);
-  transition: all 0.15s ease;
-  min-width: 180px;
-}
-
-.search-trigger:hover {
-  border-color: rgb(var(--primary));
   color: var(--text-secondary);
 }
 
-.search-trigger kbd {
-  font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  padding: 0.125rem 0.375rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  margin-left: auto;
+.search-trigger:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .search-overlay {
@@ -1255,4 +1239,62 @@ a, button, .dropdown-panel, .sidebar, .theme-toggle,
 .prev-next-link, .copy-button, .sidebar-nav li a {
   transition-duration: 0.15s;
   transition-timing-function: ease;
+}
+
+/* Document/API sections remain reachable when the ecosystem links are hidden. */
+.navbar-sections {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.navbar-sections:empty { display: none; }
+.navbar-sections .active {
+  color: rgb(var(--primary-dark));
+  background: rgb(var(--primary-light));
+  box-shadow: inset 0 -2px rgb(var(--primary));
+}
+[data-theme="dark"] .navbar-sections .active {
+  color: rgb(var(--primary));
+  background: rgba(244, 114, 11, 0.12);
+}
+@media (max-width: 600px) {
+  .navbar-inner { padding: 0 0.5rem; gap: 0.25rem; }
+  .navbar-title { display: none; }
+  .navbar-left { gap: 0.25rem; }
+  .navbar-right { margin-left: auto; gap: 0.125rem; }
+  .navbar-sections .navbar-link { padding: 0.375rem 0.5rem; }
+}
+@media (max-width: 1200px) {
+  .navbar-center { display: none; }
+  .navbar-left { min-width: auto; }
+  .navbar-right { margin-left: auto; }
+}
+@media (min-width: 601px) and (max-width: 800px) {
+  .navbar-inner { padding: 0 1rem; gap: 0.5rem; }
+}
+@media (max-width: 400px) {
+  .navbar-right .dropdown-trigger { padding: 0.375rem 0.25rem; }
+  .navbar-right .dropdown-chevron { display: none; }
+  .navbar-sections .navbar-link { padding: 0.375rem; }
+  .navbar-inner { gap: 0.125rem; }
+}
+
+/* Preserve ecosystem links when the header has no room for them. */
+.sidebar-projects { display: none; }
+@media (max-width: 1200px) {
+  .sidebar-projects {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .sidebar-projects-title {
+    margin: 0 0 0.5rem;
+    padding: 0 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+  }
 }

@@ -35,17 +35,21 @@
         </a>
       </div>
 
+      <nav class="navbar-sections" aria-label="Documentation sections">
+        <a href="../index_ZH.html" class="navbar-link active" aria-current="page">Doc</a>
+        <a href="../api.html" class="navbar-link">API</a>
+      </nav>
+
       <nav class="navbar-center">
+        
         <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
       </nav>
 
       <div class="navbar-right">
-        <button class="search-trigger" id="search-trigger" aria-label="Search">
+        <button class="search-trigger" id="search-trigger" aria-label="Search" title="Search (Ctrl/⌘ K)">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
-          <span>Search...</span>
-          <kbd>⌘K</kbd>
         </button>
         <div class="dropdown" id="lang-dropdown">
           <button class="dropdown-trigger" aria-haspopup="true" aria-expanded="false">
@@ -106,60 +110,63 @@
               <a href="../index_ZH.html">首页</a>
             </li>
           </ul>
-          <ul>
-<li class="toctree-l1"><a class="reference internal" href="../docs_index_ZH.html">文档</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DJ_service_ZH.html">DJ_服务化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
+          <p class="caption"><a href="../index_ZH.html">文档</a></p>
+          <p class="caption" role="heading"><span class="caption-text">教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">帮助文档</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service_ZH.html">DJ_服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
 </ul>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">data_juicer.format</a></li>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
 </ul>
 
 
+        </nav>
+        <nav class="sidebar-projects" aria-label="相关项目">
+          <p class="sidebar-projects-title">相关项目</p>
+          
+        <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         </nav>
       </div>
     </aside>
@@ -167,327 +174,8 @@
     <main class="main-content">
       <div class="content-wrapper">
         <article class="article" role="main">
-  <section id="module-data_juicer.format">
-<span id="data-juicer-format"></span><h1>data_juicer.format<a class="headerlink" href="#module-data_juicer.format" title="链接到此标题。">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.JsonFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">JsonFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/json_formatter.html#JsonFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.JsonFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.LocalFormatter" title="data_juicer.format.formatter.LocalFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a></p>
-<p>The class is used to load and format json-type files.</p>
-<p>Default suffixes is <cite>['.json', '.jsonl', '.jsonl.zst']</cite></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.format.JsonFormatter.SUFFIXES">
-<span class="sig-name descname"><span class="pre">SUFFIXES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['.json',</span> <span class="pre">'.jsonl',</span> <span class="pre">'.jsonl.zst']</span></span><a class="headerlink" href="#data_juicer.format.JsonFormatter.SUFFIXES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.JsonFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/json_formatter.html#JsonFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.JsonFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_path</strong> -- a dataset file or a dataset directory</p></li>
-<li><p><strong>suffixes</strong> -- files with specified suffixes to be processed</p></li>
-<li><p><strong>kwargs</strong> -- extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.LocalFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">LocalFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/formatter.html#LocalFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.LocalFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.BaseFormatter" title="data_juicer.format.formatter.BaseFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFormatter</span></code></a></p>
-<p>The class is used to load a dataset from local files or local
-directory.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.LocalFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/formatter.html#LocalFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.LocalFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_path</strong> -- path to a dataset file or a dataset
-directory</p></li>
-<li><p><strong>type</strong> -- a packaged dataset module type (json, csv, etc.)</p></li>
-<li><p><strong>suffixes</strong> -- files with specified suffixes to be processed</p></li>
-<li><p><strong>text_keys</strong> -- key names of field that stores sample
-text.</p></li>
-<li><p><strong>add_suffix</strong> -- whether to add the file suffix to dataset
-meta info</p></li>
-<li><p><strong>kwargs</strong> -- extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.LocalFormatter.load_dataset">
-<span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="reference internal" href="../_modules/data_juicer/format/formatter.html#LocalFormatter.load_dataset"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.LocalFormatter.load_dataset" title="链接到此定义。">¶</a></dt>
-<dd><p>Load a dataset from dataset file or dataset directory, and unify its
-format.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_proc</strong> -- number of processes when loading the dataset</p></li>
-<li><p><strong>global_cfg</strong> -- global cfg used in consequent processes,</p></li>
-</ul>
-</dd>
-<dt class="field-even">返回<span class="colon">:</span></dt>
-<dd class="field-even"><p>formatted dataset</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.RemoteFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">RemoteFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/formatter.html#RemoteFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.RemoteFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.BaseFormatter" title="data_juicer.format.formatter.BaseFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFormatter</span></code></a></p>
-<p>The class is used to load a dataset from repository of huggingface
-hub.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.RemoteFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/formatter.html#RemoteFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.RemoteFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_path</strong> -- a dataset file or a dataset directory</p></li>
-<li><p><strong>text_keys</strong> -- key names of field that stores sample
-text.</p></li>
-<li><p><strong>kwargs</strong> -- extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.RemoteFormatter.load_dataset">
-<span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="reference internal" href="../_modules/data_juicer/format/formatter.html#RemoteFormatter.load_dataset"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.RemoteFormatter.load_dataset" title="链接到此定义。">¶</a></dt>
-<dd><p>Load a dataset from HuggingFace, and unify its format.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_proc</strong> -- number of processes when loading the dataset</p></li>
-<li><p><strong>global_cfg</strong> -- the global cfg used in consequent processes,</p></li>
-</ul>
-</dd>
-<dt class="field-even">返回<span class="colon">:</span></dt>
-<dd class="field-even"><p>formatted dataset</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.TextFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">TextFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/text_formatter.html#TextFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.TextFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.LocalFormatter" title="data_juicer.format.formatter.LocalFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a></p>
-<p>The class is used to load and format text-type files.</p>
-<p>e.g. <cite>['.txt', '.pdf', '.cpp', '.docx']</cite></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.format.TextFormatter.SUFFIXES">
-<span class="sig-name descname"><span class="pre">SUFFIXES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['.docx',</span> <span class="pre">'.pdf',</span> <span class="pre">'.txt',</span> <span class="pre">'.md',</span> <span class="pre">'.tex',</span> <span class="pre">'.asm',</span> <span class="pre">'.bat',</span> <span class="pre">'.cmd',</span> <span class="pre">'.c',</span> <span class="pre">'.h',</span> <span class="pre">'.cs',</span> <span class="pre">'.cpp',</span> <span class="pre">'.hpp',</span> <span class="pre">'.c++',</span> <span class="pre">'.h++',</span> <span class="pre">'.cc',</span> <span class="pre">'.hh',</span> <span class="pre">'.C',</span> <span class="pre">'.H',</span> <span class="pre">'.cmake',</span> <span class="pre">'.css',</span> <span class="pre">'.dockerfile',</span> <span class="pre">'.f90',</span> <span class="pre">'.f',</span> <span class="pre">'.f03',</span> <span class="pre">'.f08',</span> <span class="pre">'.f77',</span> <span class="pre">'.f95',</span> <span class="pre">'.for',</span> <span class="pre">'.fpp',</span> <span class="pre">'.go',</span> <span class="pre">'.hs',</span> <span class="pre">'.html',</span> <span class="pre">'.java',</span> <span class="pre">'.js',</span> <span class="pre">'.jl',</span> <span class="pre">'.lua',</span> <span class="pre">'.markdown',</span> <span class="pre">'.php',</span> <span class="pre">'.php3',</span> <span class="pre">'.php4',</span> <span class="pre">'.php5',</span> <span class="pre">'.phps',</span> <span class="pre">'.phpt',</span> <span class="pre">'.pl',</span> <span class="pre">'.pm',</span> <span class="pre">'.pod',</span> <span class="pre">'.perl',</span> <span class="pre">'.ps1',</span> <span class="pre">'.psd1',</span> <span class="pre">'.psm1',</span> <span class="pre">'.py',</span> <span class="pre">'.rb',</span> <span class="pre">'.rs',</span> <span class="pre">'.sql',</span> <span class="pre">'.scala',</span> <span class="pre">'.sh',</span> <span class="pre">'.bash',</span> <span class="pre">'.command',</span> <span class="pre">'.zsh',</span> <span class="pre">'.ts',</span> <span class="pre">'.tsx',</span> <span class="pre">'.vb',</span> <span class="pre">'Dockerfile',</span> <span class="pre">'Makefile',</span> <span class="pre">'.xml',</span> <span class="pre">'.rst',</span> <span class="pre">'.m',</span> <span class="pre">'.smali']</span></span><a class="headerlink" href="#data_juicer.format.TextFormatter.SUFFIXES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.TextFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/text_formatter.html#TextFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.TextFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_path</strong> -- a dataset file or a dataset directory</p></li>
-<li><p><strong>suffixes</strong> -- files with specified suffixes to be processed</p></li>
-<li><p><strong>add_suffix</strong> -- Whether to add file suffix to dataset meta
-info</p></li>
-<li><p><strong>kwargs</strong> -- extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.TextFormatter.load_dataset">
-<span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="reference internal" href="../_modules/data_juicer/format/text_formatter.html#TextFormatter.load_dataset"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.TextFormatter.load_dataset" title="链接到此定义。">¶</a></dt>
-<dd><p>Load a dataset from local text-type files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_proc</strong> -- number of processes when loading the dataset</p></li>
-<li><p><strong>global_cfg</strong> -- the global cfg used in consequent processes,</p></li>
-</ul>
-</dd>
-<dt class="field-even">返回<span class="colon">:</span></dt>
-<dd class="field-even"><p>unified_format_dataset.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.ParquetFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">ParquetFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/parquet_formatter.html#ParquetFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.ParquetFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.LocalFormatter" title="data_juicer.format.formatter.LocalFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a></p>
-<p>The class is used to load and format parquet-type files.</p>
-<p>Default suffixes is <cite>['.parquet']</cite></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.format.ParquetFormatter.SUFFIXES">
-<span class="sig-name descname"><span class="pre">SUFFIXES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['.parquet']</span></span><a class="headerlink" href="#data_juicer.format.ParquetFormatter.SUFFIXES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.ParquetFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/parquet_formatter.html#ParquetFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.ParquetFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_path</strong> -- a dataset file or a dataset directory</p></li>
-<li><p><strong>suffixes</strong> -- files with specified suffixes to be processed</p></li>
-<li><p><strong>kwargs</strong> -- extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.CsvFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">CsvFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/csv_formatter.html#CsvFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.CsvFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.LocalFormatter" title="data_juicer.format.formatter.LocalFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a></p>
-<p>The class is used to load and format csv-type files.</p>
-<p>Default suffixes is <cite>['.csv']</cite></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.format.CsvFormatter.SUFFIXES">
-<span class="sig-name descname"><span class="pre">SUFFIXES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['.csv']</span></span><a class="headerlink" href="#data_juicer.format.CsvFormatter.SUFFIXES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.CsvFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/csv_formatter.html#CsvFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.CsvFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_path</strong> -- a dataset file or a dataset directory</p></li>
-<li><p><strong>suffixes</strong> -- files with specified suffixes to be processed</p></li>
-<li><p><strong>kwargs</strong> -- extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.TsvFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">TsvFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/tsv_formatter.html#TsvFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.TsvFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.LocalFormatter" title="data_juicer.format.formatter.LocalFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a></p>
-<p>The class is used to load and format tsv-type files.</p>
-<p>Default suffixes is <cite>['.tsv']</cite></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.format.TsvFormatter.SUFFIXES">
-<span class="sig-name descname"><span class="pre">SUFFIXES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['.tsv']</span></span><a class="headerlink" href="#data_juicer.format.TsvFormatter.SUFFIXES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.TsvFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/tsv_formatter.html#TsvFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.TsvFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_path</strong> -- a dataset file or a dataset directory</p></li>
-<li><p><strong>suffixes</strong> -- files with specified suffixes to be processed</p></li>
-<li><p><strong>kwargs</strong> -- extra args, e.g. <cite>delimiter = ','</cite></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.EmptyFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">EmptyFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/empty_formatter.html#EmptyFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.EmptyFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.BaseFormatter" title="data_juicer.format.formatter.BaseFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFormatter</span></code></a></p>
-<p>The class is used to create empty data.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.format.EmptyFormatter.SUFFIXES">
-<span class="sig-name descname"><span class="pre">SUFFIXES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></span><a class="headerlink" href="#data_juicer.format.EmptyFormatter.SUFFIXES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.EmptyFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/empty_formatter.html#EmptyFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.EmptyFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>length</strong> -- The empty dataset length.</p></li>
-<li><p><strong>feature_keys</strong> -- feature key name list.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data_juicer.format.EmptyFormatter.null_value">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">null_value</span></span><a class="headerlink" href="#data_juicer.format.EmptyFormatter.null_value" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.EmptyFormatter.load_dataset">
-<span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/empty_formatter.html#EmptyFormatter.load_dataset"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.EmptyFormatter.load_dataset" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.format.RayEmptyFormatter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.format.</span></span><span class="sig-name descname"><span class="pre">RayEmptyFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/empty_formatter.html#RayEmptyFormatter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.RayEmptyFormatter" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="data_juicer.format.formatter.html#data_juicer.format.formatter.BaseFormatter" title="data_juicer.format.formatter.BaseFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFormatter</span></code></a></p>
-<p>The class is used to create empty data for ray.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.format.RayEmptyFormatter.SUFFIXES">
-<span class="sig-name descname"><span class="pre">SUFFIXES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></span><a class="headerlink" href="#data_juicer.format.RayEmptyFormatter.SUFFIXES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.RayEmptyFormatter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/empty_formatter.html#RayEmptyFormatter.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.RayEmptyFormatter.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>length</strong> -- The empty dataset length.</p></li>
-<li><p><strong>feature_keys</strong> -- feature key name list.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data_juicer.format.RayEmptyFormatter.null_value">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">null_value</span></span><a class="headerlink" href="#data_juicer.format.RayEmptyFormatter.null_value" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.format.RayEmptyFormatter.load_dataset">
-<span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/format/empty_formatter.html#RayEmptyFormatter.load_dataset"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.format.RayEmptyFormatter.load_dataset" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <section id="data-juicer-format">
+<h1>data_juicer.format<a class="headerlink" href="#data-juicer-format" title="链接到此标题。">¶</a></h1>
 </section>
 
 
@@ -496,69 +184,13 @@ info</p></li>
           <div class="toc-sidebar-inner">
             <p class="toc-title">On this page</p>
             <ul>
-<li><a class="reference internal" href="#">data_juicer.format</a><ul>
-<li><a class="reference internal" href="#data_juicer.format.JsonFormatter"><code class="docutils literal notranslate"><span class="pre">JsonFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.JsonFormatter.SUFFIXES"><code class="docutils literal notranslate"><span class="pre">JsonFormatter.SUFFIXES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.JsonFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">JsonFormatter.__init__()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.LocalFormatter"><code class="docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.LocalFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">LocalFormatter.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.LocalFormatter.load_dataset"><code class="docutils literal notranslate"><span class="pre">LocalFormatter.load_dataset()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.RemoteFormatter"><code class="docutils literal notranslate"><span class="pre">RemoteFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.RemoteFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">RemoteFormatter.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.RemoteFormatter.load_dataset"><code class="docutils literal notranslate"><span class="pre">RemoteFormatter.load_dataset()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.TextFormatter"><code class="docutils literal notranslate"><span class="pre">TextFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.TextFormatter.SUFFIXES"><code class="docutils literal notranslate"><span class="pre">TextFormatter.SUFFIXES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.TextFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">TextFormatter.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.TextFormatter.load_dataset"><code class="docutils literal notranslate"><span class="pre">TextFormatter.load_dataset()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.ParquetFormatter"><code class="docutils literal notranslate"><span class="pre">ParquetFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.ParquetFormatter.SUFFIXES"><code class="docutils literal notranslate"><span class="pre">ParquetFormatter.SUFFIXES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.ParquetFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">ParquetFormatter.__init__()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.CsvFormatter"><code class="docutils literal notranslate"><span class="pre">CsvFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.CsvFormatter.SUFFIXES"><code class="docutils literal notranslate"><span class="pre">CsvFormatter.SUFFIXES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.CsvFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">CsvFormatter.__init__()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.TsvFormatter"><code class="docutils literal notranslate"><span class="pre">TsvFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.TsvFormatter.SUFFIXES"><code class="docutils literal notranslate"><span class="pre">TsvFormatter.SUFFIXES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.TsvFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">TsvFormatter.__init__()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.EmptyFormatter"><code class="docutils literal notranslate"><span class="pre">EmptyFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.EmptyFormatter.SUFFIXES"><code class="docutils literal notranslate"><span class="pre">EmptyFormatter.SUFFIXES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.EmptyFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">EmptyFormatter.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.EmptyFormatter.null_value"><code class="docutils literal notranslate"><span class="pre">EmptyFormatter.null_value</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.EmptyFormatter.load_dataset"><code class="docutils literal notranslate"><span class="pre">EmptyFormatter.load_dataset()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.format.RayEmptyFormatter"><code class="docutils literal notranslate"><span class="pre">RayEmptyFormatter</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.format.RayEmptyFormatter.SUFFIXES"><code class="docutils literal notranslate"><span class="pre">RayEmptyFormatter.SUFFIXES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.RayEmptyFormatter.__init__"><code class="docutils literal notranslate"><span class="pre">RayEmptyFormatter.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.RayEmptyFormatter.null_value"><code class="docutils literal notranslate"><span class="pre">RayEmptyFormatter.null_value</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.format.RayEmptyFormatter.load_dataset"><code class="docutils literal notranslate"><span class="pre">RayEmptyFormatter.load_dataset()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">data_juicer.format</a></li>
 </ul>
 
           </div>
         </aside>
       </div>
       <nav class="prev-next">
-        <a href="data_juicer.config.html" class="prev-next-link prev">
-          <span class="prev-next-label">Previous</span>
-          <span class="prev-next-title">data_juicer.config</span>
-        </a>
       </nav>
       <footer class="footer">
         <p>© 2024, Data-Juicer Team — Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> &amp; Data-Juicer Theme</p>

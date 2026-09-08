@@ -15,7 +15,6 @@ DOCS
 
    docs/Operators
    docs/DatasetCfg
-   docs/Juicer
    docs/*
 
 .. toctree::
@@ -31,7 +30,7 @@ DOCS
    docs/operators/formatter/index
    docs/operators/grouper/index
    docs/operators/selector/index
-   docs/operators/pipeline/index
+   docs/operators/op/index
 
 .. toctree::
    :maxdepth: 2

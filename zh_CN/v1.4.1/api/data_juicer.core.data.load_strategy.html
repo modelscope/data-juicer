@@ -35,17 +35,21 @@
         </a>
       </div>
 
+      <nav class="navbar-sections" aria-label="Documentation sections">
+        <a href="../index_ZH.html" class="navbar-link active" aria-current="page">Doc</a>
+        <a href="../api.html" class="navbar-link">API</a>
+      </nav>
+
       <nav class="navbar-center">
+        
         <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
       </nav>
 
       <div class="navbar-right">
-        <button class="search-trigger" id="search-trigger" aria-label="Search">
+        <button class="search-trigger" id="search-trigger" aria-label="Search" title="Search (Ctrl/⌘ K)">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
-          <span>Search...</span>
-          <kbd>⌘K</kbd>
         </button>
         <div class="dropdown" id="lang-dropdown">
           <button class="dropdown-trigger" aria-haspopup="true" aria-expanded="false">
@@ -106,60 +110,63 @@
               <a href="../index_ZH.html">首页</a>
             </li>
           </ul>
-          <ul>
-<li class="toctree-l1"><a class="reference internal" href="../docs_index_ZH.html">文档</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DJ_service_ZH.html">DJ_服务化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
-</ul>
-</li>
-</ul>
+          <p class="caption"><a href="../index_ZH.html">文档</a></p>
+          <p class="caption" role="heading"><span class="caption-text">教程</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">帮助文档</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service_ZH.html">DJ_服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
 </ul>
 
 
+        </nav>
+        <nav class="sidebar-projects" aria-label="相关项目">
+          <p class="sidebar-projects-title">相关项目</p>
+          
+        <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         </nav>
       </div>
     </aside>
@@ -167,262 +174,8 @@
     <main class="main-content">
       <div class="content-wrapper">
         <article class="article" role="main">
-  <section id="module-data_juicer.core.data.load_strategy">
-<span id="data-juicer-core-data-load-strategy-module"></span><h1>data_juicer.core.data.load_strategy module<a class="headerlink" href="#module-data_juicer.core.data.load_strategy" title="链接到此标题。">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.StrategyKey">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">StrategyKey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#StrategyKey"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.StrategyKey" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Immutable key for strategy registration with wildcard support</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.StrategyKey.executor_type">
-<span class="sig-name descname"><span class="pre">executor_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.StrategyKey.executor_type" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.StrategyKey.data_type">
-<span class="sig-name descname"><span class="pre">data_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.StrategyKey.data_type" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.StrategyKey.data_source">
-<span class="sig-name descname"><span class="pre">data_source</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.StrategyKey.data_source" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.StrategyKey.matches">
-<span class="sig-name descname"><span class="pre">matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_juicer.core.data.load_strategy.StrategyKey" title="data_juicer.core.data.load_strategy.StrategyKey"><span class="pre">StrategyKey</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#StrategyKey.matches"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.StrategyKey.matches" title="链接到此定义。">¶</a></dt>
-<dd><p>Check if this key matches another key with wildcard support</p>
-<p>Supports Unix-style wildcards:
-- '*' matches any string
-- '?' matches any single character
-- '[seq]' matches any character in seq
-- '[!seq]' matches any character not in seq</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.StrategyKey.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.StrategyKey.__init__" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <a class="reference internal" href="data_juicer.core.data.config_validator.html#data_juicer.core.data.config_validator.ConfigValidator" title="data_juicer.core.data.config_validator.ConfigValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigValidator</span></code></a></p>
-<p>abstract class for data load strategy</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DataLoadStrategy.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DataLoadStrategy.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DataLoadStrategy.__init__" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DataLoadStrategy.load_data">
-<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="data_juicer.core.data.dj_dataset.html#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DataLoadStrategyRegistry">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DataLoadStrategyRegistry</span></span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DataLoadStrategyRegistry"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DataLoadStrategyRegistry" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Flexible strategy registry with wildcard matching</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DataLoadStrategyRegistry.get_strategy_class">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_strategy_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategy" title="data_juicer.core.data.load_strategy.DataLoadStrategy"><span class="pre">DataLoadStrategy</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DataLoadStrategyRegistry.get_strategy_class"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DataLoadStrategyRegistry.get_strategy_class" title="链接到此定义。">¶</a></dt>
-<dd><p>Retrieve the most specific matching strategy</p>
-<p>Matching priority:
-1. Exact match
-2. Wildcard matches from most specific to most general</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DataLoadStrategyRegistry.register">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DataLoadStrategyRegistry.register"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DataLoadStrategyRegistry.register" title="链接到此定义。">¶</a></dt>
-<dd><p>Decorator for registering data load strategies with wildcard support</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>executor_type</strong> -- Type of executor (e.g., 'default', 'ray')</p></li>
-<li><p><strong>data_type</strong> -- Type of data (e.g., 'local', 'remote')</p></li>
-<li><p><strong>data_source</strong> -- Specific data source (e.g., 'arxiv', 's3')</p></li>
-</ul>
-</dd>
-<dt class="field-even">返回<span class="colon">:</span></dt>
-<dd class="field-even"><p>Decorator function</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">RayDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#RayDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategy" title="data_juicer.core.data.load_strategy.DataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoadStrategy</span></code></a></p>
-<p>abstract class for data load strategy for RayExecutor</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayDataLoadStrategy.load_data">
-<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="data_juicer.core.data.dj_dataset.html#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#RayDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategy" title="data_juicer.core.data.load_strategy.DataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoadStrategy</span></code></a></p>
-<p>abstract class for data load strategy for LocalExecutor</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy.load_data">
-<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="data_juicer.core.data.dj_dataset.html#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">RayLocalJsonDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#RayLocalJsonDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.RayDataLoadStrategy" title="data_juicer.core.data.load_strategy.RayDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">RayDataLoadStrategy</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#RayLocalJsonDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">RayHuggingfaceDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#RayHuggingfaceDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.RayDataLoadStrategy" title="data_juicer.core.data.load_strategy.RayDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">RayDataLoadStrategy</span></code></a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#RayHuggingfaceDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultLocalDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultLocalDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy" title="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy</span></code></a></p>
-<p>data load strategy for on disk data for LocalExecutor
-rely on AutoFormatter for actual data loading</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultLocalDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultHuggingfaceDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultHuggingfaceDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy" title="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy</span></code></a></p>
-<p>data load strategy for Huggingface dataset for LocalExecutor</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'optional_fields':</span> <span class="pre">['split',</span> <span class="pre">'limit',</span> <span class="pre">'name',</span> <span class="pre">'data_files',</span> <span class="pre">'data_dir'],</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultHuggingfaceDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultModelScopeDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultModelScopeDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultModelScopeDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultModelScopeDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy" title="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy</span></code></a></p>
-<p>data load strategy for ModelScope dataset for LocalExecutor</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultModelScopeDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultModelScopeDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultModelScopeDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultArxivDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultArxivDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy" title="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy</span></code></a></p>
-<p>data load strategy for arxiv dataset for LocalExecutor</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultArxivDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultWikiDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultWikiDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy" title="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy</span></code></a></p>
-<p>data load strategy for wiki dataset for LocalExecutor</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultWikiDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultCommonCrawlDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultCommonCrawlDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy" title="data_juicer.core.data.load_strategy.DefaultDataLoadStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy</span></code></a></p>
-<p>data load strategy for commoncrawl dataset for LocalExecutor</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{'end_snapshot':</span> <span class="pre">&lt;function</span> <span class="pre">validate_snapshot_format&gt;,</span> <span class="pre">'start_snashot':</span> <span class="pre">&lt;function</span> <span class="pre">validate_snapshot_format&gt;,</span> <span class="pre">'url_limit':</span> <span class="pre">&lt;function</span> <span class="pre">DefaultCommonCrawlDataLoadStrategy.&lt;lambda&gt;&gt;},</span> <span class="pre">'field_types':</span> <span class="pre">{'end_snapshot':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'start_snapshot':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'optional_fields':</span> <span class="pre">['aws',</span> <span class="pre">'url_limit'],</span> <span class="pre">'required_fields':</span> <span class="pre">['start_snapshot',</span> <span class="pre">'end_snapshot']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy.load_data">
-<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultCommonCrawlDataLoadStrategy.load_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy.load_data" title="链接到此定义。">¶</a></dt>
-<dd><p>Need to be implemented in the</p>
-</dd></dl>
-
-</dd></dl>
-
+  <section id="data-juicer-core-data-load-strategy-module">
+<h1>data_juicer.core.data.load_strategy module<a class="headerlink" href="#data-juicer-core-data-load-strategy-module" title="链接到此标题。">¶</a></h1>
 </section>
 
 
@@ -431,74 +184,7 @@ rely on AutoFormatter for actual data loading</p>
           <div class="toc-sidebar-inner">
             <p class="toc-title">On this page</p>
             <ul>
-<li><a class="reference internal" href="#">data_juicer.core.data.load_strategy module</a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.StrategyKey"><code class="docutils literal notranslate"><span class="pre">StrategyKey</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.StrategyKey.executor_type"><code class="docutils literal notranslate"><span class="pre">StrategyKey.executor_type</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.StrategyKey.data_type"><code class="docutils literal notranslate"><span class="pre">StrategyKey.data_type</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.StrategyKey.data_source"><code class="docutils literal notranslate"><span class="pre">StrategyKey.data_source</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.StrategyKey.matches"><code class="docutils literal notranslate"><span class="pre">StrategyKey.matches()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.StrategyKey.__init__"><code class="docutils literal notranslate"><span class="pre">StrategyKey.__init__()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategy.__init__"><code class="docutils literal notranslate"><span class="pre">DataLoadStrategy.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategyRegistry"><code class="docutils literal notranslate"><span class="pre">DataLoadStrategyRegistry</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategyRegistry.get_strategy_class"><code class="docutils literal notranslate"><span class="pre">DataLoadStrategyRegistry.get_strategy_class()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DataLoadStrategyRegistry.register"><code class="docutils literal notranslate"><span class="pre">DataLoadStrategyRegistry.register()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">RayDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">RayDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">RayLocalJsonDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">RayLocalJsonDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayLocalJsonDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">RayLocalJsonDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">RayHuggingfaceDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">RayHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.RayHuggingfaceDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">RayHuggingfaceDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultLocalDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">DefaultLocalDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultLocalDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultHuggingfaceDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultHuggingfaceDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultModelScopeDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultModelScopeDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultModelScopeDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultModelScopeDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultArxivDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">DefaultArxivDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultArxivDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultArxivDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultWikiDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">DefaultWikiDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultWikiDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultWikiDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultCommonCrawlDataLoadStrategy</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">DefaultCommonCrawlDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultCommonCrawlDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultCommonCrawlDataLoadStrategy.load_data()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">data_juicer.core.data.load_strategy module</a></li>
 </ul>
 
           </div>

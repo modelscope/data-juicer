@@ -35,17 +35,21 @@
         </a>
       </div>
 
+      <nav class="navbar-sections" aria-label="Documentation sections">
+        <a href="../index_ZH.html" class="navbar-link active" aria-current="page">Doc</a>
+        <a href="../api.html" class="navbar-link">API</a>
+      </nav>
+
       <nav class="navbar-center">
+        
         <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
       </nav>
 
       <div class="navbar-right">
-        <button class="search-trigger" id="search-trigger" aria-label="Search">
+        <button class="search-trigger" id="search-trigger" aria-label="Search" title="Search (Ctrl/⌘ K)">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
-          <span>Search...</span>
-          <kbd>⌘K</kbd>
         </button>
         <div class="dropdown" id="lang-dropdown">
           <button class="dropdown-trigger" aria-haspopup="true" aria-expanded="false">
@@ -106,60 +110,63 @@
               <a href="../index_ZH.html">首页</a>
             </li>
           </ul>
-          <ul>
-<li class="toctree-l1"><a class="reference internal" href="../docs_index_ZH.html">文档</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DJ_service_ZH.html">API服务化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
-</ul>
-</li>
-</ul>
+          <p class="caption"><a href="../index_ZH.html">文档</a></p>
+          <p class="caption" role="heading"><span class="caption-text">教程</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/Installation_ZH.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/tutorial/QuickStart_ZH.html">快速上手</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">帮助文档</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Operators.html">Operator Schemas 算子提要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RecipeGallery_ZH.html">数据菜谱Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DatasetCfg_ZH.html">数据集配置指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_SORA_ZH.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DJ_service_ZH.html">API服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DeveloperGuide_ZH.html">开发者指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/Sandbox_ZH.html">沙盒实验室</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/hpo/README_ZH.html">数据菜谱的自动化超参优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/quality_classifier/README_ZH.html">给数据打分</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
 </ul>
 
 
+        </nav>
+        <nav class="sidebar-projects" aria-label="相关项目">
+          <p class="sidebar-projects-title">相关项目</p>
+          
+        <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         </nav>
       </div>
     </aside>
@@ -167,278 +174,8 @@
     <main class="main-content">
       <div class="content-wrapper">
         <article class="article" role="main">
-  <section id="module-data_juicer.core.data.data_validator">
-<span id="data-juicer-core-data-data-validator-module"></span><h1>data_juicer.core.data.data_validator module<a class="headerlink" href="#module-data_juicer.core.data.data_validator" title="链接到此标题。">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataValidator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">DataValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataValidator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataValidator" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
-<p>Base class for data validation</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataValidator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataValidator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataValidator.__init__" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataValidator.validate">
-<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data_juicer.core.data.dj_dataset.html#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataValidator.validate"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataValidator.validate" title="链接到此定义。">¶</a></dt>
-<dd><p>Validate dataset content</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dataset</strong> -- The dataset to validate</p>
-</dd>
-<dt class="field-even">抛出<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidationError" title="data_juicer.core.data.data_validator.DataValidationError"><strong>DataValidationError</strong></a> -- If validation fails</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataValidationError">
-<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">DataValidationError</span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataValidationError"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataValidationError" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Custom exception for data validation errors</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataValidatorRegistry">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">DataValidatorRegistry</span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataValidatorRegistry"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataValidatorRegistry" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Registry for data validators</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataValidatorRegistry.register">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validator_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataValidatorRegistry.register"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataValidatorRegistry.register" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataValidatorRegistry.get_validator">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validator_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidator" title="data_juicer.core.data.data_validator.DataValidator"><span class="pre">DataValidator</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataValidatorRegistry.get_validator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataValidatorRegistry.get_validator" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.BaseConversationValidator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">BaseConversationValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#BaseConversationValidator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.BaseConversationValidator" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidator" title="data_juicer.core.data.data_validator.DataValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataValidator</span></code></a></p>
-<p>Base class for conversation validators</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.BaseConversationValidator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#BaseConversationValidator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.BaseConversationValidator.__init__" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.BaseConversationValidator.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data_juicer.core.data.dj_dataset.html#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#BaseConversationValidator.validate"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.BaseConversationValidator.validate" title="链接到此定义。">¶</a></dt>
-<dd><p>Base validation for all conversation formats</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.BaseConversationValidator.validate_conversation">
-<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate_conversation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#BaseConversationValidator.validate_conversation"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.BaseConversationValidator.validate_conversation" title="链接到此定义。">¶</a></dt>
-<dd><p>Validate specific conversation format</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.SwiftMessagesValidator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">SwiftMessagesValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#SwiftMessagesValidator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.SwiftMessagesValidator" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.data_validator.BaseConversationValidator" title="data_juicer.core.data.data_validator.BaseConversationValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseConversationValidator</span></code></a></p>
-<p>Validator for Swift Messages conversation format.</p>
-<p>This validator ensures conversations follow the Swift Messages format with
-proper message structure and role assignments.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<em>Dict</em>) -- <p>Configuration dictionary containing:
-min_turns (int, optional): Minimum number of messages.</p>
-<blockquote>
-<div><p>Defaults to 1.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>max_turns (int, optional): Maximum number of messages.</dt><dd><p>Defaults to 100.</p>
-</dd>
-<dt>sample_size (int, optional): Number of samples to validate.</dt><dd><p>Defaults to 100.</p>
-</dd>
-</dl>
-</p>
-</dd>
-</dl>
-<dl>
-<dt>Example Format:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">"messages"</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"&lt;system&gt;"</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"&lt;query&gt;"</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"&lt;response&gt;"</span><span class="p">},</span>
-        <span class="o">...</span>
-    <span class="p">]</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">抛出<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidationError" title="data_juicer.core.data.data_validator.DataValidationError"><strong>DataValidationError</strong></a> -- If validation fails due to:
-    - Missing 'messages' field
-    - Invalid message structure
-    - Invalid role values
-    - Missing content
-    - Message count outside allowed range</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.SwiftMessagesValidator.validate_conversation">
-<span class="sig-name descname"><span class="pre">validate_conversation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#SwiftMessagesValidator.validate_conversation"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.SwiftMessagesValidator.validate_conversation" title="链接到此定义。">¶</a></dt>
-<dd><p>Validate specific conversation format</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataJuicerFormatValidator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">DataJuicerFormatValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataJuicerFormatValidator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataJuicerFormatValidator" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.data_validator.BaseConversationValidator" title="data_juicer.core.data.data_validator.BaseConversationValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseConversationValidator</span></code></a></p>
-<p>Validator for Data-Juicer default conversation format.</p>
-<p>This validator ensures conversations follow the Data-Juicer format with
-proper fields and structure.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<em>Dict</em>) -- <p>Configuration dictionary containing:
-min_turns (int, optional): Minimum number of conversation turns.</p>
-<blockquote>
-<div><p>Defaults to 1.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>max_turns (int, optional): Maximum number of conversation turns.</dt><dd><p>Defaults to 100.</p>
-</dd>
-<dt>sample_size (int, optional): Number of samples to validate.</dt><dd><p>Defaults to 100.</p>
-</dd>
-</dl>
-</p>
-</dd>
-</dl>
-<dl>
-<dt>Example Format:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">"system"</span><span class="p">:</span> <span class="s2">"&lt;system&gt;"</span><span class="p">,</span>  <span class="c1"># Optional</span>
-    <span class="s2">"instruction"</span><span class="p">:</span> <span class="s2">"&lt;query-inst&gt;"</span><span class="p">,</span>
-    <span class="s2">"query"</span><span class="p">:</span> <span class="s2">"&lt;query2&gt;"</span><span class="p">,</span>
-    <span class="s2">"response"</span><span class="p">:</span> <span class="s2">"&lt;response2&gt;"</span><span class="p">,</span>
-    <span class="s2">"history"</span><span class="p">:</span> <span class="p">[</span>  <span class="c1"># Optional</span>
-        <span class="p">[</span><span class="s2">"&lt;query1&gt;"</span><span class="p">,</span> <span class="s2">"&lt;response1&gt;"</span><span class="p">],</span>
-        <span class="o">...</span>
-    <span class="p">]</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">抛出<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidationError" title="data_juicer.core.data.data_validator.DataValidationError"><strong>DataValidationError</strong></a> -- If validation fails due to:
-    - Missing required fields
-    - Invalid field types
-    - Invalid conversation structure
-    - Turn count outside allowed range</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.DataJuicerFormatValidator.validate_conversation">
-<span class="sig-name descname"><span class="pre">validate_conversation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#DataJuicerFormatValidator.validate_conversation"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.DataJuicerFormatValidator.validate_conversation" title="链接到此定义。">¶</a></dt>
-<dd><p>Validate specific conversation format</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.CodeDataValidator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">CodeDataValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#CodeDataValidator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.CodeDataValidator" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidator" title="data_juicer.core.data.data_validator.DataValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataValidator</span></code></a></p>
-<p>Validator for code data</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.CodeDataValidator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#CodeDataValidator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.CodeDataValidator.__init__" title="链接到此定义。">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.CodeDataValidator.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data_juicer.core.data.dj_dataset.html#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#CodeDataValidator.validate"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.CodeDataValidator.validate" title="链接到此定义。">¶</a></dt>
-<dd><p>Validate dataset content</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dataset</strong> -- The dataset to validate</p>
-</dd>
-<dt class="field-even">抛出<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidationError" title="data_juicer.core.data.data_validator.DataValidationError"><strong>DataValidationError</strong></a> -- If validation fails</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.RequiredFieldsValidator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.data_validator.</span></span><span class="sig-name descname"><span class="pre">RequiredFieldsValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#RequiredFieldsValidator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.RequiredFieldsValidator" title="链接到此定义。">¶</a></dt>
-<dd><p>基类：<a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidator" title="data_juicer.core.data.data_validator.DataValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataValidator</span></code></a></p>
-<p>Validator that checks for required fields in dataset.</p>
-<p>This validator ensures that specified fields exist in the dataset and
-optionally checks their types and missing value ratios.</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<em>Dict</em>) -- Configuration dictionary containing:
-required_fields (List[str]): List of field names that must exist
-field_types (Dict[str, type], optional): Map of field names to
-expected types allow_missing (float, optional): Maximum ratio of
-missing values allowed. Defaults to 0.0.</p>
-</dd>
-</dl>
-<dl>
-<dt>Example Config:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">"required_fields"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"field1"</span><span class="p">,</span> <span class="s2">"field2"</span><span class="p">],</span>
-    <span class="s2">"field_types"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"field1"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"field2"</span><span class="p">:</span> <span class="nb">int</span><span class="p">},</span>
-    <span class="s2">"allow_missing"</span><span class="p">:</span> <span class="mf">0.0</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">抛出<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidationError" title="data_juicer.core.data.data_validator.DataValidationError"><strong>DataValidationError</strong></a> -- If validation fails</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.RequiredFieldsValidator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#RequiredFieldsValidator.__init__"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.RequiredFieldsValidator.__init__" title="链接到此定义。">¶</a></dt>
-<dd><p>Initialize validator with config</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> -- Dict containing:
-- required_fields: List of field names that must exist
-- field_types: Optional map of field names to expected types
-- allow_missing: Optional float for max ratio missing allowed</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.data.data_validator.RequiredFieldsValidator.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data_juicer.core.data.dj_dataset.html#data_juicer.core.data.dj_dataset.DJDataset" title="data_juicer.core.data.dj_dataset.DJDataset"><span class="pre">DJDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/data_validator.html#RequiredFieldsValidator.validate"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.data_validator.RequiredFieldsValidator.validate" title="链接到此定义。">¶</a></dt>
-<dd><p>Validate dataset has required fields with correct types</p>
-<dl class="field-list simple">
-<dt class="field-odd">参数<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dataset</strong> -- NestedDataset or RayDataset to validate</p>
-</dd>
-<dt class="field-even">抛出<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidationError" title="data_juicer.core.data.data_validator.DataValidationError"><strong>DataValidationError</strong></a> -- If validation fails</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+  <section id="data-juicer-core-data-data-validator-module">
+<h1>data_juicer.core.data.data_validator module<a class="headerlink" href="#data-juicer-core-data-data-validator-module" title="链接到此标题。">¶</a></h1>
 </section>
 
 
@@ -447,44 +184,7 @@ missing values allowed. Defaults to 0.0.</p>
           <div class="toc-sidebar-inner">
             <p class="toc-title">On this page</p>
             <ul>
-<li><a class="reference internal" href="#">data_juicer.core.data.data_validator module</a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidator"><code class="docutils literal notranslate"><span class="pre">DataValidator</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidator.__init__"><code class="docutils literal notranslate"><span class="pre">DataValidator.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidator.validate"><code class="docutils literal notranslate"><span class="pre">DataValidator.validate()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidationError"><code class="docutils literal notranslate"><span class="pre">DataValidationError</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidatorRegistry"><code class="docutils literal notranslate"><span class="pre">DataValidatorRegistry</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidatorRegistry.register"><code class="docutils literal notranslate"><span class="pre">DataValidatorRegistry.register()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataValidatorRegistry.get_validator"><code class="docutils literal notranslate"><span class="pre">DataValidatorRegistry.get_validator()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.BaseConversationValidator"><code class="docutils literal notranslate"><span class="pre">BaseConversationValidator</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.BaseConversationValidator.__init__"><code class="docutils literal notranslate"><span class="pre">BaseConversationValidator.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.BaseConversationValidator.validate"><code class="docutils literal notranslate"><span class="pre">BaseConversationValidator.validate()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.BaseConversationValidator.validate_conversation"><code class="docutils literal notranslate"><span class="pre">BaseConversationValidator.validate_conversation()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.SwiftMessagesValidator"><code class="docutils literal notranslate"><span class="pre">SwiftMessagesValidator</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.SwiftMessagesValidator.validate_conversation"><code class="docutils literal notranslate"><span class="pre">SwiftMessagesValidator.validate_conversation()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataJuicerFormatValidator"><code class="docutils literal notranslate"><span class="pre">DataJuicerFormatValidator</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.DataJuicerFormatValidator.validate_conversation"><code class="docutils literal notranslate"><span class="pre">DataJuicerFormatValidator.validate_conversation()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.CodeDataValidator"><code class="docutils literal notranslate"><span class="pre">CodeDataValidator</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.CodeDataValidator.__init__"><code class="docutils literal notranslate"><span class="pre">CodeDataValidator.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.CodeDataValidator.validate"><code class="docutils literal notranslate"><span class="pre">CodeDataValidator.validate()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.RequiredFieldsValidator"><code class="docutils literal notranslate"><span class="pre">RequiredFieldsValidator</span></code></a><ul>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.RequiredFieldsValidator.__init__"><code class="docutils literal notranslate"><span class="pre">RequiredFieldsValidator.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#data_juicer.core.data.data_validator.RequiredFieldsValidator.validate"><code class="docutils literal notranslate"><span class="pre">RequiredFieldsValidator.validate()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">data_juicer.core.data.data_validator module</a></li>
 </ul>
 
           </div>
