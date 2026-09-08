@@ -107,6 +107,7 @@ class RayBasicDeduplicator(Filter):
 
     # TODO: Set a more reasonable value
     EMPTY_HASH_VALUE = "EMPTY"
+    _supported_exec_modes = ("ray", "ray_partitioned")
 
     def __init__(
         self,

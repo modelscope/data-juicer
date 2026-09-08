@@ -59,7 +59,7 @@ class WordsNumFilter(Filter):
     def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
-        words_key = f"{InterVars.words}-{self.model_key}"
+        words_key = f"{InterVars.words}-{self.model_key}-{self.text_key}"
 
         for idx, stat in enumerate(samples_stats):
             # check if it's computed already

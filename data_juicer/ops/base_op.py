@@ -945,7 +945,7 @@ class Filter(OP):
 
 
 class Deduplicator(OP):
-    _supported_exec_modes = ("default", "ray", "ray_partitioned")
+    _supported_exec_modes = ("default",)
 
     def __init__(self, *args, **kwargs):
         """

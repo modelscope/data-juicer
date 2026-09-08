@@ -89,7 +89,7 @@ vision = [
 
 # Natural Language Processing
 nlp = [
-    "nltk==3.9.1",  # NLP toolkit
+    "nltk==3.10.3",  # NLP toolkit
     "easyocr==1.7.1",  # OCR
     "fasttext-predict",  # FastText (no numpy dependency, numpy 2.x safe)
     "kenlm",  # Language modeling
@@ -160,6 +160,7 @@ dev = [
 ai_services = [
     "dashscope",  # Alibaba Cloud AI
     "openai",  # OpenAI API
+    "litellm>=1.80.0,<2",  # Allows OpenAI 1.x compatibility with label-studio
     "label-studio>=1.23.0",  # Data labeling
 ]
 

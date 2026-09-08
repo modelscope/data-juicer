@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import tempfile
@@ -33,7 +34,8 @@ class PartitionedRayExecutorTest(DataJuicerTestCaseBase):
         cfg = init_configs([
             '--config', os.path.join(self.root_path, 'demos/process_on_ray/configs/demo-new-config.yaml'),
             '--partition.mode', 'manual',
-            '--partition.num_of_partitions', '2'
+            '--partition.size', '5',
+            '--override_num_blocks', '1',
         ])
         cfg.export_path = os.path.join(self.tmp_dir, 'test_end2end_execution_manual', 'res.jsonl')
         cfg.work_dir = os.path.join(self.tmp_dir, 'test_end2end_execution_manual')
@@ -42,6 +44,37 @@ class PartitionedRayExecutorTest(DataJuicerTestCaseBase):
 
         # check result files
         self.assertTrue(os.path.exists(cfg.export_path))
+        self.assertEqual(executor.num_partitions, 2)
+
+        with open(os.path.join(cfg.checkpoint_dir, 'partitioning_info.json')) as f:
+            partitioning_info = json.load(f)
+        self.assertEqual(
+            [partition['row_count'] for partition in partitioning_info['partitions']],
+            [5, 6],
+        )
+
+    @TEST_TAG('ray')
+    def test_end2end_manual_size_with_single_partition(self):
+        """A sample target larger than most of the dataset creates one partition."""
+        cfg = init_configs([
+            '--config', os.path.join(self.root_path, 'demos/process_on_ray/configs/demo-new-config.yaml'),
+            '--partition.mode', 'manual',
+            '--partition.size', '10',
+            '--override_num_blocks', '1',
+        ])
+        cfg.export_path = os.path.join(self.tmp_dir, 'test_manual_size_single_partition', 'res.jsonl')
+        cfg.work_dir = os.path.join(self.tmp_dir, 'test_manual_size_single_partition')
+
+        executor = PartitionedRayExecutor(cfg)
+        executor.run()
+
+        self.assertEqual(executor.num_partitions, 1)
+        with open(os.path.join(cfg.checkpoint_dir, 'partitioning_info.json')) as f:
+            partitioning_info = json.load(f)
+        self.assertEqual(
+            [partition['row_count'] for partition in partitioning_info['partitions']],
+            [11],
+        )
 
     @TEST_TAG('ray')
     def test_end2end_execution_with_checkpointing(self):
@@ -489,6 +522,13 @@ class PartitionedRayExecutorTest(DataJuicerTestCaseBase):
 
         # Verify execution completes without checkpoints
         self.assertTrue(os.path.exists(cfg.export_path))
+
+        detailed_job_start = next(
+            event for event in executor.get_events()
+            if event.event_type.value == 'job_start' and 'config_summary' in event.metadata
+        )
+        self.assertEqual(detailed_job_start.metadata['total_partitions'], 2)
+        self.assertIsNone(detailed_job_start.metadata['config_summary']['partition_size'])
 
         # Checkpoint directory might exist but should be empty or not created
         checkpoint_dir = cfg.checkpoint_dir

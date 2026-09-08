@@ -1,3 +1,5 @@
+from datetime import date, datetime, timezone
+
 import json
 import os
 import shutil
@@ -462,11 +464,21 @@ class CoreExporterFileTest(DataJuicerTestCaseBase):
             "scalar": np.int64(7),
             "array": ListLike(),
             "nested": [ArrowLike()],
+            "date": date(2024, 1, 2),
+            "datetime": datetime(2024, 1, 2, 3, 4, 5),
+            "datetime_tz": datetime(2024, 1, 2, 3, 4, 5, tzinfo=timezone.utc),
         }
 
         self.assertEqual(
             self.Exporter._row_to_json_serializable(row),
-            {"scalar": 7, "array": [1, 2], "nested": [{"nested": 3}]},
+            {
+                "scalar": 7,
+                "array": [1, 2],
+                "nested": [{"nested": 3}],
+                "date": "2024-01-02",
+                "datetime": "2024-01-02T03:04:05",
+                "datetime_tz": "2024-01-02T03:04:05+00:00",
+            },
         )
 
     def test_json_jsonl_parquet_exports_and_filtered_shards(self):
@@ -500,6 +512,32 @@ class CoreExporterFileTest(DataJuicerTestCaseBase):
 
         shard_files = os.listdir(os.path.dirname(shard_path))
         self.assertTrue(any(name.endswith(".jsonl") for name in shard_files))
+
+
+class ExporterNoSuffixTest(DataJuicerTestCaseBase):
+    """Regression test: export_path without extension should give clear error."""
+
+    def test_no_suffix_raises_valueerror(self):
+        with self.assertRaises(ValueError) as ctx:
+            Exporter(export_path='s3://bucket/data/result', num_proc=1)
+        self.assertIn('no file extension', str(ctx.exception))
+
+    def test_no_suffix_local_path_raises_valueerror(self):
+        with self.assertRaises(ValueError) as ctx:
+            Exporter(export_path='/tmp/output/dataset', num_proc=1)
+        self.assertIn('no file extension', str(ctx.exception))
+
+    def test_valid_suffix_still_works(self):
+        exp = Exporter(export_path='/tmp/output/data.jsonl', num_proc=1)
+        self.assertEqual(exp.suffix, 'jsonl')
+
+    def test_explicit_export_type_bypasses_suffix(self):
+        exp = Exporter(
+            export_path='s3://bucket/data/result',
+            export_type='jsonl',
+            num_proc=1,
+        )
+        self.assertEqual(exp.suffix, 'jsonl')
 
 
 if __name__ == '__main__':

@@ -17,6 +17,8 @@ import psutil
 import ray
 from loguru import logger
 
+from data_juicer.core.data.dj_dataset import nested_query
+
 
 class ModalityType(Enum):
     """Supported data modalities."""
@@ -71,15 +73,10 @@ class DataCharacteristics:
 
 @dataclass
 class ModalityConfig:
-    """Configuration for a specific modality."""
+    """Sample-count fallback and upper bound for a data modality."""
 
-    modality: ModalityType
     default_partition_size: int
     max_partition_size: int
-    max_partition_size_mb: int
-    memory_multiplier: float  # Memory usage multiplier compared to text
-    complexity_multiplier: float  # Processing complexity multiplier
-    description: str
 
 
 class ResourceDetector:
@@ -246,56 +243,39 @@ class PartitionSizeOptimizer:
     # Default configurations for different modalities
     MODALITY_CONFIGS = {
         ModalityType.TEXT: ModalityConfig(
-            modality=ModalityType.TEXT,
-            default_partition_size=10000,  # Increased for 256MB target
-            max_partition_size=50000,  # Increased for larger partitions
-            max_partition_size_mb=256,  # Default 256MB per partition (configurable)
-            memory_multiplier=1.0,
-            complexity_multiplier=1.0,
-            description="Text data - efficient processing, low memory usage, target 256MB partitions (configurable)",
+            default_partition_size=10000,
+            max_partition_size=50000,
         ),
         ModalityType.IMAGE: ModalityConfig(
-            modality=ModalityType.IMAGE,
-            default_partition_size=2000,  # Increased for 256MB target
-            max_partition_size=10000,  # Increased for larger partitions
-            max_partition_size_mb=256,  # Default 256MB per partition (configurable)
-            memory_multiplier=5.0,
-            complexity_multiplier=3.0,
-            description="Image data - moderate memory usage, target 256MB partitions (configurable)",
+            default_partition_size=2000,
+            max_partition_size=10000,
         ),
         ModalityType.AUDIO: ModalityConfig(
-            modality=ModalityType.AUDIO,
-            default_partition_size=1000,  # Increased for 256MB target
-            max_partition_size=4000,  # Increased for larger partitions
-            max_partition_size_mb=256,  # Default 256MB per partition (configurable)
-            memory_multiplier=8.0,
-            complexity_multiplier=5.0,
-            description="Audio data - high memory usage, target 256MB partitions (configurable)",
+            default_partition_size=1000,
+            max_partition_size=4000,
         ),
         ModalityType.VIDEO: ModalityConfig(
-            modality=ModalityType.VIDEO,
-            default_partition_size=400,  # Increased for 256MB target
-            max_partition_size=2000,  # Increased for larger partitions
-            max_partition_size_mb=256,  # Default 256MB per partition (configurable)
-            memory_multiplier=20.0,
-            complexity_multiplier=15.0,
-            description="Video data - very high memory usage, target 256MB partitions (configurable)",
+            default_partition_size=400,
+            max_partition_size=2000,
         ),
         ModalityType.MULTIMODAL: ModalityConfig(
-            modality=ModalityType.MULTIMODAL,
-            default_partition_size=1600,  # Increased for 256MB target
-            max_partition_size=6000,  # Increased for larger partitions
-            max_partition_size_mb=256,  # Default 256MB per partition (configurable)
-            memory_multiplier=10.0,
-            complexity_multiplier=8.0,
-            description="Multimodal data - combination of multiple modalities, target 256MB partitions (configurable)",
+            default_partition_size=1600,
+            max_partition_size=6000,
         ),
     }
 
     def __init__(self, cfg):
         """Initialize the optimizer with configuration."""
         self.cfg = cfg
-        self.text_key = getattr(cfg, "text_key", "text")
+        text_keys = getattr(cfg, "text_keys", None)
+        if text_keys is None:
+            # Preserve the legacy programmatic interface when no global keys
+            # are provided. YAML/CLI use text_keys, as do the operators.
+            self.text_key = getattr(cfg, "text_key", "text")
+        elif isinstance(text_keys, str):
+            self.text_key = text_keys
+        else:
+            self.text_key = text_keys[0] if text_keys else None
         self.image_key = getattr(cfg, "image_key", "images")
         self.audio_key = getattr(cfg, "audio_key", "audios")
         self.video_key = getattr(cfg, "video_key", "videos")
@@ -306,7 +286,7 @@ class PartitionSizeOptimizer:
         modalities = []
 
         # Check for text
-        if self.text_key in sample and sample[self.text_key]:
+        if self.text_key and nested_query(sample, self.text_key):
             modalities.append(ModalityType.TEXT)
 
         # Check for images
@@ -411,11 +391,11 @@ class PartitionSizeOptimizer:
 
             # Analyze text
             text_length = 0
-            if self.text_key in sample and sample[self.text_key]:
-                if isinstance(sample[self.text_key], str):
-                    text_length = len(sample[self.text_key])
-                elif isinstance(sample[self.text_key], list):
-                    text_length = sum(len(t) for t in sample[self.text_key])
+            text = nested_query(sample, self.text_key) if self.text_key else None
+            if isinstance(text, str):
+                text_length = len(text)
+            elif isinstance(text, list):
+                text_length = sum(len(t) for t in text)
             text_lengths.append(text_length)
 
             # Count media files
@@ -636,6 +616,11 @@ class PartitionSizeOptimizer:
                 target_size = int(target_memory_mb / (characteristics.memory_per_sample_mb * complexity_multiplier))
             else:
                 target_size = base_config.default_partition_size
+            if target_size < 10:
+                logger.warning(
+                    f"Calculated {characteristics.primary_modality.value} partition size {target_size} samples; "
+                    "applying the optimizer minimum of 10 samples."
+                )
             target_size = max(10, min(target_size, base_config.max_partition_size))
 
         # Step 2: Check if this fits in available memory
@@ -720,6 +705,11 @@ class PartitionSizeOptimizer:
 
         # Apply bounds from MODALITY_CONFIGS
         text_config = self.MODALITY_CONFIGS[ModalityType.TEXT]
+        if target_samples < 100:
+            logger.warning(
+                f"Calculated text partition size {target_samples} samples; "
+                "applying the optimizer minimum of 100 samples."
+            )
         target_samples = max(100, min(target_samples, text_config.max_partition_size))
 
         logger.info(f"Text partition calculation:")
@@ -752,6 +742,11 @@ class PartitionSizeOptimizer:
 
         # Apply bounds
         optimal_max_size_mb = min(complexity_adjusted_size, max_size_by_memory)
+        if optimal_max_size_mb < 32:
+            logger.warning(
+                f"Calculated maximum partition size {optimal_max_size_mb} MB; "
+                "applying the optimizer minimum of 32 MB."
+            )
         optimal_max_size_mb = max(32, optimal_max_size_mb)
         optimal_max_size_mb = min(512, optimal_max_size_mb)  # Increased max from 128MB
 
@@ -819,8 +814,6 @@ class PartitionSizeOptimizer:
                 modality.value: {
                     "default_size": config.default_partition_size,
                     "max_size": config.max_partition_size,
-                    "max_size_mb": config.max_partition_size_mb,
-                    "description": config.description,
                 }
                 for modality, config in self.MODALITY_CONFIGS.items()
             },
@@ -849,7 +842,7 @@ def auto_configure_resources(cfg, dataset, process_pipeline: List) -> Dict:
 
     logger.info("Resource optimization completed:")
     logger.info(f"  Recommended partition.size: {recommendations['recommended_partition_size']}")
-    logger.info(f"  Recommended partition.max_size_mb: {recommendations['recommended_max_size_mb']}")
+    logger.info(f"  Estimated maximum partition size: {recommendations['recommended_max_size_mb']} MB")
     logger.info(f"  Recommended worker count: {recommendations['recommended_worker_count']}")
 
     return recommendations

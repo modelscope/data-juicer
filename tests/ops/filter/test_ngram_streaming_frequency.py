@@ -57,8 +57,8 @@ def _reference_word_ratio(words, n):
 
 
 def _word_context(op, word_rows):
-    words_key = f"{InterVars.words}-{op.model_key}"
-    refined_words_key = f"{InterVars.refined_words}-True-SPECIAL_CHARS-False-[2]-"
+    words_key = f"{InterVars.words}-{op.model_key}-{op.text_key}"
+    refined_words_key = f"{InterVars.refined_words}-{op.model_key}-{op.text_key}-True-SPECIAL_CHARS-False-[2]-"
     return [
         {
             words_key: words,

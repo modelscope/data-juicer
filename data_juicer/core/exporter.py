@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import date
 from multiprocessing import Pool
 from urllib.parse import urlparse
 
@@ -179,7 +180,15 @@ class Exporter:
         :param export_path: the path to export datasets.
         :return: the suffix of export_path.
         """
-        suffix = export_path.split(".")[-1].lower()
+        parts = export_path.rsplit(".", 1)
+        if len(parts) < 2 or "/" in parts[-1]:
+            raise ValueError(
+                f"Cannot determine file format from export_path "
+                f"[{export_path}] because it has no file extension. "
+                f"Please add a suffix (e.g. .jsonl, .json, .parquet) "
+                f"or specify export_type explicitly."
+            )
+        suffix = parts[-1].lower()
         return suffix
 
     @staticmethod
@@ -387,6 +396,8 @@ class Exporter:
             return {k: Exporter._row_to_json_serializable(v) for k, v in obj.items()}
         if isinstance(obj, list):
             return [Exporter._row_to_json_serializable(v) for v in obj]
+        if isinstance(obj, date):
+            return obj.isoformat()
         if hasattr(obj, "item"):  # numpy scalar
             return obj.item()
         if hasattr(obj, "tolist"):

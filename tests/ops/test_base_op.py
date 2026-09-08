@@ -884,6 +884,53 @@ class TestBaseParamsSync(unittest.TestCase):
                     f"{klass.__name__}._supported_exec_modes contains invalid mode '{m}'",
                 )
 
+    def test_deduplicator_supported_exec_modes_are_exact(self):
+        """
+        Deduplicators are mode-specific: the non-Ray implementations only work
+        in default mode, and the Ray implementations only in the Ray modes.
+        Assert the exact tuples so a wrong declaration cannot regress silently.
+        """
+        from data_juicer.ops import deduplicator as dedup_module
+
+        expected = {
+            "DocumentDeduplicator": ("default",),
+            "DocumentLineDeduplicator": ("default",),
+            "DocumentMinhashDeduplicator": ("default",),
+            "DocumentSimhashDeduplicator": ("default",),
+            "ImageDeduplicator": ("default",),
+            "VideoDeduplicator": ("default",),
+            "RayBasicDeduplicator": ("ray", "ray_partitioned"),
+            "RayDocumentDeduplicator": ("ray", "ray_partitioned"),
+            "RayImageDeduplicator": ("ray", "ray_partitioned"),
+            "RayVideoDeduplicator": ("ray", "ray_partitioned"),
+            "RayBTSMinhashDeduplicator": ("ray", "ray_partitioned"),
+            "RayBTSMinhashCppDeduplicator": ("ray", "ray_partitioned"),
+        }
+
+        for name, expected_modes in expected.items():
+            klass = getattr(dedup_module, name)
+            self.assertEqual(
+                klass._supported_exec_modes,
+                expected_modes,
+                f"{name}._supported_exec_modes should be {expected_modes}",
+            )
+
+        # Guard against new deduplicators silently inheriting the wrong modes.
+        discovered = {
+            n for n in dir(dedup_module) if n.endswith("Deduplicator") and isinstance(getattr(dedup_module, n), type)
+        }
+        self.assertEqual(
+            discovered,
+            set(expected),
+            "deduplicator set changed; add the new op to the expected exec-modes map",
+        )
+
+    def test_base_deduplicator_class_is_default_only(self):
+        """The Deduplicator base class must not advertise Ray support."""
+        from data_juicer.ops.base_op import Deduplicator
+
+        self.assertEqual(Deduplicator._supported_exec_modes, ("default",))
+
 
 if __name__ == '__main__':
     unittest.main()

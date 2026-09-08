@@ -67,7 +67,7 @@ class WordRepetitionFilter(Filter):
     def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
-        words_key = f"{InterVars.words}-{self.model_key}"
+        words_key = f"{InterVars.words}-{self.model_key}-{self.text_key}"
 
         for idx, stat in enumerate(samples_stats):
             # check if it's computed already
@@ -85,7 +85,9 @@ class WordRepetitionFilter(Filter):
                     samples[Fields.context][idx][words_key] = words
 
             # try to get refined words from context
-            refined_words_key = f"{InterVars.refined_words}-" f"True-SPECIAL_CHARS-False-[2]-"
+            refined_words_key = (
+                f"{InterVars.refined_words}-{self.model_key}-{self.text_key}-" f"True-SPECIAL_CHARS-False-[2]-"
+            )
             if context and refined_words_key in samples[Fields.context][idx]:
                 words = samples[Fields.context][idx][refined_words_key]
             else:

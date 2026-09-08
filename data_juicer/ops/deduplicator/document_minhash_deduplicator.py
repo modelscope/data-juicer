@@ -262,8 +262,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
         # compute minhash value
         hv = np.fromiter((sha1_hash32(token) for token in tokens), dtype=np.uint64, count=len(tokens))
         if len(hv) == 0:
-            phv = np.bitwise_and((hv[:, None] * self.perm_a + self.perm_b) % MERSENNE_PRIME, MAX_HASH)
-            hash_values = phv.min(axis=0)
+            hash_values = np.full(self.num_permutation, MAX_HASH, dtype=np.uint64)
         else:
             bytes_per_token = self.num_permutation * np.dtype(np.uint64).itemsize
             tokens_per_block = max(1, _MINHASH_PERMUTATION_BLOCK_BYTES // bytes_per_token)

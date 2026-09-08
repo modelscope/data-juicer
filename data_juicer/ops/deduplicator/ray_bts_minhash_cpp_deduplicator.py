@@ -440,6 +440,7 @@ class RayBTSMinhashCppDeduplicator(Deduplicator):
     # TODO: Set a more reasonable value
     EMPTY_HASH_VALUE = "EMPTY"
     _batched_op = True
+    _supported_exec_modes = ("ray", "ray_partitioned")
 
     def __init__(
         self,

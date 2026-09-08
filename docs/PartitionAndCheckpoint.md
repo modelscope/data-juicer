@@ -23,7 +23,6 @@ The `ray_partitioned` executor splits datasets into partitions and processes the
 ├── checkpoints/                  # Checkpoint data
 │   ├── partitioning_info.json    # Saved row boundaries and partition hashes
 │   └── checkpoint_op_*.parquet/  # Per-operation partition checkpoints
-├── partitions/                   # Input partitions
 ├── logs/                         # Human-readable logs
 └── metadata/                     # Job metadata
 ```
@@ -210,9 +209,11 @@ checkpoint:
   strategy: every_n_ops  # every_n_ops (default), every_op, manual, disabled
   n_ops: 5               # Default: checkpoint every 5 operations
   op_names:              # For manual strategy - checkpoint after expensive ops
-    - document_deduplicator
-    - embedding_mapper
+    - ray_document_deduplicator
+    - extract_keyword_mapper
 ```
+
+Choose `every_op`, `every_n_ops`, `manual`, or `disabled`. For `every_n_ops`, set `n_ops` to a positive integer. For `manual`, list operator names from your recipe in `op_names`.
 
 When checkpointing is enabled, the initial run saves
 `checkpoints/partitioning_info.json`. For every logical partition, this file
@@ -228,15 +229,11 @@ partitions even when Ray produces a different physical block layout in the new
 process. Complete partition hashes are sensitive to row order, independent of
 Ray batch boundaries, and validated before any checkpoint is reused.
 
-### Intermediate Storage
+### Checkpoints and Temporary Files
 
-```yaml
-intermediate_storage:
-  format: "parquet"              # parquet, arrow, jsonl
-  compression: "snappy"          # snappy, gzip, none
-  preserve_intermediate_data: true
-  retention_policy: "keep_all"   # keep_all, keep_failed_only, cleanup_all
-```
+Use `checkpoint.enabled` to turn checkpointing on or off and `checkpoint.strategy` to choose when to save. Checkpoints are saved as Parquet datasets under `checkpoint_dir`, which defaults to `<work_dir>/checkpoints`. Keep this directory to resume an interrupted job.
+
+The executor cleans up its temporary working files when the run exits. Checkpoints are stored separately and remain available for resumption.
 
 ## Usage
 
@@ -285,13 +282,7 @@ If metadata is missing, row boundaries are invalid, the input has changed, or
 a content hash does not match, explicit resume stops with an error and leaves
 the existing checkpoints unchanged.
 
-`--job_id` remains available for custom job naming and backward compatibility.
-For fault-tolerant continuation, prefer `--resume`: the legacy `--job_id`
-resumption path keeps its previous behavior and may clear mismatched
-checkpoints before starting fresh. Metadata created by an older Data-Juicer
-version can still be read, but it does not contain the row boundaries and full
-content hashes required by explicit resume; `--resume` therefore rejects it
-without deleting its checkpoints.
+Use `--job_id` to name a job. To resume it, add `--resume` with the original job ID to the original command.
 
 If both arguments are supplied, their values must be identical:
 
@@ -460,7 +451,6 @@ disabled         | 0s        | Re-run everything
 
 - Event logs: fast storage (SSD)
 - Checkpoints: large capacity storage
-- Partitions: local storage
 
 ### Partition Sizing Trade-offs
 

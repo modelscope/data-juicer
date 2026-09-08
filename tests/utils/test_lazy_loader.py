@@ -640,12 +640,20 @@ class LazyLoaderBehaviorTest(DataJuicerTestCaseBase):
 
         loader = LazyLoader(
             "json",
-            package_url="local-package@git+https://example.invalid/repo.git",
+            package_url="local-package @ git+https://example.invalid/repo.git",
             auto_install=False,
         )
 
         self.assertEqual(loader._package_name, "json")
         self.assertEqual(loader._package_url, "git+https://example.invalid/repo.git")
+
+        # Raw HTTPS URL with pinned SHA must not be split
+        loader2 = LazyLoader(
+            "json",
+            package_url="https://github.com/org/repo.git@abc123",
+            auto_install=False,
+        )
+        self.assertEqual(loader2._package_url, "https://github.com/org/repo.git@abc123")
 
     def test_existing_module_loads_once_and_updates_parent_globals(self):
         globals().pop("decimal", None)

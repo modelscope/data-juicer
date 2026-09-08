@@ -10,7 +10,7 @@ Covers:
 import math
 import unittest
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from data_juicer.core.executor.ray_executor_partitioned import PartitionedRayExecutor
 from data_juicer.utils.ray_cluster_utils import ClusterTopology, detect_cluster_topology
@@ -109,8 +109,8 @@ def _fake_executor(**attrs):
     fake.max_concurrent_partitions = "auto"
     fake.num_partitions = 4
     fake.partition_mode = "auto"
-    fake.partition_size = 5000
-    fake.max_size_mb = 64
+    fake.partition_size_cfg = None
+    fake._partition_count_from_size = PartitionedRayExecutor._partition_count_from_size
     fake._partitions_per_node_cfg = "auto"
     for key, value in attrs.items():
         setattr(fake, key, value)
@@ -121,7 +121,7 @@ def _gpu_op(num_gpus):
     return SimpleNamespace(num_gpus=num_gpus, _name="gpu_op")
 
 
-class SentinelParsingTest(unittest.TestCase):
+class SentinelParsingTest(DataJuicerTestCaseBase):
     def _configure(self, partition_cfg):
         fake = _fake_executor()
         fake.cfg = SimpleNamespace(partition=partition_cfg)
@@ -354,8 +354,41 @@ class PartitionsPerNodeTest(unittest.TestCase):
         self.assertEqual(value, 16)
 
 
-class OptimizerFallbackTest(unittest.TestCase):
-    """Cluster bounds must still apply when the optimizer fails."""
+class OptimizerFallbackTest(DataJuicerTestCaseBase):
+    """Cluster bounds and sample-count fallback apply when optimization fails."""
+
+    def test_partition_size_used_when_optimizer_raises(self):
+        fake = _fake_executor(partition_size_cfg=500)
+        fake._apply_cluster_partition_bounds = lambda ops: None
+        dataset = SimpleNamespace(count=lambda: 1001)
+        with patch(
+            "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
+            side_effect=RuntimeError("optimizer unavailable"),
+        ):
+            PartitionedRayExecutor._configure_auto_partitioning(fake, dataset, [])
+        self.assertEqual(fake.num_partitions, 2)
+
+    def test_invalid_recommendation_uses_partition_size(self):
+        fake = _fake_executor(partition_size_cfg=500)
+        fake._apply_cluster_partition_bounds = lambda ops: None
+        dataset = SimpleNamespace(count=lambda: 1001)
+        recommendations = {"recommended_partition_size": 0, "recommended_worker_count": 4}
+        with patch(
+            "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
+            return_value=recommendations,
+        ):
+            PartitionedRayExecutor._configure_auto_partitioning(fake, dataset, [])
+        self.assertEqual(fake.num_partitions, 2)
+
+    def test_unavailable_dataset_size_keeps_configured_count(self):
+        fake = _fake_executor(partition_size_cfg=500)
+        fake._apply_cluster_partition_bounds = lambda ops: None
+        with patch(
+            "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
+            side_effect=RuntimeError("optimizer unavailable"),
+        ):
+            PartitionedRayExecutor._configure_auto_partitioning(fake, object(), [])
+        self.assertEqual(fake.num_partitions, 4)
 
     def _bound_fake(self, **attrs):
         fake = _fake_executor(**attrs)
@@ -412,6 +445,92 @@ class OptimizerFallbackTest(unittest.TestCase):
         ):
             PartitionedRayExecutor._configure_auto_partitioning(fake, dataset, [_gpu_op(0.5)])
         self.assertEqual(fake.num_partitions, 24)
+
+
+class SampleBasedSplitTest(DataJuicerTestCaseBase):
+    """Verify that manual+size mode uses split_at_indices for row-level cuts."""
+
+    def _make_executor(self, partition_size_cfg, num_partitions):
+        fake = _fake_executor(
+            partition_size_cfg=partition_size_cfg,
+            num_partitions=num_partitions,
+            partition_mode="manual",
+            ckpt_manager=SimpleNamespace(checkpoint_enabled=False),
+        )
+        fake._enable_deterministic_execution = lambda: None
+        fake._load_partitioning_info = lambda: None
+        fake._collect_partition_metadata = lambda p, i, **kw: SimpleNamespace(
+            partition_id=i, row_count=0, first_row_hash="", content_hash="",
+            start_row=0, end_row=0,
+        )
+        fake._save_partitioning_info = lambda info: None
+        return fake
+
+    def test_manual_size_uses_target_boundaries_without_recount(self):
+        data = MagicMock()
+        data.split_at_indices.return_value = [MagicMock() for _ in range(3)]
+        for p in data.split_at_indices.return_value:
+            p.count.return_value = 2
+            p.take.return_value = [{"x": 1}]
+
+        dataset = SimpleNamespace(data=data)
+        fake = self._make_executor(partition_size_cfg=2, num_partitions=3)
+
+        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+
+        data.split_at_indices.assert_called_once()
+        indices = data.split_at_indices.call_args[0][0]
+        self.assertEqual(indices, [2, 4])
+        data.count.assert_not_called()
+        data.split.assert_not_called()
+
+    def test_single_partition_materializes_without_split_indices(self):
+        data = MagicMock()
+        materialized = MagicMock()
+        data.materialize.return_value = materialized
+        dataset = SimpleNamespace(data=data)
+        fake = self._make_executor(partition_size_cfg=100, num_partitions=1)
+
+        partitions, _ = PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+
+        self.assertEqual(partitions, [materialized])
+        data.materialize.assert_called_once_with()
+        data.split_at_indices.assert_not_called()
+        data.split.assert_not_called()
+
+    def test_count_based_uses_block_split(self):
+        """When partition_size_cfg is None (count-based), split() is used."""
+        data = MagicMock()
+        data.split.return_value = [MagicMock() for _ in range(4)]
+        for p in data.split.return_value:
+            p.count.return_value = 250
+            p.take.return_value = [{"x": 1}]
+
+        dataset = SimpleNamespace(data=data)
+        fake = self._make_executor(partition_size_cfg=None, num_partitions=4)
+
+        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+
+        data.split.assert_called_once_with(4)
+        data.split_at_indices.assert_not_called()
+
+    def test_auto_mode_with_size_uses_block_split(self):
+        """Auto mode uses block-based split even when partition_size_cfg is set
+        (size is only an optimizer fallback in auto mode, not a row-level guarantee)."""
+        data = MagicMock()
+        data.split.return_value = [MagicMock() for _ in range(4)]
+        for p in data.split.return_value:
+            p.count.return_value = 250
+            p.take.return_value = [{"x": 1}]
+
+        dataset = SimpleNamespace(data=data)
+        fake = self._make_executor(partition_size_cfg=500, num_partitions=4)
+        fake.partition_mode = "auto"
+
+        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+
+        data.split.assert_called_once_with(4)
+        data.split_at_indices.assert_not_called()
 
 
 if __name__ == "__main__":

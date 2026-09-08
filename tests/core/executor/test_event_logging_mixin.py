@@ -624,7 +624,14 @@ class CoreEventLoggingFileTest(DataJuicerTestCaseBase):
             "execution_plan_length": 2,
         }
 
-        executor.log_job_start({"dataset_path": "data.jsonl", "executor_type": "unit"}, 2)
+        executor.log_job_start(
+            {
+                "dataset_path": "data.jsonl",
+                "executor_type": "unit",
+                "partition": {"size": 500},
+            },
+            2,
+        )
         executor.log_partition_start(0, {"partition_path": "part.jsonl", "sample_count": 4})
         executor.log_partition_complete(0, 1.5, "out/0.jsonl", success=True)
         executor.log_partition_complete(1, 2.0, "out/1.jsonl", success=False, error="bad rows")
@@ -677,6 +684,7 @@ class CoreEventLoggingFileTest(DataJuicerTestCaseBase):
             self.EventType.JOB_FAILED,
         ]
         self.assertEqual([event.event_type for event in events], expected_event_types)
+        self.assertEqual(events[0].metadata["config_summary"]["partition_size"], 500)
         self.assertTrue(os.path.exists(executor.event_logger.jsonl_file))
 
         op_start = executor.get_events(event_type=self.EventType.OP_START)[0]

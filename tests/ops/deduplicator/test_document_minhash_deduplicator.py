@@ -1053,5 +1053,59 @@ class DocumentMinhashDeduplicatorRepeatedCallTest(DataJuicerTestCaseBase):
                          "UID-based dedup must not carry state between process() calls")
 
 
+class DocumentMinhashDeduplicatorEmptyInputTest(DataJuicerTestCaseBase):
+    """Tests for samples whose text produces zero tokens.
+
+    An empty string, or text shorter than window_size, yields no shingles.
+    compute_hash must still produce a well-formed minhash signature for such
+    samples instead of failing on the empty token array.
+    """
+
+    def test_empty_text_no_crash(self):
+        ds_list = [
+            {'text': ''},
+            {'text': 'hello world this is a normal sentence'},
+        ]
+        dataset = Dataset.from_list(ds_list)
+        op = DocumentMinhashDeduplicator()
+        dataset = dataset.map(op.compute_hash)
+        self.assertEqual(len(dataset), 2)
+        # The empty-text sample still gets a minhash signature
+        self.assertIn(HashKeys.minhash, dataset[0])
+
+    def test_short_text_below_window_size(self):
+        ds_list = [
+            {'text': 'ab'},  # shorter than default window_size=5
+            {'text': 'a long enough sentence for minhash to work properly'},
+        ]
+        dataset = Dataset.from_list(ds_list)
+        op = DocumentMinhashDeduplicator(tokenization='character', window_size=5)
+        dataset = dataset.map(op.compute_hash)
+        self.assertEqual(len(dataset), 2)
+        self.assertIn(HashKeys.minhash, dataset[0])
+
+    def test_empty_texts_are_duplicates_of_each_other(self):
+        # Zero-token samples all share the same all-MAX_HASH signature, so they
+        # are near-duplicates of each other and collapse to a single sample,
+        # while a non-empty sample is kept separately.
+        ds_list = [
+            {'text': ''},
+            {'text': ''},
+            {'text': 'hello world this is a normal sentence'},
+        ]
+        dataset = Dataset.from_list(ds_list)
+        op = DocumentMinhashDeduplicator()
+        dataset = dataset.map(op.compute_hash)
+
+        sigs = [tuple(sample[HashKeys.minhash]) for sample in dataset]
+        self.assertEqual(sigs[0], sigs[1])
+        self.assertNotEqual(sigs[0], sigs[2])
+
+        result, _ = op.process(dataset)
+        self.assertEqual(
+            result.select_columns(column_names=['text']).to_list(),
+            [{'text': ''}, {'text': 'hello world this is a normal sentence'}])
+
+
 if __name__ == '__main__':
     unittest.main()

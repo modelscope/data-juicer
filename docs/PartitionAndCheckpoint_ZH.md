@@ -23,7 +23,6 @@
 ├── checkpoints/                  # 检查点数据
 │   ├── partitioning_info.json    # 保存的行号边界和分区内容 hash
 │   └── checkpoint_op_*.parquet/  # 各操作、各分区的检查点
-├── partitions/                   # 输入分区
 ├── logs/                         # 人类可读日志
 └── metadata/                     # 作业元数据
 ```
@@ -113,9 +112,11 @@ checkpoint:
   strategy: every_n_ops  # every_n_ops（默认）, every_op, manual, disabled
   n_ops: 5               # 默认：每 5 个操作检查点
   op_names:              # 用于 manual 策略 - 在耗时操作后检查点
-    - document_deduplicator
-    - embedding_mapper
+    - ray_document_deduplicator
+    - extract_keyword_mapper
 ```
+
+选择 `every_op`、`every_n_ops`、`manual` 或 `disabled` 作为保存策略。使用 `every_n_ops` 时，将 `n_ops` 设置为正整数；使用 `manual` 时，在 `op_names` 中填写配方里的算子名。
 
 启用检查点后，首次运行会保存
 `checkpoints/partitioning_info.json`。该文件为每个逻辑分区记录：
@@ -127,15 +128,11 @@ checkpoint:
 
 即使新进程中的 Ray 物理 block 布局发生变化，显式续跑也可以用这些信息重建首次运行的逻辑分区。完整分区 hash 对样本顺序敏感、不依赖 Ray batch 边界，并且会在复用任何 checkpoint 前完成校验。
 
-### 中间存储
+### 检查点与临时文件
 
-```yaml
-intermediate_storage:
-  format: "parquet"              # parquet, arrow, jsonl
-  compression: "snappy"          # snappy, gzip, none
-  preserve_intermediate_data: true
-  retention_policy: "keep_all"   # keep_all, keep_failed_only, cleanup_all
-```
+使用 `checkpoint.enabled` 开关检查点，用 `checkpoint.strategy` 选择保存时机。检查点以 Parquet 数据集的形式保存在 `checkpoint_dir`，默认目录为 `<work_dir>/checkpoints`。保留该目录即可恢复中断的作业。
+
+运行退出时，执行器会清理临时工作文件。检查点单独存储，仍可用于恢复作业。
 
 ## 使用方法
 
@@ -180,7 +177,7 @@ dj-process --config config.yaml --resume my_experiment_001
 
 如果 metadata 缺失、行号边界非法、输入内容发生变化或内容 hash 不一致，显式续跑会报错停止，并保留已有 checkpoint，不会将其删除。
 
-`--job_id` 仍可用于自定义任务名称和向后兼容。需要进行容错续跑时，应优先使用 `--resume`：旧的 `--job_id` 续跑路径保持原有行为，在分区不匹配时可能清除 checkpoint 并重新开始。旧版 Data-Juicer 创建的 metadata 仍可读取，但其中没有显式续跑所需的行号边界和完整内容 hash；因此，`--resume` 会拒绝使用这种旧 metadata，同时保留已有 checkpoint。
+`--job_id` 用于指定作业名称。恢复作业时，在原命令上添加 `--resume`，并使用首次运行的作业 ID。
 
 如果同时提供两个参数，它们的值必须相同：
 
@@ -349,7 +346,6 @@ disabled          | 0秒     | 重新执行全部
 
 - 事件日志：快速存储（SSD）
 - 检查点：大容量存储
-- 分区：本地存储
 
 ### 分区大小权衡
 
