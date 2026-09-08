@@ -41,11 +41,14 @@ partition:
   mode: "auto"
   max_concurrent_partitions: "auto"  # Resource-aware driver concurrency
   max_gpu_workers_per_device: 5       # Conservative model-replica cap per GPU
-  max_concurrent_gpu_probes: "auto"   # Fill available GPU/CPU slots; set an integer to cap parallel probes
+  max_concurrent_gpu_probes: "auto"   # Probe one target at a time; set an integer to opt into parallel probes
   gpu_preflight_enabled: true          # false skips preflight and uses explicit resources/actor counts
   gpu_probe_timeout_seconds: null     # Optional per-probe timeout; null disables termination
   gpu_probe_warmup_batches: 1         # Warmup batches before steady-state timing
   gpu_probe_steady_batches: 3         # Batches used for steady-state throughput
+  gpu_probe_sample_offset: 0          # Leading rows skipped when sampling for preflight
+  gpu_probe_sample_shuffle: false     # true randomizes block order before sampling
+  gpu_probe_sample_seed: 42           # Seed for the shuffled sample; null re-samples, and never reuses the report
   execution_group_size: "auto"       # Logical partitions sharing one GPU actor lifecycle
   max_initialization_overhead_ratio: 0.1  # Allowed model-init share per execution group
   target_size_mb: 256    # Target partition size (128, 256, 512, or 1024)
@@ -61,6 +64,19 @@ partition:
   num_of_partitions: 8
   max_concurrent_partitions: "auto"
 ```
+
+Partitions are cut at exact row boundaries, so every partition holds the same
+row count give or take one row. This is deliberately not Ray's
+`Dataset.split(n)`, which distributes whole blocks: a dataset with fewer blocks
+than `num_of_partitions` would otherwise produce empty trailing partitions (ten
+rows in one block split four ways gives `[10, 0, 0, 0]`), and unevenly sized
+blocks would skew partitions even when there are enough of them. Empty
+partitions are not free -- each one still builds an operator graph, consumes an
+actor lifecycle and writes a checkpoint -- and skew breaks the uniform
+partition-size assumption behind execution-group sizing. A partition count
+larger than the row count therefore fails the job before any actor starts,
+rather than being lowered silently: the count is what a resume is validated
+against, so it must be the one that was asked for.
 
 Logical partitions and GPU execution concurrency are independent. Logical
 partitions define checkpoint/recovery granularity and the per-partition data
@@ -92,7 +108,19 @@ without `memory`/`num_gpus` also receives resource estimates. Explicit values
 still win, but throughput is measured for automatic `num_proc` planning:
 
 1. The executor takes a fixed prefix of the input. Its size is the largest
-   `batch_size` among operators that still need probing.
+   `batch_size` among operators that still need probing. A dataset ordered by
+   length, resolution or source makes that prefix unrepresentative and biases
+   both measured memory and throughput. `gpu_probe_sample_shuffle: true`
+   randomizes block order first, so the sample comes from a random block instead
+   of the first one; only block references are reordered, keeping the preflight
+   cost proportional to the sample rather than to the dataset. Alternatively,
+   `gpu_probe_sample_offset` skips a known-unrepresentative prefix. The two are
+   alternatives rather than a combination: a successful shuffle has already left
+   the head, so the offset is reported as ignored. Changing either option
+   invalidates `gpu_probe_results.json`, because measurements from a different
+   part of the dataset are not comparable. A shuffle without
+   `gpu_probe_sample_seed` samples different rows on every run, so its report is
+   written for observability but never reused as a cache.
 2. Operators may declare `input_columns` and `output_columns`, including
    nested paths such as `__dj__meta__.quality_score`. The executor builds a
    conservative data-dependency graph from these contracts.
@@ -101,9 +129,12 @@ still win, but throughput is measured for automatic `num_proc` planning:
    lightweight source rows, replays its required CPU ancestors locally, and
    reserves one full GPU for the target. Large intermediate NumPy values are
    therefore not round-tripped through the driver. The default
-   `max_concurrent_gpu_probes: "auto"` fills the dependency-safe GPU and CPU
-   slots. Set a positive integer to cap concurrent model loading when checkpoint
-   storage or host-memory bandwidth is constrained.
+   `max_concurrent_gpu_probes: "auto"` probes one target at a time: concurrent
+   probes initialize several models at once, and neither checkpoint storage nor
+   host-memory bandwidth is a Ray resource, so nothing automatic can tell whether
+   the node can sustain them. Set a positive integer to opt into parallel probing
+   when checkpoints are local or the I/O headroom is known; the value is still
+   bounded by the dependency-safe GPU and CPU slots.
    Workers log dependency replay and measured-target timing. The driver logs
    each completion immediately and emits a progress heartbeat every 30 seconds.
    `gpu_probe_timeout_seconds` can fail a stalled target with its operator name;
@@ -115,7 +146,18 @@ still win, but throughput is measured for automatic `num_proc` planning:
 5. The disposable worker constructs the target only once and separately
    records model initialization, warmup, and multiple steady-state batches.
    It reports steady input throughput and output ratio. Defaults are one
-   warmup batch and three measured batches.
+   warmup batch and three measured batches. Replay and measurement use the
+   recipe's `skip_op_error`, so a few invalid rows are skipped exactly as in the
+   formal run instead of aborting the job at preflight. Because one measured
+   batch is repeated, a batch that returns nothing is not a usable measurement:
+   a Mapper that returns no rows always fails preflight with its operator name
+   (with `skip_op_error` the whole batch took the error path, without it the
+   operator returned empty where it should have raised), while a
+   Filter that keeps nothing only warns that its throughput is worst-case.
+   Preflight no longer sets the `DATA_JUICER_GPU_PREFLIGHT_OP` marker, because
+   operators that reacted to it with extra CUDA synchronizations could turn a
+   normal model transfer into a multi-minute stall; custom operators must not
+   depend on observing that variable.
 6. A probe does not poll CUDA from a background thread during model
    initialization, avoiding `cudaMemGetInfo` contention with large
    `model.to(cuda)` transfers on the same CUDA context. The disposable worker
@@ -125,11 +167,12 @@ still win, but throughput is measured for automatic `num_proc` planning:
    10% headroom and becomes `memory_fraction`. Ray's scheduling `num_gpus` is `max(memory_fraction,
    1 / max_gpu_workers_per_device)`; the default allows at most five
    auto-probed model actors per physical GPU.
-7. Resource values, phased timing, throughput, output ratio, probe mode, and
-   replayed dependencies are saved in `{work_dir}/gpu_probe_results.json`. A resume
+7. Resource values, phased timing, throughput, output ratio, probe mode,
+   replayed dependencies, and where the sample actually came from are saved in
+   `{work_dir}/gpu_probe_results.json`. A resume
    reuses entries when the operator configuration, GPU model/capacity, and
-   timing-batch settings, and per-device worker cap match, and re-probes
-   otherwise. The source YAML is not overwritten.
+   timing-batch settings, per-device worker cap, and sampling policy match, and
+   re-probes otherwise. The source YAML is not overwritten.
 
 For example, independent image taggers sharing a CPU resize can opt into the
 parallel path without changing their Python classes:
@@ -150,9 +193,11 @@ process:
 `None`/omitted metadata means unknown, not empty. Existing recipes therefore
 retain ordered probing until their operators declare a complete contract.
 
-An explicit `memory` or `num_gpus` always wins and is not overwritten by the
-measurement. Preflight currently supports ordinary Mapper/Filter operators
-that fit on one GPU.
+An explicit `memory` or `num_gpus` wins over the measurement, except that a
+`num_gpus` below the measured memory fraction is raised to it with a warning:
+Ray packs actors by `num_gpus` alone, so a smaller request would let it place
+more actors on a device than its memory allows. Preflight currently supports
+ordinary Mapper/Filter operators that fit on one GPU.
 GPU `Pipeline` operators, a `Pipeline` before a pending target, and multi-GPU
 operators require explicit resources. Empty input, probe errors, OOM, and an
 invalid zero peak fail before formal partition workers start.

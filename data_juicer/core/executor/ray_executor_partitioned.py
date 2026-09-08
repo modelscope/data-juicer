@@ -2,7 +2,7 @@
 Simplified Partitioned Ray Executor for Large Dataset Processing
 
 This module implements a streamlined partitioned execution strategy for Ray mode that:
-2. Splits the dataset into manageable partitions using Ray's .split() method
+2. Splits the dataset into manageable partitions at exact row boundaries
 3. Processes each partition independently with Ray tasks
 4. Merges results back into a single dataset for export
 5. Supports convergence points for global operations (like deduplicators)
@@ -46,6 +46,7 @@ _AUTO_GPU_PIPELINE_MEMORY_FRACTION = 0.90
 _DEFAULT_MAX_GPU_WORKERS_PER_DEVICE = 5
 _DEFAULT_GPU_PROBE_WARMUP_BATCHES = 1
 _DEFAULT_GPU_PROBE_STEADY_BATCHES = 3
+_DEFAULT_GPU_PROBE_SAMPLE_SEED = 42
 _DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO = 0.10
 _LOGICAL_PARTITION_COLUMN = "__data_juicer_logical_partition_id__"
 _PARTITION_CONTENT_HASH_ALGORITHM = "sha256-sequence-v1"
@@ -228,11 +229,11 @@ class PartitioningInfo:
 
 class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin):
     """
-    Simplified Ray executor with dataset partitioning using .split().
+    Simplified Ray executor with row-balanced dataset partitioning.
 
     Features:
     - Single DatasetBuilder loads the full dataset
-    - Uses Ray's .split() method for partitioning
+    - Splits at exact row boundaries so partitions stay balanced and non-empty
     - Processes partitions in parallel with Ray tasks
     - Supports convergence points for global operations
     - Merges results back into a single dataset
@@ -394,6 +395,13 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             "gpu_probe_steady_batches",
             _DEFAULT_GPU_PROBE_STEADY_BATCHES,
         )
+        gpu_probe_sample_offset = ConfigAccessor.get(partition_cfg, "gpu_probe_sample_offset", 0)
+        gpu_probe_sample_shuffle = ConfigAccessor.get(partition_cfg, "gpu_probe_sample_shuffle", False)
+        gpu_probe_sample_seed = ConfigAccessor.get(
+            partition_cfg,
+            "gpu_probe_sample_seed",
+            _DEFAULT_GPU_PROBE_SAMPLE_SEED,
+        )
         execution_group_size = ConfigAccessor.get(partition_cfg, "execution_group_size", "auto")
         max_initialization_overhead_ratio = ConfigAccessor.get(
             partition_cfg,
@@ -510,6 +518,42 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 f"{gpu_probe_steady_batches!r}; using {_DEFAULT_GPU_PROBE_STEADY_BATCHES}"
             )
             self.gpu_probe_steady_batches = _DEFAULT_GPU_PROBE_STEADY_BATCHES
+        try:
+            if isinstance(gpu_probe_sample_offset, bool) or int(gpu_probe_sample_offset) < 0:
+                raise ValueError
+            self.gpu_probe_sample_offset = int(gpu_probe_sample_offset)
+        except (TypeError, ValueError):
+            logger.warning(
+                "Invalid partition.gpu_probe_sample_offset=" f"{gpu_probe_sample_offset!r}; sampling the dataset head"
+            )
+            self.gpu_probe_sample_offset = 0
+        if isinstance(gpu_probe_sample_shuffle, str):
+            normalized = gpu_probe_sample_shuffle.strip().lower()
+            if normalized in {"true", "1", "yes", "on"}:
+                self.gpu_probe_sample_shuffle = True
+            elif normalized in {"false", "0", "no", "off"}:
+                self.gpu_probe_sample_shuffle = False
+            else:
+                logger.warning(
+                    "Invalid partition.gpu_probe_sample_shuffle="
+                    f"{gpu_probe_sample_shuffle!r}; sampling the dataset head"
+                )
+                self.gpu_probe_sample_shuffle = False
+        else:
+            self.gpu_probe_sample_shuffle = bool(gpu_probe_sample_shuffle)
+        if gpu_probe_sample_seed is None:
+            self.gpu_probe_sample_seed = None
+        else:
+            try:
+                if isinstance(gpu_probe_sample_seed, bool):
+                    raise ValueError
+                self.gpu_probe_sample_seed = int(gpu_probe_sample_seed)
+            except (TypeError, ValueError):
+                logger.warning(
+                    "Invalid partition.gpu_probe_sample_seed="
+                    f"{gpu_probe_sample_seed!r}; using {_DEFAULT_GPU_PROBE_SAMPLE_SEED}"
+                )
+                self.gpu_probe_sample_seed = _DEFAULT_GPU_PROBE_SAMPLE_SEED
         if isinstance(execution_group_size, str) and execution_group_size.strip().lower() == "auto":
             self.execution_group_size = "auto"
         else:
@@ -602,10 +646,11 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 logger.warning(f"Could not determine dataset size for partition calculation: {e}")
                 logger.info(f"Using fallback partition count: {self.num_partitions}")
 
-        # Keep a real row-count ceiling even when the optimizer is unavailable.
-        # Ray Dataset.split() accepts counts larger than the dataset and creates
-        # empty partitions, which is especially costly for actor-based GPU
-        # pipelines because every empty partition still builds an operator graph.
+        # Keep a real row-count ceiling even when the optimizer is unavailable,
+        # so cluster-aware planning never asks for more partitions than rows.
+        # ``_split_into_row_balanced_partitions`` is what actually keeps every
+        # partition non-empty; this ceiling additionally keeps the recorded plan
+        # and the execution-group sizing derived from it honest.
         if total_samples is None and dataset is not None:
             try:
                 if hasattr(dataset, "count"):
@@ -1325,6 +1370,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 "gpu_probe_steady_batches",
                 _DEFAULT_GPU_PROBE_STEADY_BATCHES,
             ),
+            sample_offset=getattr(self, "gpu_probe_sample_offset", 0),
+            sample_shuffle=getattr(self, "gpu_probe_sample_shuffle", False),
+            sample_seed=getattr(self, "gpu_probe_sample_seed", _DEFAULT_GPU_PROBE_SAMPLE_SEED),
         ).resolve(dataset, ops)
 
         total_samples = self._count_dataset_rows(dataset)
@@ -1399,6 +1447,17 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         if not candidates:
             self._resolved_throughput_actor_plan = None
             self._throughput_planned_op_ids = set()
+            profiled_cuda_ops = [op for op in ops if self._is_cuda_operator(op) and hasattr(op, "_gpu_rows_per_second")]
+            if profiled_cuda_ops:
+                skipped = ", ".join(
+                    f"{getattr(op, '_name', type(op).__name__)}=" f"{getattr(op, 'num_proc', None)}"
+                    for op in profiled_cuda_ops
+                )
+                logger.info(
+                    "Throughput-aware GPU actor plan skipped despite GPU probe records: "
+                    "no profiled CUDA operator is eligible for automatic actor planning "
+                    f"(num_proc: {skipped})."
+                )
             return None
 
         from data_juicer.utils.ray_cluster_utils import detect_cluster_topology
@@ -2360,6 +2419,69 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         logger.info(f"Recreating partitions at saved row boundaries: {split_indices}")
         return dataset.data.split_at_indices(split_indices)
 
+    @staticmethod
+    def _balanced_split_indices(total_rows: int, num_partitions: int) -> List[int]:
+        """Return row boundaries that spread ``total_rows`` as evenly as possible.
+
+        The first ``total_rows % num_partitions`` partitions take one extra row,
+        so no row is dropped and no partition is empty as long as
+        ``num_partitions <= total_rows``.
+        """
+        base, remainder = divmod(total_rows, num_partitions)
+        indices = []
+        boundary = 0
+        for partition_id in range(num_partitions - 1):
+            boundary += base + (1 if partition_id < remainder else 0)
+            indices.append(boundary)
+        return indices
+
+    def _split_into_row_balanced_partitions(self, dataset: RayDataset) -> List:
+        """Split the input into partitions holding nearly equal row counts.
+
+        ``Dataset.split(n)`` hands out whole *blocks* via ``np.array_split``
+        rather than cutting at row boundaries. Fewer blocks than ``n`` therefore
+        produces trailing empty partitions -- one block of ten rows split four
+        ways yields ``[10, 0, 0, 0]`` -- and unevenly sized blocks skew the
+        partitions even when the block count is sufficient. Both are harmful
+        here: an empty partition still builds an operator graph, takes an actor
+        lifecycle and writes a checkpoint, while skew invalidates the uniform
+        ``total_rows / num_partitions`` assumption behind execution-group sizing.
+        ``split(n, equal=True)`` is not a usable alternative because it silently
+        drops up to ``n - 1`` rows.
+
+        Boundaries computed from the exact row count avoid all of that and make
+        a fresh split use the same row-addressed primitive as an explicit
+        resume, so partition identity no longer depends on Ray's block layout.
+        """
+        # ``split()`` executes the plan anyway; materializing here makes the
+        # row count metadata-cheap and keeps the boundaries stable.
+        data = dataset.data.materialize()
+        total_rows = data.count()
+
+        if total_rows <= 0:
+            logger.warning("Input dataset has no rows; creating a single empty partition.")
+            self.num_partitions = 1
+            return [data]
+
+        if self.num_partitions > total_rows:
+            raise ValueError(
+                f"partition.num_of_partitions={self.num_partitions} exceeds the {total_rows} row(s) in "
+                "the input dataset, so at least one partition would be empty. An empty partition still "
+                "builds an operator graph, takes an actor lifecycle and writes a checkpoint, and "
+                "lowering the count here would silently disagree with the count a resume was asked "
+                f"for. Set num_of_partitions to at most {total_rows}, or use partition.mode: auto to "
+                "let the executor size the partitions from the dataset itself."
+            )
+
+        if self.num_partitions == 1:
+            return [data]
+
+        split_indices = self._balanced_split_indices(total_rows, self.num_partitions)
+        logger.info(
+            f"Splitting {total_rows} rows into {self.num_partitions} partitions at row boundaries: {split_indices}"
+        )
+        return data.split_at_indices(split_indices)
+
     def _split_dataset_deterministic(self, dataset: RayDataset) -> tuple:
         """Split dataset deterministically and collect metadata.
 
@@ -2407,9 +2529,8 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             return partitions, saved_info
 
         # Split the dataset
-        logger.info(f"Splitting dataset into {self.num_partitions} partitions (deterministic mode)...")
-        partitions = dataset.data.split(self.num_partitions)
-        logger.info(f"Created {len(partitions)} partitions")
+        partitions = self._split_into_row_balanced_partitions(dataset)
+        logger.info(f"Created {len(partitions)} partitions (deterministic mode)")
 
         # If resuming, validate partitions match
         if saved_info is not None:

@@ -348,6 +348,25 @@ def test_throughput_aware_actor_plan_fills_gpus_without_partition_multiplier():
     assert executor._throughput_planned_op_ids == {id(op) for op in ops}
 
 
+def test_throughput_actor_plan_logs_profiled_ops_excluded_from_auto_parallelism():
+    executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
+    executor.cfg = SimpleNamespace()
+    profiled_op = FakeOp("profiled", 4, auto=False, cuda=True)
+    profiled_op._gpu_rows_per_second = 10
+    executor._auto_parallel_op_ids = set()
+
+    with patch("data_juicer.core.executor.ray_executor_partitioned.logger.info") as info:
+        plan = executor._configure_throughput_aware_gpu_parallelism([profiled_op])
+
+    assert plan is None
+    assert executor._throughput_planned_op_ids == set()
+    info.assert_called_once_with(
+        "Throughput-aware GPU actor plan skipped despite GPU probe records: "
+        "no profiled CUDA operator is eligible for automatic actor planning "
+        "(num_proc: profiled=4)."
+    )
+
+
 def test_throughput_actor_plan_fails_before_oversubscribing_one_gpu():
     executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
     executor.cfg = SimpleNamespace()

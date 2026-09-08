@@ -768,9 +768,11 @@ def build_base_parser() -> ArgumentParser:
         default="auto",
         help=(
             "Maximum number of dependency-safe GPU preflight tasks running concurrently. "
-            "The default 'auto' fills the available GPU and CPU slots. Set a positive "
-            "integer to cap parallel model loading when storage or host-memory bandwidth "
-            "is limited; every probe reserves one full GPU."
+            "The default 'auto' probes one target at a time, because concurrent probes "
+            "load several models from shared storage at once and storage bandwidth is not "
+            "a Ray resource. Set a positive integer to opt into parallel probing when "
+            "checkpoints are local or the I/O headroom is known; every probe reserves one "
+            "full GPU, so the cap is also bounded by the available GPU and CPU slots."
         ),
     )
     parser.add_argument(
@@ -804,6 +806,35 @@ def build_base_parser() -> ArgumentParser:
         type=PositiveInt,
         default=3,
         help="Number of batches used to estimate steady-state GPU operator throughput.",
+    )
+    parser.add_argument(
+        "--partition.gpu_probe_sample_offset",
+        type=NonNegativeInt,
+        default=0,
+        help=(
+            "Number of leading dataset rows skipped when collecting the GPU preflight sample. "
+            "Use it when the first rows are not representative; the skipped prefix is streamed, "
+            "not materialized, for dataset types that support row iteration."
+        ),
+    )
+    parser.add_argument(
+        "--partition.gpu_probe_sample_shuffle",
+        type=bool,
+        default=False,
+        help=(
+            "Whether to randomize dataset block order before taking the GPU preflight sample. "
+            "Reads a random block instead of the first one, which avoids biased memory and "
+            "throughput measurements on datasets ordered by size or source."
+        ),
+    )
+    parser.add_argument(
+        "--partition.gpu_probe_sample_seed",
+        type=Optional[int],
+        default=42,
+        help=(
+            "Seed for the shuffled GPU preflight sample, keeping repeated runs and cached probe "
+            "reports comparable. Set null for a different sample on every run."
+        ),
     )
     parser.add_argument(
         "--partition.execution_group_size",
@@ -1258,7 +1289,12 @@ def init_setup_from_cfg(cfg: Namespace, load_configs_only=False):
         "auto_op_parallelism": cfg.get("auto_op_parallelism", True),
         "work_dir": cfg.work_dir,
     }
-    if not is_ray_mode():
+    # ``np`` controls local multiprocessing.  A partitioned Ray pipeline
+    # uses it for data-loading and partition sizing, while operator actor
+    # parallelism is resolved after GPU preflight from the Ray cluster.
+    # Injecting it here would turn the default ``np`` into an explicit actor
+    # budget and disable that automatic planning.
+    if cfg.get("executor_type", "default") != "ray_partitioned" and not is_ray_mode():
         op_attrs.update({"num_proc": cfg.get("np", None)})
     cfg.process = update_op_attr(cfg.process, op_attrs)
 

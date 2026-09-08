@@ -175,6 +175,33 @@ class SentinelParsingTest(unittest.TestCase):
         self.assertEqual(explicit.gpu_probe_timeout_seconds, 300.0)
         self.assertIsNone(invalid.gpu_probe_timeout_seconds)
 
+    def test_gpu_probe_sampling_defaults_to_the_dataset_head(self):
+        default = self._configure({})
+
+        self.assertEqual(default.gpu_probe_sample_offset, 0)
+        self.assertFalse(default.gpu_probe_sample_shuffle)
+        self.assertEqual(default.gpu_probe_sample_seed, 42)
+
+    def test_gpu_probe_sampling_explicit_and_invalid_values(self):
+        offset = self._configure({"gpu_probe_sample_offset": 1000})
+        shuffled = self._configure({"gpu_probe_sample_shuffle": "true", "gpu_probe_sample_seed": 7})
+        unseeded = self._configure({"gpu_probe_sample_seed": None})
+        invalid = self._configure(
+            {
+                "gpu_probe_sample_offset": -5,
+                "gpu_probe_sample_shuffle": "invalid",
+                "gpu_probe_sample_seed": "invalid",
+            }
+        )
+
+        self.assertEqual(offset.gpu_probe_sample_offset, 1000)
+        self.assertTrue(shuffled.gpu_probe_sample_shuffle)
+        self.assertEqual(shuffled.gpu_probe_sample_seed, 7)
+        self.assertIsNone(unseeded.gpu_probe_sample_seed)
+        self.assertEqual(invalid.gpu_probe_sample_offset, 0)
+        self.assertFalse(invalid.gpu_probe_sample_shuffle)
+        self.assertEqual(invalid.gpu_probe_sample_seed, 42)
+
 
 class ClusterPartitionBoundsTest(unittest.TestCase):
     MULTINODE = ClusterTopology(

@@ -19,13 +19,26 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 ray = LazyLoader("ray")
 
-_REPORT_VERSION = 4
-_OBSERVABILITY_VERSION = 3
+_REPORT_VERSION = 5
+_OBSERVABILITY_VERSION = 4
 _REPORT_NAME = "gpu_probe_results.json"
 _MEMORY_HEADROOM = 1.10
 _DEFAULT_MAX_GPU_WORKERS_PER_DEVICE = 5
+# Probing N targets at once starts N model initializations at once, so a node
+# with eight GPUs can pull several large checkpoints off shared storage
+# simultaneously. Storage and host-memory bandwidth are not Ray resources, so no
+# automatic policy can tell whether that fits; serializing is the only generally
+# safe default. Deployments with local checkpoints or known I/O headroom opt in
+# through an explicit partition.max_concurrent_gpu_probes.
+_DEFAULT_AUTO_MAX_CONCURRENT_PROBES = 1
 _PROGRESS_INTERVAL_SECONDS = 30.0
 _MIB = 1024**2
+# Preflight deliberately does not set this marker any more: operators that
+# reacted to it with extra CUDA synchronizations could turn a normal model
+# transfer into a multi-minute stall. It is still popped and restored around
+# probe execution so a marker left in the surrounding environment cannot change
+# what gets measured. Nothing in Data-Juicer sets it, so operators must not
+# depend on observing it.
 _PREFLIGHT_OP_ENV_VAR = "DATA_JUICER_GPU_PREFLIGHT_OP"
 
 
@@ -323,6 +336,26 @@ def calculate_resource_plan(
     }
 
 
+def scheduling_num_gpus(op_name: str, num_gpus: float, memory_fraction: float) -> float:
+    """Return a Ray request that also enforces the measured memory share.
+
+    Ray places actors using ``num_gpus`` alone, while actor planning also
+    accounts for the measured ``memory_fraction``. A request smaller than the
+    measured share therefore lets Ray co-locate more actors on one device than
+    its memory allows, so the request is raised to keep both views identical.
+    """
+    if memory_fraction <= num_gpus + 1e-9:
+        return num_gpus
+    effective = min(1.0, memory_fraction)
+    logger.warning(
+        f"Op[{op_name}] requests num_gpus={num_gpus:.2f}, but GPU preflight measured a memory "
+        f"share of {memory_fraction:.2f} of one device. Raising the Ray request to "
+        f"{effective:.2f} so scheduling cannot pack more actors on a device than its memory "
+        "allows. Reduce the operator batch size to keep more actors per device."
+    )
+    return effective
+
+
 def _config_hash(op) -> str:
     config = getattr(op, "_op_cfg", {getattr(op, "_name", type(op).__name__): {}})
     payload = json.dumps(config, sort_keys=True, ensure_ascii=False, default=str, separators=(",", ":"))
@@ -412,11 +445,64 @@ def _batch_to_rows(batch: Mapping[str, Sequence[Any]]) -> List[Dict[str, Any]]:
     return [{column: values[index] for column, values in batch.items()} for index in range(row_count)]
 
 
+def _probe_execution_kwargs(init_kwargs: Optional[Mapping[str, Any]]) -> Dict[str, Any]:
+    """Return operator kwargs for a probe worker, overriding only what must change.
+
+    Keep all work in the disposable Ray worker: dataset-level multiprocessing
+    after CUDA initialization would fork an unsafe child.  Fault tolerance is
+    not an execution detail of the worker, so ``skip_op_error`` stays as the
+    recipe set it.  Forcing it off made preflight stricter than the formal run,
+    which defaults to skipping, so a handful of invalid rows in the sample
+    aborted the job before it started.
+    """
+    kwargs = dict(init_kwargs or {})
+    kwargs.update(num_proc=None, auto_op_parallelism=False)
+    return kwargs
+
+
+def _validate_measured_sample(op, input_count: Optional[int], output_count: Optional[int]) -> None:
+    """Reject a measurement whose batch left nothing behind.
+
+    Honoring ``skip_op_error`` means one invalid row can drop a whole batch.
+    The probe measures a single batch and repeats it, so a dropped batch is not
+    a statistical loss: every timing and memory number would then describe the
+    error path rather than the operator, and the resulting plan would be far
+    too optimistic.  A Mapper keeps its rows, so an empty result is never a
+    valid measurement -- only the reason differs, and the plan is unusable
+    either way.  A Filter may legitimately keep nothing, which only makes
+    throughput and output ratio worst-case.
+    """
+    if not input_count or output_count is None or output_count > 0:
+        return
+    name = getattr(op, "_name", type(op).__name__)
+    if isinstance(op, Mapper):
+        if getattr(op, "skip_op_error", False):
+            reason = (
+                "skip_op_error dropped the whole batch, so the measurement describes the error "
+                "path instead of the operator. Check the operator log for the skipped error, move "
+                "the sample with partition.gpu_probe_sample_offset or "
+                "partition.gpu_probe_sample_shuffle, or set skip_op_error: false to fail on the "
+                "original exception."
+            )
+        else:
+            reason = (
+                "skip_op_error is disabled, so the operator returned an empty batch where it "
+                "should have raised. A Mapper owes one row per input row; fix the operator or "
+                "move the sample with partition.gpu_probe_sample_offset or "
+                "partition.gpu_probe_sample_shuffle."
+            )
+        raise RuntimeError(
+            f"GPU preflight measured Op[{name}] on {input_count} sample(s) and got no rows back. {reason}"
+        )
+    logger.warning(
+        f"GPU preflight measured Op[{name}] on {input_count} sample(s) that all left the pipeline, "
+        "so its throughput and output ratio are worst-case. If this is unexpected, check the "
+        "operator log for errors skipped by skip_op_error."
+    )
+
+
 def _construct_probe_op(spec: Mapping[str, Any]):
-    kwargs = dict(spec.get("init_kwargs") or {})
-    # Keep all work in the disposable Ray worker.  Dataset-level
-    # multiprocessing after CUDA initialization would fork an unsafe child.
-    kwargs.update(num_proc=None, auto_op_parallelism=False, skip_op_error=False)
+    kwargs = _probe_execution_kwargs(spec.get("init_kwargs"))
     return spec["op_class"](*(spec.get("init_args") or ()), **kwargs)
 
 
@@ -558,7 +644,12 @@ def _run_parallel_probe_job(job: Mapping[str, Any], source_rows: List[Dict]) -> 
                 f"output_rows={len(rows)}."
             )
             if not rows:
-                raise RuntimeError("GPU preflight has no samples left after dependency " f"Op[{dependency_name}].")
+                raise RuntimeError(
+                    f"GPU preflight has no samples left after dependency Op[{dependency_name}]. "
+                    "A strict filter or errors skipped by skip_op_error removed the whole sample; "
+                    "move the sample with partition.gpu_probe_sample_offset or "
+                    "partition.gpu_probe_sample_shuffle."
+                )
 
         target_rows = fill_to_batch(rows, target_batch_size)
 
@@ -625,14 +716,13 @@ def _run_probe_stage(
     from datasets import Dataset, disable_caching
 
     disable_caching()
-    kwargs = dict(init_kwargs or {})
     # Hugging Face Datasets treats ``num_proc=1`` as multiprocessing and
     # starts a forked child.  CUDA has already been initialized in this
     # disposable Ray worker so that model construction is included in the
     # peak; using a fork here both fails CUDA re-initialization and would hide
     # the child's allocator peak from this process.  ``None`` keeps the whole
     # probe stage in the Ray worker while still processing batches serially.
-    kwargs.update(num_proc=None, auto_op_parallelism=False, skip_op_error=False)
+    kwargs = _probe_execution_kwargs(init_kwargs)
 
     def run_stage_once():
         op = op_class(*(init_args or ()), **kwargs)
@@ -733,6 +823,9 @@ class GPUMemoryProbe:
         probe_timeout_seconds: Optional[float] = None,
         warmup_batches: int = 1,
         steady_batches: int = 3,
+        sample_offset: int = 0,
+        sample_shuffle: bool = False,
+        sample_seed: Optional[int] = None,
         stage_runner: Optional[Callable] = None,
         parallel_runner: Optional[Callable] = None,
         hardware_reader: Optional[Callable] = None,
@@ -751,6 +844,10 @@ class GPUMemoryProbe:
             raise ValueError("warmup_batches must be a non-negative integer")
         if isinstance(steady_batches, bool) or int(steady_batches) < 1:
             raise ValueError("steady_batches must be a positive integer")
+        if isinstance(sample_offset, bool) or int(sample_offset) < 0:
+            raise ValueError("sample_offset must be a non-negative integer")
+        if sample_seed is not None and isinstance(sample_seed, bool):
+            raise ValueError("sample_seed must be an integer or None")
         self.work_dir = work_dir
         self.report_path = os.path.join(work_dir, _REPORT_NAME)
         self.max_gpu_workers_per_device = int(max_gpu_workers_per_device)
@@ -758,6 +855,12 @@ class GPUMemoryProbe:
         self.probe_timeout_seconds = float(probe_timeout_seconds) if probe_timeout_seconds is not None else None
         self.warmup_batches = int(warmup_batches)
         self.steady_batches = int(steady_batches)
+        self.sample_offset = int(sample_offset)
+        self.sample_shuffle = bool(sample_shuffle)
+        self.sample_seed = int(sample_seed) if sample_seed is not None else None
+        # Where the sample actually came from, which is not always what was
+        # asked for once a sampling preference degrades back to the head.
+        self._sample_source = "the dataset head"
         self._stage_runner = stage_runner or self._run_stage_with_ray
         self._parallel_runner = parallel_runner or self._run_parallel_jobs_with_ray
         self._hardware_reader = hardware_reader or self._read_hardware_with_ray
@@ -801,12 +904,13 @@ class GPUMemoryProbe:
             )
 
         sample_count = probe_sample_count(list(pending.values()))
-        rows = list(dataset.get(sample_count))
+        rows, sample_source = self._collect_probe_rows(dataset, sample_count)
         if not rows:
             raise RuntimeError("GPU preflight cannot run because the input dataset is empty.")
 
         logger.info(
-            f"Running GPU memory preflight for {len(pending)} operator(s) " f"with the first {len(rows)} sample(s)."
+            f"Running GPU memory preflight for {len(pending)} operator(s) "
+            f"with {len(rows)} sample(s) taken from {sample_source}."
         )
         new_records: Dict[int, Dict[str, Any]] = {}
 
@@ -855,6 +959,7 @@ class GPUMemoryProbe:
                         f"GPU preflight failed while measuring Op[{name}] at recipe index {index}. "
                         "The formal Ray experiment was not started."
                     ) from error
+                _validate_measured_sample(ops[index], result.get("sample_count"), result.get("output_count"))
                 self._accept_record(ops[index], record)
                 new_records[index] = record
 
@@ -876,6 +981,7 @@ class GPUMemoryProbe:
                 serial_rows = list(result["rows"])
 
                 if is_target:
+                    _validate_measured_sample(op, len(stage_rows), len(serial_rows))
                     record = self._record_from_metrics(
                         index,
                         op,
@@ -891,6 +997,128 @@ class GPUMemoryProbe:
         merged = {**reusable, **new_records}
         self._save_report([merged[index] for index in sorted(merged)])
         return [merged[index] for index in sorted(merged)]
+
+    def _collect_probe_rows(self, dataset, sample_count: int) -> Tuple[List[Dict], str]:
+        """Collect the preflight sample under the configured sampling policy.
+
+        The head of a dataset is not representative when rows arrive sorted by
+        length, resolution or source, which biases both the measured peak memory
+        and the measured throughput.  A shuffle or an offset lets the sample come
+        from elsewhere; both degrade back to the head so preflight never fails
+        over a sampling preference.  The source that actually produced the sample
+        is remembered, because a degraded policy would otherwise leave the report
+        describing a sample it does not contain.
+        """
+        if self.sample_shuffle:
+            rows = self._shuffled_rows(dataset, sample_count)
+            if rows:
+                if self.sample_offset > 0:
+                    logger.warning(
+                        f"GPU preflight ignores gpu_probe_sample_offset={self.sample_offset} "
+                        "because gpu_probe_sample_shuffle already moved the sample off the "
+                        "dataset head. Drop one of the two options to make the sample explicit."
+                    )
+                self._sample_source = f"randomized blocks (seed={self.sample_seed})"
+                return rows, self._sample_source
+        if self.sample_offset > 0:
+            rows = self._offset_rows(dataset, sample_count)
+            if rows:
+                self._sample_source = f"row offset {self.sample_offset}"
+                return rows, self._sample_source
+            logger.warning(
+                f"GPU preflight found no sample at row offset {self.sample_offset}; "
+                "the dataset is likely smaller than the offset. Sampling the head instead."
+            )
+        self._sample_source = "the dataset head"
+        return list(dataset.get(sample_count)), self._sample_source
+
+    def _shuffled_rows(self, dataset, sample_count: int) -> List[Dict]:
+        """Read the sample from a randomly chosen block instead of the first one.
+
+        Only block references are reordered.  A full ``random_shuffle`` would
+        move the whole dataset before the job even starts, so this trades exact
+        row-level randomness for a preflight cost that stays proportional to the
+        sample: rows within the sample remain neighbours, but a globally ordered
+        dataset no longer decides the measurement.
+
+        Returning no rows hands the decision back to the offset and head paths,
+        which is also the honest answer when there is only one block to reorder.
+        """
+        data = getattr(dataset, "data", None)
+        randomize = getattr(data, "randomize_block_order", None)
+        if not callable(randomize):
+            logger.warning(
+                f"GPU preflight cannot randomize blocks of {type(dataset).__name__}; sampling the head instead."
+            )
+            return []
+        if self._block_count(data) == 1:
+            logger.warning(
+                "GPU preflight cannot move the sample of a single-block dataset by reordering "
+                "block references; honoring gpu_probe_sample_offset or sampling the head instead."
+            )
+            return []
+        try:
+            return list(randomize(seed=self.sample_seed).take(sample_count))
+        except Exception as error:
+            logger.warning(f"GPU preflight could not shuffle the probe sample ({error}); sampling the head instead.")
+            return []
+
+    def _offset_rows(self, dataset, sample_count: int) -> List[Dict]:
+        """Skip rows without pulling the skipped prefix onto the driver."""
+        iter_rows = getattr(getattr(dataset, "data", None), "iter_rows", None)
+        if callable(iter_rows):
+            try:
+                window = islice(iter_rows(), self.sample_offset, self.sample_offset + sample_count)
+                return [dict(row) for row in window]
+            except Exception as error:
+                logger.warning(
+                    f"GPU preflight could not stream to row offset {self.sample_offset} ({error}); "
+                    "sampling the head instead."
+                )
+                return []
+        # Datasets without row streaming can only be read from the front, so the
+        # skipped prefix reaches the driver and the offset must stay modest.
+        rows = list(dataset.get(self.sample_offset + sample_count))
+        return rows[self.sample_offset :]
+
+    @staticmethod
+    def _block_count(data) -> Optional[int]:
+        """Best-effort block count, or ``None`` when Ray will not say cheaply.
+
+        ``num_blocks()`` is only answerable for a materialized dataset, and the
+        plan accessor is private, so an unknown count has to stay unknown rather
+        than force a materialization the sample does not need.
+        """
+        for reader in (
+            getattr(data, "num_blocks", None),
+            getattr(getattr(data, "_plan", None), "initial_num_blocks", None),
+        ):
+            if not callable(reader):
+                continue
+            try:
+                count = reader()
+            except Exception:
+                continue
+            if isinstance(count, int) and count > 0:
+                return count
+        return None
+
+    def _sample_policy(self) -> Dict[str, Any]:
+        """Describe the sampling policy that produced the cached measurements."""
+        return {
+            "offset": self.sample_offset,
+            "shuffle": self.sample_shuffle,
+            "seed": self.sample_seed,
+        }
+
+    def _sample_is_reproducible(self) -> bool:
+        """Whether the policy draws the same sample on every run.
+
+        A seedless shuffle does not, and the policy alone cannot tell two such
+        runs apart, so reusing its report would silently plan the job from rows
+        this run never measured.
+        """
+        return not (self.sample_shuffle and self.sample_seed is None)
 
     def _record_from_metrics(
         self,
@@ -913,7 +1141,11 @@ class GPUMemoryProbe:
         plan = {
             **measured_plan,
             "memory": configured_memory or measured_plan["memory"],
-            "num_gpus": configured_num_gpus or measured_plan["num_gpus"],
+            "num_gpus": scheduling_num_gpus(
+                getattr(op, "_name", type(op).__name__),
+                configured_num_gpus or measured_plan["num_gpus"],
+                float(measured_plan["memory_fraction"]),
+            ),
         }
         record = {
             "op_index": index,
@@ -976,11 +1208,12 @@ class GPUMemoryProbe:
         if cpu_slots < 1:
             raise RuntimeError(f"GPU preflight has no CPU slot for a probe requiring {max_job_cpus:g} CPU(s).")
         limit = min(len(jobs), gpu_slots, cpu_slots)
-        # Auto mode fills dependency-safe GPU/CPU slots. Users can set an
-        # explicit cap when storage or host-memory bandwidth cannot sustain
-        # that many concurrent model initializations.
-        if self.max_concurrent_probes is not None:
-            limit = min(limit, self.max_concurrent_probes)
+        configured_limit = (
+            self.max_concurrent_probes
+            if self.max_concurrent_probes is not None
+            else _DEFAULT_AUTO_MAX_CONCURRENT_PROBES
+        )
+        limit = min(limit, configured_limit)
         return max(1, limit)
 
     def _run_parallel_jobs_with_ray(
@@ -1169,8 +1402,17 @@ class GPUMemoryProbe:
     @staticmethod
     def _apply_record(op, record: Mapping[str, Any]) -> None:
         op.memory = float(record["memory"])
-        op.num_gpus = float(record["num_gpus"])
-        op._gpu_memory_fraction = float(record.get("memory_fraction", op.num_gpus))
+        op._gpu_memory_fraction = float(record.get("memory_fraction", record["num_gpus"]))
+        # A cached record carries the num_gpus it was saved with, and an explicit
+        # num_gpus below the measured memory share would let Ray pack more actors
+        # onto a GPU than the plan sized for. Reconciling here keeps a reused
+        # report equivalent to a fresh measurement, which `_record_from_metrics`
+        # has already reconciled.
+        op.num_gpus = scheduling_num_gpus(
+            getattr(op, "_name", type(op).__name__),
+            float(record["num_gpus"]),
+            op._gpu_memory_fraction,
+        )
         op._planned_gpu_memory_mb = int(record.get("planned_memory_mb", 0))
         op._gpu_total_mb = float(record.get("gpu_total_mb", 0))
         profile = record.get("profile") or {}
@@ -1196,6 +1438,14 @@ class GPUMemoryProbe:
     def _load_report(self) -> List[Dict[str, Any]]:
         if not os.path.exists(self.report_path):
             return []
+        if not self._sample_is_reproducible():
+            logger.info(
+                "Ignoring the cached GPU preflight report because gpu_probe_sample_shuffle is "
+                "enabled without gpu_probe_sample_seed: every run samples different rows, so the "
+                "cached numbers do not describe the sample this run would measure. Set "
+                "gpu_probe_sample_seed to make the sample, and therefore the cache, reusable."
+            )
+            return []
         try:
             with open(self.report_path, "r", encoding="utf-8") as stream:
                 report = json.load(stream)
@@ -1205,6 +1455,9 @@ class GPUMemoryProbe:
                 or report.get("max_gpu_workers_per_device") != self.max_gpu_workers_per_device
                 or report.get("warmup_batches") != self.warmup_batches
                 or report.get("steady_batches") != self.steady_batches
+                # Measurements taken from a different part of the dataset are not
+                # comparable, so a changed sampling policy has to re-probe.
+                or report.get("sample_policy") != self._sample_policy()
             ):
                 return []
             return list(report.get("operators", []))
@@ -1221,6 +1474,10 @@ class GPUMemoryProbe:
             "max_gpu_workers_per_device": self.max_gpu_workers_per_device,
             "warmup_batches": self.warmup_batches,
             "steady_batches": self.steady_batches,
+            "sample_policy": self._sample_policy(),
+            # The policy above is what was requested and gates cache reuse; this
+            # is where the sample came from once fallbacks were applied.
+            "sample_source": self._sample_source,
             "operators": records,
         }
         with tempfile.NamedTemporaryFile(

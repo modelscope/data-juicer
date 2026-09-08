@@ -90,11 +90,14 @@ partition:
   partitions_per_node: auto                                 # per-node partition multiplier for auto mode; "auto" uses per-node GPU slots for GPU pipelines (2x for CPU-only), set a positive integer to override
   max_concurrent_partitions: auto                           # resource-aware driver concurrency; set a positive integer to override
   max_gpu_workers_per_device: 5                             # conservative Ray scheduling cap for auto-probed GPU operators; implies a 0.2 scheduling floor while retaining measured memory separately
-  max_concurrent_gpu_probes: auto                           # dependency-safe preflight concurrency; auto fills available GPU/CPU slots, set a positive integer to cap concurrent model loading
+  max_concurrent_gpu_probes: auto                           # dependency-safe preflight concurrency; auto probes one target at a time because storage bandwidth is not a Ray resource, set a positive integer to opt into parallel model loading
   gpu_preflight_enabled: true                               # set false to skip preflight and use explicitly configured GPU resources/actor counts
   gpu_probe_timeout_seconds: null                           # optional per-probe timeout; null disables termination while progress heartbeats remain enabled
   gpu_probe_warmup_batches: 1                               # warmup batches before steady-state GPU throughput measurement
   gpu_probe_steady_batches: 3                               # measured batches used for steady-state throughput and output-ratio estimation
+  gpu_probe_sample_offset: 0                                # leading rows skipped when collecting the preflight sample; use it when the dataset head is not representative
+  gpu_probe_sample_shuffle: false                           # set true to randomize block order before sampling, avoiding biased measurements on datasets ordered by size or source
+  gpu_probe_sample_seed: 42                                 # seed for the shuffled preflight sample; null draws a different sample on every run and therefore never reuses gpu_probe_results.json
   execution_group_size: auto                               # logical checkpoint partitions sharing one GPU actor lifecycle; auto limits model-init overhead
   max_initialization_overhead_ratio: 0.1                    # maximum estimated model initialization share for each execution group
   target_size_mb: 256                                       # target partition size in MB for auto mode (128, 256, 512, or 1024). 256MB balances memory safety and efficiency.

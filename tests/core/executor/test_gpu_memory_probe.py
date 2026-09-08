@@ -22,7 +22,7 @@ from data_juicer.core.executor.gpu_memory_probe import (
     probe_sample_count,
 )
 from data_juicer.core.executor.ray_executor_partitioned import PartitionedRayExecutor
-from data_juicer.ops import Mapper, Pipeline
+from data_juicer.ops import Filter, Mapper, Pipeline
 
 
 class FakeDataset:
@@ -33,6 +33,25 @@ class FakeDataset:
     def get(self, count):
         self.requested.append(count)
         return self.rows[:count]
+
+
+class FakeRayDataset(FakeDataset):
+    """Expose the Ray dataset surface used by offset and shuffle sampling."""
+
+    def __init__(self, rows, *, num_blocks=None):
+        super().__init__(rows)
+        self.seeds = []
+        self.data = SimpleNamespace(
+            randomize_block_order=self._randomize_block_order,
+            iter_rows=lambda: iter(self.rows),
+        )
+        if num_blocks is not None:
+            self.data.num_blocks = lambda: num_blocks
+
+    def _randomize_block_order(self, *, seed=None):
+        self.seeds.append(seed)
+        reordered = list(reversed(self.rows))
+        return SimpleNamespace(take=lambda count: reordered[:count])
 
 
 class FakeOp:
@@ -155,6 +174,38 @@ class ProfilingProbeMapper(Mapper):
         return samples
 
 
+class FlakyBatchMapper(Mapper):
+    """Fail on batches that contain an invalid row, like a real bad sample."""
+
+    _batched_op = True
+
+    def process_batched(self, samples, rank=None):
+        if any(text == "bad" for text in samples["text"]):
+            raise ValueError("invalid sample")
+        return samples
+
+
+class UndeclaredProbeMapper(Mapper):
+    """A contract-free Mapper, so preflight keeps it on ordered replay."""
+
+    _batched_op = True
+
+    def process_batched(self, samples, rank=None):
+        return samples
+
+
+class UndeclaredProbeFilter(Filter):
+    """A contract-free Filter that keeps nothing."""
+
+    _batched_op = True
+
+    def compute_stats_batched(self, samples, rank=None):
+        return samples
+
+    def process_batched(self, samples):
+        return [False] * len(samples["text"])
+
+
 def metrics(measured=100, total=1000, name="Fake GPU"):
     return {
         "gpu_name": name,
@@ -240,7 +291,7 @@ def test_cuda_measurement_does_not_touch_context_until_target_returns():
     assert measured["memory_measurement_mode"] == "post_call_device_usage_and_allocator_peak"
 
 
-def test_probe_stage_disables_inner_multiprocessing():
+def test_probe_stage_disables_inner_multiprocessing_and_keeps_recipe_fault_tolerance():
     result = _run_probe_stage(
         CapturingProbeOp,
         (),
@@ -252,7 +303,20 @@ def test_probe_stage_disables_inner_multiprocessing():
     assert result["rows"] == [{"text": "sample"}]
     assert CapturingProbeOp.init_kwargs["num_proc"] is None
     assert CapturingProbeOp.init_kwargs["auto_op_parallelism"] is False
-    assert CapturingProbeOp.init_kwargs["skip_op_error"] is False
+    assert CapturingProbeOp.init_kwargs["skip_op_error"] is True
+
+
+def test_replay_skips_invalid_rows_when_the_recipe_asks_for_it():
+    rows = [{"text": "good"}, {"text": "bad"}, {"text": "also good"}]
+    tolerant = FlakyBatchMapper(batch_size=1, skip_op_error=True)
+    strict = FlakyBatchMapper(batch_size=1, skip_op_error=False)
+
+    assert _run_probe_op_rows(_op_spec(tolerant), rows) == [
+        {"text": "good"},
+        {"text": "also good"},
+    ]
+    with pytest.raises(ValueError, match="invalid sample"):
+        _run_probe_op_rows(_op_spec(strict), rows)
 
 
 def test_probe_stage_preserves_multidimensional_numpy_arrays_between_ops():
@@ -505,7 +569,7 @@ def test_gpu_dependent_target_falls_back_after_independent_parallel_probe(tmp_pa
     assert [record["probe_mode"] for record in records] == ["parallel", "ordered"]
 
 
-def test_parallel_probe_concurrency_fills_available_slots_and_honors_user_cap(tmp_path):
+def test_parallel_probe_concurrency_serializes_by_default_and_bounds_an_explicit_cap(tmp_path):
     targets = [
         DeclaredProbeMapper(
             name=f"gpu_{index}",
@@ -525,9 +589,14 @@ def test_parallel_probe_concurrency_fills_available_slots_and_honors_user_cap(tm
     ):
         automatic = GPUMemoryProbe(str(tmp_path))._parallel_probe_limit(jobs)
         explicit = GPUMemoryProbe(str(tmp_path), max_concurrent_probes=3)._parallel_probe_limit(jobs)
+        over_provisioned = GPUMemoryProbe(str(tmp_path), max_concurrent_probes=20)._parallel_probe_limit(jobs)
 
-    assert automatic == 6
+    # Concurrent probes initialize several models at once, and storage bandwidth
+    # is not a Ray resource, so 'auto' probes one target at a time.
+    assert automatic == 1
     assert explicit == 3
+    # Ten jobs and eight GPUs, but 24 CPUs only cover six four-CPU probes.
+    assert over_provisioned == 6
 
     with patch(
         "data_juicer.core.executor.gpu_memory_probe.ray",
@@ -593,6 +662,64 @@ def test_parallel_probe_failure_prevents_formal_run(tmp_path):
     assert isinstance(error.value.__cause__, MemoryError)
 
 
+def test_measurement_from_a_fully_skipped_batch_is_rejected(tmp_path):
+    target = DeclaredProbeMapper(
+        name="gpu",
+        accelerator="cuda",
+        batch_size=2,
+        input_columns=["images"],
+        output_columns=["score"],
+        skip_op_error=True,
+    )
+
+    def parallel_runner(jobs, rows):
+        return {0: {"sample_count": 2, "output_count": 0, "metrics": metrics()}}
+
+    with pytest.raises(RuntimeError, match="skip_op_error dropped the whole batch"):
+        GPUMemoryProbe(str(tmp_path), parallel_runner=parallel_runner).resolve(
+            FakeDataset([{"images": ["a.jpg"]}, {"images": ["b.jpg"]}]),
+            [target],
+        )
+
+
+def test_empty_mapper_measurement_is_rejected_even_without_skip_op_error(tmp_path):
+    """A Mapper owes one row per input row, so an empty batch is never measurable."""
+    target = DeclaredProbeMapper(
+        name="gpu",
+        accelerator="cuda",
+        batch_size=2,
+        input_columns=["images"],
+        output_columns=["score"],
+        skip_op_error=False,
+    )
+
+    def parallel_runner(jobs, rows):
+        return {0: {"sample_count": 2, "output_count": 0, "metrics": metrics()}}
+
+    with pytest.raises(RuntimeError, match="should have raised"):
+        GPUMemoryProbe(str(tmp_path), parallel_runner=parallel_runner).resolve(
+            FakeDataset([{"images": ["a.jpg"]}, {"images": ["b.jpg"]}]),
+            [target],
+        )
+
+
+def test_filter_target_that_keeps_no_samples_is_only_reported_as_worst_case(tmp_path):
+    target = UndeclaredProbeFilter(accelerator="cuda", batch_size=2, skip_op_error=True)
+
+    def run_stage(op, rows, measure_memory):
+        return {"rows": [], "metrics": metrics()}
+
+    with patch("data_juicer.core.executor.gpu_memory_probe.logger.warning") as warning:
+        records = GPUMemoryProbe(str(tmp_path), stage_runner=run_stage).resolve(
+            FakeDataset([{"text": "a"}, {"text": "b"}]),
+            [target],
+        )
+
+    assert len(records) == 1
+    assert target.num_gpus == 0.2
+    assert "worst-case" in warning.call_args[0][0]
+
+
 def test_ordered_replay_uses_front_sample_and_refills_after_filter(tmp_path):
     dataset = FakeDataset([{"id": index} for index in range(8)])
     cpu_filter = FakeOp("cpu_filter")
@@ -629,13 +756,139 @@ def test_ordered_replay_uses_front_sample_and_refills_after_filter(tmp_path):
     assert first_gpu._op_cfg["first_gpu"]["memory"] == 111 / 1024
 
     report = json.loads((tmp_path / "gpu_probe_results.json").read_text())
-    assert report["version"] == 4
-    assert report["observability_version"] == 3
+    assert report["version"] == 5
+    assert report["observability_version"] == 4
     assert report["memory_headroom"] == 1.1
     assert report["max_gpu_workers_per_device"] == 5
     assert report["warmup_batches"] == 1
     assert report["steady_batches"] == 3
+    assert report["sample_policy"] == {"offset": 0, "shuffle": False, "seed": None}
+    assert report["sample_source"] == "the dataset head"
     assert report["operators"][1]["sample_count"] == 4
+
+
+def probe_sample_ids(tmp_path, dataset, **options):
+    """Return the sample ids each probed stage received."""
+    sampled = []
+
+    def run_stage(op, rows, measure_memory):
+        sampled.append([row["id"] for row in rows])
+        return {"rows": rows, "metrics": metrics()}
+
+    GPUMemoryProbe(str(tmp_path), stage_runner=run_stage, **options).resolve(
+        dataset, [FakeOp("gpu", accelerator="cuda", batch_size=2)]
+    )
+    return sampled
+
+
+def test_probe_sample_offset_skips_the_dataset_head(tmp_path):
+    dataset = FakeDataset([{"id": index} for index in range(6)])
+
+    assert probe_sample_ids(tmp_path, dataset, sample_offset=2) == [[2, 3]]
+    assert dataset.requested == [4]
+
+
+def test_probe_sample_offset_streams_past_the_head_of_a_ray_dataset(tmp_path):
+    dataset = FakeRayDataset([{"id": index} for index in range(6)])
+
+    assert probe_sample_ids(tmp_path, dataset, sample_offset=3) == [[3, 4]]
+    assert dataset.requested == []
+
+
+def test_probe_sample_offset_beyond_the_dataset_falls_back_to_the_head(tmp_path):
+    dataset = FakeDataset([{"id": 0}, {"id": 1}])
+
+    with patch("data_juicer.core.executor.gpu_memory_probe.logger.warning") as warning:
+        assert probe_sample_ids(tmp_path, dataset, sample_offset=10) == [[0, 1]]
+
+    assert dataset.requested == [12, 2]
+    assert "row offset 10" in warning.call_args[0][0]
+
+
+def test_probe_sample_shuffle_reads_a_randomized_block(tmp_path):
+    dataset = FakeRayDataset([{"id": index} for index in range(6)])
+
+    assert probe_sample_ids(tmp_path, dataset, sample_shuffle=True, sample_seed=7) == [[5, 4]]
+    assert dataset.seeds == [7]
+    assert dataset.requested == []
+
+
+def test_probe_sample_shuffle_falls_back_to_the_head_without_block_support(tmp_path):
+    dataset = FakeDataset([{"id": index} for index in range(6)])
+
+    with patch("data_juicer.core.executor.gpu_memory_probe.logger.warning") as warning:
+        assert probe_sample_ids(tmp_path, dataset, sample_shuffle=True) == [[0, 1]]
+
+    assert dataset.requested == [2]
+    assert "sampling the head instead" in warning.call_args[0][0]
+
+
+def test_probe_sample_shuffle_reports_the_ignored_offset(tmp_path):
+    dataset = FakeRayDataset([{"id": index} for index in range(6)])
+
+    with patch("data_juicer.core.executor.gpu_memory_probe.logger.warning") as warning:
+        assert probe_sample_ids(tmp_path, dataset, sample_shuffle=True, sample_offset=2) == [[5, 4]]
+
+    assert "ignores gpu_probe_sample_offset=2" in warning.call_args[0][0]
+
+
+def test_single_block_shuffle_hands_the_sample_back_to_the_offset(tmp_path):
+    """Reordering one block reference moves nothing, so the offset must still apply."""
+    dataset = FakeRayDataset([{"id": index} for index in range(6)], num_blocks=1)
+
+    with patch("data_juicer.core.executor.gpu_memory_probe.logger.warning") as warning:
+        assert probe_sample_ids(tmp_path, dataset, sample_shuffle=True, sample_offset=3) == [[3, 4]]
+
+    assert dataset.seeds == []
+    assert "single-block dataset" in warning.call_args[0][0]
+    assert json.loads((tmp_path / "gpu_probe_results.json").read_text())["sample_source"] == "row offset 3"
+
+
+def test_seedless_shuffle_report_is_observed_but_never_reused(tmp_path):
+    """Its policy cannot distinguish two runs that sampled different rows."""
+    dataset = FakeRayDataset([{"id": index} for index in range(6)])
+
+    assert probe_sample_ids(tmp_path, dataset, sample_shuffle=True) == [[5, 4]]
+    report = json.loads((tmp_path / "gpu_probe_results.json").read_text())
+    assert report["sample_source"] == "randomized blocks (seed=None)"
+
+    reprobed = probe_sample_ids(
+        tmp_path,
+        dataset,
+        sample_shuffle=True,
+        hardware_reader=lambda: {"gpu_name": "Fake GPU", "total_mb": 1000},
+    )
+
+    assert reprobed == [[5, 4]]
+
+
+def test_seeded_shuffle_report_is_reused(tmp_path):
+    dataset = FakeRayDataset([{"id": index} for index in range(6)])
+    assert probe_sample_ids(tmp_path, dataset, sample_shuffle=True, sample_seed=7) == [[5, 4]]
+
+    reprobed = probe_sample_ids(
+        tmp_path,
+        dataset,
+        sample_shuffle=True,
+        sample_seed=7,
+        hardware_reader=lambda: {"gpu_name": "Fake GPU", "total_mb": 1000},
+    )
+
+    assert reprobed == []
+
+
+def test_sampling_policy_change_invalidates_cached_plan(tmp_path):
+    dataset = FakeDataset([{"id": index} for index in range(6)])
+    assert probe_sample_ids(tmp_path, dataset) == [[0, 1]]
+
+    reprobed = probe_sample_ids(
+        tmp_path,
+        dataset,
+        sample_offset=2,
+        hardware_reader=lambda: {"gpu_name": "Fake GPU", "total_mb": 1000},
+    )
+
+    assert reprobed == [[2, 3]]
 
 
 def test_matching_report_is_reused_without_replaying_samples(tmp_path):
@@ -758,6 +1011,57 @@ def test_explicit_gpu_fraction_is_preserved_while_throughput_is_profiled(tmp_pat
     assert op.num_gpus == 0.5
     assert op._gpu_memory_fraction == 0.12
     assert op._gpu_rows_per_second == 2
+
+
+def test_explicit_gpu_fraction_below_measured_memory_is_raised_to_the_memory_share(tmp_path):
+    op = DeclaredProbeMapper(
+        name="undersized",
+        accelerator="cuda",
+        num_gpus=0.05,
+        input_columns=["text"],
+        output_columns=["text"],
+    )
+
+    def parallel_runner(jobs, rows):
+        return {0: {"sample_count": 1, "metrics": metrics(measured=100)}}
+
+    with patch("data_juicer.core.executor.gpu_memory_probe.logger.warning") as warning:
+        records = GPUMemoryProbe(str(tmp_path), parallel_runner=parallel_runner).resolve(
+            FakeDataset([{"text": "sample"}]),
+            [op],
+        )
+
+    assert records[0]["resource_mode"] == "configured"
+    assert records[0]["num_gpus"] == 0.12
+    assert op.num_gpus == 0.12
+    assert op._gpu_memory_fraction == 0.12
+    assert op._op_cfg["undersized"]["num_gpus"] == 0.12
+    assert "Raising the Ray request to 0.12" in warning.call_args[0][0]
+
+
+def test_cached_record_below_measured_memory_share_is_reconciled_on_reuse(tmp_path):
+    GPUMemoryProbe(str(tmp_path), stage_runner=lambda op, rows, measure: {"rows": rows, "metrics": metrics()}).resolve(
+        FakeDataset([{"id": 1}]), [FakeOp("gpu", accelerator="cuda")]
+    )
+
+    report_path = tmp_path / "gpu_probe_results.json"
+    report = json.loads(report_path.read_text())
+    report["operators"][0]["num_gpus"] = 0.05
+    report_path.write_text(json.dumps(report))
+
+    def must_not_run(*args):
+        raise AssertionError("cached probe should not replay the recipe")
+
+    fresh_op = FakeOp("gpu", accelerator="cuda")
+    GPUMemoryProbe(
+        str(tmp_path),
+        stage_runner=must_not_run,
+        hardware_reader=lambda: {"gpu_name": "Fake GPU", "total_mb": 1000},
+    ).resolve(FakeDataset([{"id": 99}]), [fresh_op])
+
+    assert fresh_op.num_gpus == 0.12
+    assert fresh_op._gpu_memory_fraction == 0.12
+    assert fresh_op._init_kwargs["num_gpus"] == 0.12
 
 
 def test_pipeline_target_and_pipeline_barrier_fail_before_formal_run(tmp_path):

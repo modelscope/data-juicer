@@ -229,3 +229,121 @@ def test_explicit_resume_rejects_legacy_metadata_without_hashes_or_boundaries():
         executor._split_dataset_deterministic(SimpleNamespace(data=Mock()))
 
     executor._clear_invalid_checkpoints.assert_not_called()
+
+
+def _fake_ray_data(total_rows, split_result=None):
+    """Return a ``dataset.data`` double plus the materialized view it exposes."""
+    materialized = Mock()
+    materialized.count.return_value = total_rows
+    materialized.split_at_indices.return_value = split_result if split_result is not None else []
+    data = Mock()
+    data.materialize.return_value = materialized
+    return data, materialized
+
+
+@pytest.mark.parametrize(
+    ("total_rows", "num_partitions", "expected"),
+    [
+        (10, 4, [3, 6, 8]),
+        (8, 4, [2, 4, 6]),
+        (10, 3, [4, 7]),
+        (2, 2, [1]),
+    ],
+)
+def test_balanced_split_indices_spread_the_remainder_over_leading_partitions(total_rows, num_partitions, expected):
+    indices = PartitionedRayExecutor._balanced_split_indices(total_rows, num_partitions)
+
+    assert indices == expected
+    # No row is dropped and no partition is left empty.
+    sizes = [b - a for a, b in zip([0] + indices, indices + [total_rows])]
+    assert sum(sizes) == total_rows
+    assert min(sizes) >= 1
+    assert max(sizes) - min(sizes) <= 1
+
+
+def test_row_balanced_split_cuts_at_row_boundaries_instead_of_block_boundaries():
+    executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
+    executor.num_partitions = 4
+    data, materialized = _fake_ray_data(10, ["p0", "p1", "p2", "p3"])
+
+    partitions = executor._split_into_row_balanced_partitions(SimpleNamespace(data=data))
+
+    assert partitions == ["p0", "p1", "p2", "p3"]
+    materialized.split_at_indices.assert_called_once_with([3, 6, 8])
+    # Ray's block-based split() must not be used for the fresh split.
+    data.split.assert_not_called()
+    assert executor.num_partitions == 4
+
+
+def test_row_balanced_split_rejects_more_partitions_than_rows():
+    """An empty partition still costs an actor lifecycle and a checkpoint."""
+    executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
+    executor.num_partitions = 8
+    data, materialized = _fake_ray_data(3, ["p0", "p1", "p2"])
+
+    with pytest.raises(ValueError, match="exceeds the 3 row"):
+        executor._split_into_row_balanced_partitions(SimpleNamespace(data=data))
+
+    materialized.split_at_indices.assert_not_called()
+    # The requested count is reported as-is instead of being silently lowered.
+    assert executor.num_partitions == 8
+
+
+def test_row_balanced_split_materializes_a_single_partition():
+    executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
+    executor.num_partitions = 1
+    data, materialized = _fake_ray_data(5)
+
+    partitions = executor._split_into_row_balanced_partitions(SimpleNamespace(data=data))
+
+    assert partitions == [materialized]
+    materialized.split_at_indices.assert_not_called()
+
+
+def test_row_balanced_split_of_an_empty_dataset_yields_one_partition():
+    executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
+    executor.num_partitions = 4
+    data, materialized = _fake_ray_data(0)
+
+    partitions = executor._split_into_row_balanced_partitions(SimpleNamespace(data=data))
+
+    assert partitions == [materialized]
+    assert executor.num_partitions == 1
+    materialized.split_at_indices.assert_not_called()
+
+
+@pytest.mark.parametrize("num_blocks", [1, 2, 4])
+def test_row_balanced_split_never_produces_empty_partitions_whatever_the_block_layout(num_blocks):
+    """Regression: ``Dataset.split(n)`` splits by blocks, not by rows.
+
+    With Ray's own ``split(4)``, ten rows in one block produce ``[10, 0, 0, 0]``
+    and in two blocks ``[5, 5, 0, 0]``, so the row-count ceiling alone does not
+    prevent empty or badly skewed logical partitions.
+    """
+    ray = pytest.importorskip("ray")
+    ray.init(num_cpus=2, include_dashboard=False, ignore_reinit_error=True, logging_level="ERROR")
+
+    executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
+    executor.num_partitions = 4
+    dataset = SimpleNamespace(data=ray.data.range(10, override_num_blocks=num_blocks))
+
+    partitions = executor._split_into_row_balanced_partitions(dataset)
+    row_counts = [partition.count() for partition in partitions]
+
+    assert row_counts == [3, 3, 2, 2]
+    assert sum(row_counts) == 10
+
+
+def test_row_balanced_split_keeps_every_row_exactly_once():
+    ray = pytest.importorskip("ray")
+    ray.init(num_cpus=2, include_dashboard=False, ignore_reinit_error=True, logging_level="ERROR")
+
+    executor = PartitionedRayExecutor.__new__(PartitionedRayExecutor)
+    executor.num_partitions = 3
+    dataset = SimpleNamespace(data=ray.data.range(10, override_num_blocks=1))
+
+    partitions = executor._split_into_row_balanced_partitions(dataset)
+    ids = [row["id"] for partition in partitions for row in partition.take_all()]
+
+    # split(n, equal=True) would have dropped rows here; split_at_indices must not.
+    assert ids == list(range(10))
