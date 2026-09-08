@@ -39,7 +39,6 @@ partition:
   mode: "auto"
   max_concurrent_partitions: "auto"  # Resource-aware driver concurrency
   target_size_mb: 256    # Target size in MB used for auto-mode planning
-  size: null             # Optional sample-count fallback when optimization cannot recommend a valid size
 ```
 
 **Manual mode** - specify exact partition count:
@@ -51,12 +50,7 @@ partition:
   max_concurrent_partitions: "auto"
 ```
 
-Manual mode can instead derive the nearest partition count from a sample
-target. `size` and `num_of_partitions` are mutually exclusive in manual mode.
-The executor materializes the input once and splits it at row boundaries. Each
-partition contains `size` samples except for the final partition, which absorbs
-the remainder from nearest-count planning. If the derived count is one, the
-whole dataset is processed as one materialized partition:
+To choose a target number of samples per partition, set `size` instead of `num_of_partitions`. Choose one of these settings in manual mode. Data-Juicer rounds the partition count to the nearest whole number, with at least one partition. The last partition holds the remaining rows: for 12,000 rows and `size: 5000`, the two partitions contain 5,000 and 7,000 rows.
 
 ```yaml
 partition:
@@ -64,10 +58,7 @@ partition:
   size: 5000
 ```
 
-`target_size_mb` is an optimizer input rather than a hard memory or output-file
-limit. Zero and negative values are accepted; when the resulting recommendation
-falls below an optimizer minimum, Data-Juicer applies that minimum and logs a
-warning.
+In auto mode, start with `target_size_mb: 256` and adjust it to tune partition sizes. This is a planning target, so actual memory use and output file sizes can differ. You can also set `partition.size` as a sample-count fallback for automatic planning.
 
 `max_concurrent_partitions: "auto"` is the default. It is resolved after
 operator resource planning: GPU pipelines use the tightest CPU/GPU worker
@@ -84,13 +75,11 @@ checkpoint:
   strategy: every_n_ops  # every_n_ops (default), every_op, manual, disabled
   n_ops: 5               # Default: checkpoint every 5 operations
   op_names:              # For manual strategy - checkpoint after expensive ops
-    - document_deduplicator
-    - embedding_mapper
+    - ray_document_deduplicator
+    - extract_keyword_mapper
 ```
 
-`strategy` accepts only `every_op`, `every_n_ops`, `manual`, and `disabled`;
-any other value, including `every_partition`, is rejected while the
-configuration is parsed. `n_ops` must be a positive integer.
+Choose `every_op`, `every_n_ops`, `manual`, or `disabled`. For `every_n_ops`, set `n_ops` to a positive integer. For `manual`, list operator names from your recipe in `op_names`.
 
 When checkpointing is enabled, the initial run saves
 `checkpoints/partitioning_info.json`. For every logical partition, this file
@@ -108,9 +97,9 @@ Ray batch boundaries, and validated before any checkpoint is reused.
 
 ### Checkpoints and Temporary Files
 
-`checkpoint.enabled`, `checkpoint.strategy`, `checkpoint.n_ops`, and `checkpoint.op_names` control checkpoint creation. Checkpoints use Parquet with the underlying writer's default compression. Ray Dataset splitting creates the partitions; checkpoints capture data after the selected operations.
+Use `checkpoint.enabled` to turn checkpointing on or off and `checkpoint.strategy` to choose when to save. Checkpoints are saved as Parquet datasets under `checkpoint_dir`, which defaults to `<work_dir>/checkpoints`. Keep this directory to resume an interrupted job.
 
-On normal or exceptional exit from its run context, the executor attempts to remove `work_dir/.tmp/<Ray job id>`. Checkpoints live in a separate directory for resumption.
+The executor cleans up its temporary working files when the run exits. Checkpoints are stored separately and remain available for resumption.
 
 ## Usage
 
@@ -159,13 +148,7 @@ If metadata is missing, row boundaries are invalid, the input has changed, or
 a content hash does not match, explicit resume stops with an error and leaves
 the existing checkpoints unchanged.
 
-`--job_id` remains available for custom job naming and backward compatibility.
-For fault-tolerant continuation, prefer `--resume`: the legacy `--job_id`
-resumption path keeps its previous behavior and may clear mismatched
-checkpoints before starting fresh. Metadata created by an older Data-Juicer
-version can still be read, but it does not contain the row boundaries and full
-content hashes required by explicit resume; `--resume` therefore rejects it
-without deleting its checkpoints.
+Use `--job_id` to name a job. To resume it, add `--resume` with the original job ID to the original command.
 
 If both arguments are supplied, their values must be identical:
 
@@ -334,7 +317,6 @@ disabled         | 0s        | Re-run everything
 
 - Event logs: fast storage (SSD)
 - Checkpoints: large capacity storage
-- Partitions: local storage
 
 ### Partition Sizing Trade-offs
 

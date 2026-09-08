@@ -39,7 +39,6 @@ partition:
   mode: "auto"
   max_concurrent_partitions: "auto"  # 资源感知的 Driver 并发上限
   target_size_mb: 256    # 自动模式规划使用的目标大小（MB）
-  size: null             # 可选：优化器无法给出有效建议时使用的样本数回退值
 ```
 
 **手动模式** - 指定确切的分区数量：
@@ -51,10 +50,7 @@ partition:
   max_concurrent_partitions: "auto"
 ```
 
-手动模式也可以通过样本数目标推导最接近的分区数量。手动模式下，`size` 与
-`num_of_partitions` 互斥。执行器会物化一次输入数据，再按照行边界切分。除最后
-一个分区吸收按最接近数量规划产生的余数外，其余分区各包含 `size` 条样本。如果
-推导结果为一个分区，则整个数据集作为一个已物化分区处理：
+如果希望按每个分区的目标样本数切分，使用 `size`。手动模式下，`size` 和 `num_of_partitions` 只能选择一个。Data-Juicer 将分区数量四舍五入为整数，至少保留一个分区，最后一个分区容纳剩余数据。例如，12,000 条数据配合 `size: 5000` 会得到两个分区，分别包含 5,000 和 7,000 条数据。
 
 ```yaml
 partition:
@@ -62,9 +58,7 @@ partition:
   size: 5000
 ```
 
-`target_size_mb` 是优化器的规划输入，并非内存或输出文件大小的硬限制。该参数
-接受 0 和负数；如果据此算出的建议低于优化器内部下限，Data-Juicer 会应用下限
-并记录 warning。
+自动模式下，可以从 `target_size_mb: 256` 开始调整分区大小。它是规划目标，实际内存占用和输出文件大小可能有所不同。也可以设置 `partition.size`，作为自动规划无法给出样本数建议时的回退值。
 
 `max_concurrent_partitions: "auto"` 是默认值。该值会在 Operator 资源规划完成后解析：含 GPU Operator 的 pipeline 根据 Ray 集群可容纳的最小 CPU/GPU worker 数确定，纯 CPU pipeline 的外层并发保守限制为 4。实际并发还会受到 Partition 数量和显式全局 Actor `num_proc` 预算的限制。需要手动调优时，可将其设置为正整数来覆盖自动值。
 
@@ -76,11 +70,11 @@ checkpoint:
   strategy: every_n_ops  # every_n_ops（默认）, every_op, manual, disabled
   n_ops: 5               # 默认：每 5 个操作检查点
   op_names:              # 用于 manual 策略 - 在耗时操作后检查点
-    - document_deduplicator
-    - embedding_mapper
+    - ray_document_deduplicator
+    - extract_keyword_mapper
 ```
 
-`strategy` 只接受 `every_op`、`every_n_ops`、`manual` 和 `disabled`，其他取值（包括 `every_partition`）会在解析配置时被拒绝。`n_ops` 必须为正整数。
+选择 `every_op`、`every_n_ops`、`manual` 或 `disabled` 作为保存策略。使用 `every_n_ops` 时，将 `n_ops` 设置为正整数；使用 `manual` 时，在 `op_names` 中填写配方里的算子名。
 
 启用检查点后，首次运行会保存
 `checkpoints/partitioning_info.json`。该文件为每个逻辑分区记录：
@@ -94,9 +88,9 @@ checkpoint:
 
 ### 检查点与临时文件
 
-检查点由 `checkpoint.enabled`、`checkpoint.strategy`、`checkpoint.n_ops` 和 `checkpoint.op_names` 控制，保存为 Parquet，压缩使用底层写入器的默认设置。分区通过 Ray Dataset 拆分；检查点记录所选算子执行后的数据。
+使用 `checkpoint.enabled` 开关检查点，用 `checkpoint.strategy` 选择保存时机。检查点以 Parquet 数据集的形式保存在 `checkpoint_dir`，默认目录为 `<work_dir>/checkpoints`。保留该目录即可恢复中断的作业。
 
-执行器退出运行上下文时会尝试清理 `work_dir/.tmp/<Ray job id>`，正常完成和异常退出都会触发。检查点保存在单独的目录中，可用于续跑。
+运行退出时，执行器会清理临时工作文件。检查点单独存储，仍可用于恢复作业。
 
 ## 使用方法
 
@@ -141,7 +135,7 @@ dj-process --config config.yaml --resume my_experiment_001
 
 如果 metadata 缺失、行号边界非法、输入内容发生变化或内容 hash 不一致，显式续跑会报错停止，并保留已有 checkpoint，不会将其删除。
 
-`--job_id` 仍可用于自定义任务名称和向后兼容。需要进行容错续跑时，应优先使用 `--resume`：旧的 `--job_id` 续跑路径保持原有行为，在分区不匹配时可能清除 checkpoint 并重新开始。旧版 Data-Juicer 创建的 metadata 仍可读取，但其中没有显式续跑所需的行号边界和完整内容 hash；因此，`--resume` 会拒绝使用这种旧 metadata，同时保留已有 checkpoint。
+`--job_id` 用于指定作业名称。恢复作业时，在原命令上添加 `--resume`，并使用首次运行的作业 ID。
 
 如果同时提供两个参数，它们的值必须相同：
 
@@ -310,7 +304,6 @@ disabled          | 0秒     | 重新执行全部
 
 - 事件日志：快速存储（SSD）
 - 检查点：大容量存储
-- 分区：本地存储
 
 ### 分区大小权衡
 

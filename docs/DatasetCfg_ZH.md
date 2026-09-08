@@ -1,21 +1,21 @@
-# 数据集配置指南
-中文 | [EN](DatasetCfg.md)
+# 数据集配置
 
-本指南概述了如何在 Data-Juicer 框架中使用 YAML 格式配置数据集。允许您指定本地和远程数据集以及数据验证规则。
+本指南介绍如何在 Data-Juicer 菜谱中配置输入数据集。你将学习如何指向本地文件、远程 Hugging Face 或 arXiv 数据集、混合多个数据源、校验数据，以及处理边界情况。
 
 ## 支持的数据集格式
 
+Data-Juicer 会自动检测本地文件的格式。支持的格式包括 `parquet`、`jsonl`、`json`、`csv`、`tsv`、`txt` 和 `jsonl.gz`。
+
 ### 本地数据集
 
-`local_json.yaml` 配置文件用于指定以 JSON 格式本地存储的数据集。*path* 是必需的，用于指定本地数据集路径，可以是单个文件或目录。*format* 是可选的，用于指定数据集格式。
-对于本地文件，DJ 将自动检测文件格式并相应地加载数据集。支持 parquet、jsonl、json、csv、tsv、txt 和 jsonl.gz 等格式
-有关更多详细信息，请参阅 [local_json.yaml](https://github.com/datajuicer/data-juicer-hub/blob/main/dataset_config/local_json.yaml)。
+指向本地文件系统上的文件或目录。`format` 字段是可选的——Data-Juicer 根据文件扩展名自动检测。
+
 ```yaml
 dataset:
   configs:
     - type: local
       path: path/to/your/local/dataset.json
-      format: json
+      format: json    # 可选
 ```
 
 ```yaml
@@ -26,10 +26,11 @@ dataset:
       format: parquet
 ```
 
-### Remote Huggingface 数据集
+完整示例参见 [local_json.yaml](https://github.com/datajuicer/data-juicer-hub/blob/main/dataset_config/local_json.yaml)。
 
-`remote_huggingface.yaml` 配置文件用于指定 huggingface 数据集。*type* 和 *source* 固定为 'remote' 和 'huggingface'，以定位 huggingface 加载逻辑。*path* 是必需的，用于标识 huggingface 数据集。*name*、*split* 和 *limit* 是可选的，用于指定数据集名称/拆分并限制要加载的样本数量。
-更多详细信息请参阅 [remote_huggingface.yaml](https://github.com/datajuicer/data-juicer-hub/blob/main/dataset_config/remote_huggingface.yaml)。
+### 远程 Hugging Face 数据集
+
+从 Hugging Face Hub 加载任意数据集。将 `type` 设为 `remote`，`source` 设为 `huggingface`。
 
 ```yaml
 dataset:
@@ -37,40 +38,35 @@ dataset:
     - type: 'remote'
       source: 'huggingface'
       path: "HuggingFaceFW/fineweb"
-      name: "CC-MAIN-2024-10"
-      split: "train"
-      limit: 1000
+      name: "CC-MAIN-2024-10"   # 可选：数据集配置名
+      split: "train"             # 可选：加载哪个 split
+      limit: 1000                # 可选：限制加载的样本数
 ```
 
-### 远程 Arxiv 数据集
+完整示例参见 [remote_huggingface.yaml](https://github.com/datajuicer/data-juicer-hub/blob/main/dataset_config/remote_huggingface.yaml)。
 
-`remote_arxiv.yaml` 配置文件用于指定以 JSON 格式远程存储的数据集。*type* 和 *source* 固定为 'remote' 和 'arxiv'，以定位 arxiv 加载逻辑。 *lang*、*dump_date*、*force_download* 和 *url_limit* 是可选的，用于指定数据集语言、转储日期、强制下载和 URL 限制。
-有关更多详细信息，请参阅 [remote_arxiv.yaml](https://github.com/datajuicer/data-juicer-hub/blob/main/dataset_config/remote_arxiv.yaml)。
+### arXiv 数据
+
+arXiv 论文请使用[预处理工具](../tools/preprocess/README_ZH.md)下载并将 arXiv tar 包转为 Data-Juicer 可直接处理的 JSONL 格式。
+
+### 其他格式
+
+完整的支持格式和加载策略列表，参见 [load_strategy.py](https://github.com/datajuicer/data-juicer/blob/main/data_juicer/core/data/load_strategy.py)。
+
+---
+
+## 数据混合
+
+默认执行器支持在 `dataset.configs` 中配置多个数据源，并按以下方式合并：
+
+- 设置 `dataset.max_sample_num`：按各源权重分配总样本预算，再采样并合并。分配量超过某个源的样本数时，会重复采样以补足预算。
+- 省略 `dataset.max_sample_num`：全量拼接各数据源。
+
+Ray 执行器通过该配置加载单个数据源。
 
 ```yaml
 dataset:
-  configs:
-    - type: 'remote'
-      source: 'arxiv'
-      lang: 'en'
-      dump_date: 'latest'
-      force_download: false
-      url_limit: 2
-```
-
-### 其他支持的数据集格式
-
-有关更多详细信息和支持的数据集格式，请参阅 [load_strategy.py](https://github.com/datajuicer/data-juicer/blob/main/data_juicer/core/data/load_strategy.py)。
-
-## 其他功能
-
-### 数据混合
-
-`mixture.yaml` 配置文件演示了如何指定数据混合规则。DJ 将通过对数据集的一部分进行采样并应用适当的权重来混合数据集。
-有关更多详细信息，请参阅 [mixture.yaml](https://github.com/datajuicer/data-juicer-hub/blob/main/dataset_config/mixture.yaml)。
-```yaml
-dataset:
-  max_sample_num: 10000
+  max_sample_num: 10000    # 按各数据源权重分配的总样本数
   configs:
     - type: 'local'
       weight: 1.0
@@ -80,10 +76,14 @@ dataset:
       path: 'path/to/csv/file'
 ```
 
-### 数据验证
+完整示例参见 [mixture.yaml](https://github.com/datajuicer/data-juicer-hub/blob/main/dataset_config/mixture.yaml)。
 
-`validator.yaml` 配置文件演示了如何指定数据验证规则。DJ 将通过对数据集的一部分进行采样并应用验证规则来验证数据集。
-有关更多详细信息和支持的验证器，请参阅 [data_validator.py](https://github.com/datajuicer/data-juicer/blob/main/data_juicer/core/data/data_validator.py)。
+---
+
+## 数据校验
+
+在菜谱中添加 `validators` 即可在处理前校验数据集。每个校验器检查数据的一个特定方面。
+
 ```yaml
 dataset:
   configs:
@@ -106,90 +106,98 @@ validators:
       language: "str"
 ```
 
-### 读取选项
+完整的校验器列表参见 [data_validator.py](https://github.com/datajuicer/data-juicer/blob/main/data_juicer/core/data/data_validator.py)。
 
-全局读取选项由 `DatasetBuilder` 统一应用，因此数据处理、分析和直接调用 `DatasetBuilder` 的加载行为一致。显式传给 `DatasetBuilder.load_dataset(...)` 的同名参数优先于对应的全局默认值。
+---
+
+## 读取选项
+
+本地处理和分析时，可以用 `load_dataset_kwargs` 设置文件格式相关的读取选项。例如，只读取 Parquet 中的指定列：
 
 ```yaml
-# DefaultExecutor 和 Analyzer：HuggingFace 读取默认参数
 load_dataset_kwargs:
-  columns: ['text', 'meta']   # Parquet
-  delimiter: "\t"             # CSV
+  columns: ['text', 'meta']
+```
 
-# ray、ray_partitioned 和 RayAnalyzer：PyArrow JSON 读取
+读取以制表符分隔的 CSV 时，改用 `load_dataset_kwargs: {delimiter: "\t"}`。请根据输入文件的格式选择对应选项。
+
+### 加载进程数
+
+`np` 同时设置加载和处理的默认进程数。要减少加载阶段使用的进程数：
+
+```yaml
+np: 16
+load_dataset_kwargs:
+  num_proc: 4
+```
+
+此配置使用 4 个进程加载数据，处理阶段默认使用 16 个进程。在 Python 中，显式传给 `DatasetBuilder.load_dataset(num_proc=...)` 的参数优先于这些配置。
+
+### Ray 输入
+
+使用 `ray`、`ray_partitioned` 或 RayAnalyzer 时，通过 `override_num_blocks` 设置所需的输入数据块数量。读取较大的 JSON 记录时，可以增大 `block_size`：
+
+```yaml
 read_options:
-  block_size: 268435456       # 256MB；JSON 单条记录很大时可调高
-override_num_blocks: 64       # Ray 读取请求的 block 数，必须为正整数
+  block_size: 268435456  # 256 MiB
+override_num_blocks: 64
 ```
 
-`read_options` 接受 `pyarrow.json.ReadOptions` 的字段。留空则保持读取器自身的默认值——其中 PyArrow 内部多线程是关闭的，因为每个 Ray 读取任务本身已经是并行的。
+`read_options` 接受 PyArrow JSON 读取选项，留空即使用默认值。Ray 将加载任务分配到集群；`load_dataset_kwargs.num_proc` 仅控制本地加载。
 
-#### 加载并行度
+---
 
-`np` 是加载进程数的全局默认值。若需要让加载并行度与处理并行度解耦，设置 `load_dataset_kwargs.num_proc`：
+## 故障排除
 
-```yaml
-np: 16                        # 处理并行度，同时作为加载的默认值
-load_dataset_kwargs:
-  num_proc: 4                 # 用 4 个进程加载，而非 16
-```
+### JSONL 逐行容错
 
-优先级由低到高共三层：`np`、`load_dataset_kwargs.num_proc`、显式传入的 `DatasetBuilder.load_dataset(num_proc=...)`。该值仅对 default 执行器和 Analyzer 生效；Ray 执行器的读取并行度由 `override_num_blocks` 和集群资源决定。
-
-`run()` 的 `load_data_np` 参数将被废弃。它解析到的是同一个 `num_proc`，但只能从 Python 传入。在默认执行器和 Analyzer 上传入该参数仍然生效，并会输出一条警告说明实际采用的并行度；在 Ray 执行器上它从来没有生效过，警告会改为说明这一点。
-
-`generated_dataset_config` 不受影响，它继续使用自己的 formatter 构造参数。
-
-### JSONL 样本级容错（跳过坏行）
-
-若少数行损坏、或整行无法被 HF/ujson 解析，可使用 **宽松 JSONL 加载**：用标准库逐行 ``json.loads``，解析失败 **仅跳过该行** 并打日志，其余样本照常进入流水线（下游算子仍面对与普通 JSONL 一致的 ``datasets.Dataset``）。
-
-**启用方式（二选一）：**
+本地处理和分析时，在配方中设置 `load_jsonl_lenient: true`，即可跳过格式错误的 JSONL 行并继续处理其余数据：
 
 ```yaml
 load_jsonl_lenient: true
 ```
 
+也可以只为一次运行开启此选项：
+
 ```bash
 DATA_JUICER_JSONL_LENIENT=1 dj-process --config path/to/config.yaml
 ```
 
-**限制：**
+> **注意：** 仅读取 `.jsonl` / `.jsonl.gz` / `.jsonl.zst` 分片。同目录下的其它文件（如 `.json`）会被跳过并打警告。搜索日志中的 `[lenient jsonl]` 可查看哪些行被跳过。
 
-- 只会读 ``.jsonl`` / ``.jsonl.gz`` / ``.jsonl.zst``；同目录下其它后缀（如 ``.json``）会被 **跳过** 并打警告，**不再** 整体回退到 HF/ujson（避免再次出现 ``Value is too big!``）。需要时可设 ``suffixes: ['.jsonl']``。
-- 适合 **DefaultExecutor** 本地 jsonl；与 Parquet 无关。
-- 跳过的行请搜日志前缀 ``[lenient jsonl]``。
+### `Value is too big!` 报错
 
-### JSON / JSONL 加载报错 ``Value is too big!``
+加载本地 JSONL 时，HuggingFace `datasets` 可能使用 `ujson` 解析，它无法处理超大整数。如果看到 `ValueError: Value is too big!`：
 
-本地 JSONL 由 HuggingFace ``datasets`` 解析时可能走 ``ujson``；若某条样本里含有 **超出 ujson 表示范围的整数**（例如极长的数字型 ID），会报错 ``ValueError: Value is too big!``。这与单行文本长短无关，多半是 **数字字段** 问题。
+| 修复方式 | 做法 |
+|---------|------|
+| **使用标准库 json**（推荐） | `DATA_JUICER_USE_STDLIB_JSON=1 dj-process --config path/to/config.yaml` |
+| **导出为字符串** | 在 JSON 源数据中将问题数值字段加引号。 |
+| **改用 Parquet** | Parquet 使用 Arrow，完全不经过此代码路径。 |
 
-**处理方式：**
+---
 
-1. **推荐（无需改数据）**：在运行前设置环境变量，让解析改走 CPython 标准库 ``json``：
+## 旧版 `dataset_path` 配置
 
-   ```bash
-   DATA_JUICER_USE_STDLIB_JSON=1 dj-process --config path/to/config.yaml
-   ```
+`dataset_path` 是最初的、更简单的输入指定方式。它可以用但缺乏上面 `dataset.configs` 方式的灵活性。
 
-2. **从源头规避**：把易超大的字段导出为 **字符串**（JSON 里加引号），再生成 JSONL。
+```yaml
+# YAML
+dataset_path: path/to/your/dataset.json
+```
 
-3. **换一种格式**：例如改为 Parquet，由 Arrow 读入，不经过该 JSON 路径。
-
-### 旧版 dataset_path 配置
-
-`dataset_path` 配置是指定数据集路径的历史版本方式。它简单易用，但缺乏灵活性。它可以在 yaml 或命令行输入中使用。一些示例：
-
-命令行输入：
 ```bash
-# 命令行输入
+# 命令行
 dj-process --dataset_path path/to/your/dataset.json
 
-# 带权重的命令行输入
-dj-process --dataset_path 0.5 path/to/your/dataset1.json 0.5 path/to/your/dataset2.json
+# 带权重的命令行
+dj-process --dataset_path "0.5 path/to/dataset1.json 0.5 path/to/dataset2.json"
 ```
 
-Yaml 输入：
-```yaml
-dataset_path：path/to/your/dataset.json
-```
+---
+
+## 下一步
+
+- [处理数据](ProcessData_ZH.md)——学习如何运行流水线和串联算子。
+- [算子提要](Operators.md)——了解可用于数据的算子类型。
+- [导出指南](Export_ZH.md)——控制输出格式和路径。
