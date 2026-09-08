@@ -88,14 +88,16 @@ for s in res_ds:
 ## 📰 动态
 
 <details open>
-<summary>[2026-09-07] Release v1.6.0: <b>集群感知自动分区；配置预检校验；统一远程文件系统分发</b></summary>
+<summary>[2026-09-08] Release v1.6.0: <b>集群感知分区；配置校验与迁移；LiteLLM 后端</b></summary>
 
-* 🧮 集群感知自动分区 — `num_of_partitions: auto` 根据实时 Ray 集群拓扑推导分区数，并统一拓扑数据源，修正了节点数猜测与 driver 本地钳制问题。
-* ✅ 配置预检校验 — 新增 `preflight` 模块，在执行前就管道配置与算子字段需求对数据集 schema 进行校验，做到快速失败而非中途报错。
-* 🗄️ 统一远程文件系统分发 — 导出器现通过共享的 `fs_utils` 分发层解析 S3/HDFS/本地路径，为湖仓支持打下基础。
-* 🖼️ 图像 OHEM 选择器 — 新增 `image_ohem_selector`，保留高损失图像样本以进行难例挖掘。
-* ⚡ 分词批次限制 — token 计数过滤器现会限制分词批大小，以控制长文本下的内存峰值。
-* 🔧 健壮性修复 — 防止不同文本列与分词配置之间发生融合过滤器上下文缓存冲突；修复 MinHash 状态复用与空 token 处理、去重器执行模式声明、无扩展名导出路径报错、文本空分块、gzip JSONL 的 HPO 采样、pandas 扩展 dtype 处理及回归测试收集阻塞；并更新外部模型依赖的维护分支地址。
+* 🧮 集群感知分区 — 自动分区数量根据实时 Ray 集群资源确定；手动 `partition.size` 按样本行切分，在输入 block 数少于分区数时也能正确划分数据。
+* ✅ 配置校验与迁移 — 管道预检在处理前发现算子配置错误及执行模式、数据字段不匹配；执行与分析统一应用读取默认参数，移除废弃的全局设置，并以 `partition.size` 替代已弃用的 `partition_size`。升级时请核对更新后的[全局配置](docs/GlobalConfig_ZH.md)和[分区指南](docs/PartitionAndCheckpoint_ZH.md)。
+* 🔌 LiteLLM 后端 — 在 `prepare_api_model` 中选择 `api_backend="litellm"`，通过提供商模型路由调用聊天、embedding 和 Responses 接口；原有 OpenAI 兼容后端仍为默认值。
+* 📚 文档更新 — 重写安装、数据处理、分析、配置、导出及 playground 的中英文指南，为 28 个已有算子补充文档并修正示例；指南与 API 导航独立组织，文档支持按版本增量构建。
+* 🗄️ 统一远程导出 — 本地、S3 和 HDFS 导出共用文件系统分发；JSONL 导出支持将 Python 日期和时间值序列化为 ISO 格式。
+* 🖼️ 图像 OHEM 选择器 — 新增 `image_ohem_selector`，通过用户提供的评分函数及 top-k 或比例预算选择高损失图像样本。
+* ⚡ 分词批次限制 — token 计数过滤器限制分词批大小，降低长输入的内存峰值。
+* 🔧 健壮性修复 — 修复融合过滤器缓存隔离、MinHash 状态复用与空输入、去重器执行模式声明、文本空分块、gzip JSONL 的 HPO 采样及 pandas 扩展 dtype 处理；导入 HPO 模块不再启动 sweep。
 </details>
 
 <details open>

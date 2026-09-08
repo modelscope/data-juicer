@@ -89,14 +89,16 @@ for s in res_ds:
 ## 📰 News
 
 <details open>
-<summary>[2026-09-07] Release v1.6.0: <b>Cluster-Aware Auto Partitioning; Config Preflight Validation; Unified Remote Filesystem Dispatch</b></summary>
+<summary>[2026-09-08] Release v1.6.0: <b>Cluster-Aware Partitioning; Config Validation & Migration; LiteLLM Backend</b></summary>
 
-* 🧮 *Cluster-Aware Auto Partitioning* — `num_of_partitions: auto` derives partition count from live Ray cluster topology, with a single topology source that fixes guessed node counts and driver-local clamping.
-* ✅ *Config Preflight Validation* — New `preflight` module validates pipeline configs and OP field requirements against the dataset schema before execution, failing fast instead of erroring mid-run.
-* 🗄️ *Unified Remote Filesystem Dispatch* — Exporters now resolve S3/HDFS/local paths through a shared `fs_utils` dispatch layer, laying groundwork for lakehouse support.
-* 🖼️ *Image OHEM Selector* — New `image_ohem_selector` retains high-loss image samples for hard-example mining.
-* ⚡ *Bounded Tokenizer Batches* — Token-count filters now cap tokenizer batch sizes to bound peak memory on long texts.
-* 🔧 *Robustness Fixes* — Prevented fused-filter context cache collisions across text columns and tokenizer settings; fixed MinHash state reuse and empty-token handling, deduplicator execution-mode declarations, extensionless export-path errors, empty text chunks, gzip JSONL HPO sampling, pandas extension-dtype handling, and regression test discovery; and updated maintenance fork URLs for external model dependencies.
+* 🧮 *Cluster-Aware Partitioning* — Automatic partition counts use live Ray cluster resources. Manual `partition.size` targets split data at row boundaries, including inputs with fewer blocks than partitions.
+* ✅ *Config Validation & Migration* — Pipeline preflight catches invalid operator settings and executor/schema mismatches before processing. Reader defaults now apply consistently across execution and analysis; obsolete global settings are removed, and `partition_size` is deprecated in favor of `partition.size`. Review the updated [global configuration](docs/GlobalConfig.md) and [partitioning guide](docs/PartitionAndCheckpoint.md) when upgrading.
+* 🔌 *LiteLLM Backend* — Select `api_backend="litellm"` in `prepare_api_model` for chat, embedding, and Responses requests through provider-specific model routing; the existing OpenAI-compatible backend remains the default.
+* 📚 *Documentation Refresh* — Rewritten English and Chinese guides cover installation, processing, analysis, configuration, export, and the playground. Added documentation for 28 existing operators, corrected examples, and separated guide and API navigation with incremental versioned documentation builds.
+* 🗄️ *Unified Remote Export* — Local, S3, and HDFS export share filesystem dispatch; JSONL export now serializes Python dates and datetimes in ISO format.
+* 🖼️ *Image OHEM Selector* — New `image_ohem_selector` selects high-loss image samples using a user-supplied scoring function and a top-k or ratio budget.
+* ⚡ *Bounded Tokenizer Batches* — Token-count filters limit tokenizer batch sizes to reduce peak memory on long inputs.
+* 🔧 *Robustness Fixes* — Fixed fused-filter cache isolation, MinHash state reuse and empty inputs, deduplicator execution-mode declarations, empty text chunks, gzip JSONL HPO sampling, and pandas extension-dtype handling. HPO modules can now be imported without starting a sweep.
 </details>
 
 <details open>
