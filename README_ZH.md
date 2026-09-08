@@ -88,7 +88,7 @@ for s in res_ds:
 ## 📰 动态
 
 <details open>
-<summary>[2026-09-08] Release v1.6.0: <b>集群感知分区；配置校验；LiteLLM 后端</b></summary>
+<summary>[2026-09-08] Release v1.6.0: <b>Juicer 模型发布；集群感知分区；配置校验；LiteLLM 后端</b></summary>
 
 * 🧮 集群感知分区 — 自动分区数量根据实时 Ray 集群资源确定；手动 `partition.size` 按样本行切分，在输入 block 数少于分区数时也能正确划分数据。
 * ✅ 配置校验 — 管道预检在处理前发现算子配置错误及执行模式、数据字段不匹配；执行与分析统一应用读取默认参数。

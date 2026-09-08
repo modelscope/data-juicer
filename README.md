@@ -89,7 +89,7 @@ for s in res_ds:
 ## 📰 News
 
 <details open>
-<summary>[2026-09-08] Release v1.6.0: <b>Cluster-Aware Partitioning; Config Validation; LiteLLM Backend</b></summary>
+<summary>[2026-09-08] Release v1.6.0: <b>Juicer Model Release; Cluster-Aware Partitioning; Config Validation; LiteLLM Backend</b></summary>
 
 * 🧮 *Cluster-Aware Partitioning* — Automatic partition counts use live Ray cluster resources. Manual `partition.size` targets split data at row boundaries, including inputs with fewer blocks than partitions.
 * ✅ *Config Validation* — Pipeline preflight catches invalid operator settings and executor/schema mismatches before processing. Reader defaults now apply consistently across execution and analysis.
