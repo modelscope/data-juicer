@@ -88,10 +88,10 @@ for s in res_ds:
 ## 📰 动态
 
 <details open>
-<summary>[2026-09-08] Release v1.6.0: <b>集群感知分区；配置校验与迁移；LiteLLM 后端</b></summary>
+<summary>[2026-09-08] Release v1.6.0: <b>集群感知分区；配置校验；LiteLLM 后端</b></summary>
 
 * 🧮 集群感知分区 — 自动分区数量根据实时 Ray 集群资源确定；手动 `partition.size` 按样本行切分，在输入 block 数少于分区数时也能正确划分数据。
-* ✅ 配置校验与迁移 — 管道预检在处理前发现算子配置错误及执行模式、数据字段不匹配；执行与分析统一应用读取默认参数，移除废弃的全局设置，并以 `partition.size` 替代已弃用的 `partition_size`。升级时请核对更新后的[全局配置](docs/GlobalConfig_ZH.md)和[分区指南](docs/PartitionAndCheckpoint_ZH.md)。
+* ✅ 配置校验 — 管道预检在处理前发现算子配置错误及执行模式、数据字段不匹配；执行与分析统一应用读取默认参数。
 * 🔌 LiteLLM 后端 — 在 `prepare_api_model` 中选择 `api_backend="litellm"`，通过提供商模型路由调用聊天、embedding 和 Responses 接口；原有 OpenAI 兼容后端仍为默认值。
 * 📚 文档更新 — 重写安装、数据处理、分析、配置、导出及 playground 的中英文指南，为 28 个已有算子补充文档并修正示例；指南与 API 导航独立组织，文档支持按版本增量构建。
 * 🗄️ 统一远程导出 — 本地、S3 和 HDFS 导出共用文件系统分发；JSONL 导出支持将 Python 日期和时间值序列化为 ISO 格式。

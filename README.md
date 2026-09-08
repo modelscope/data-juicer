@@ -89,10 +89,10 @@ for s in res_ds:
 ## 📰 News
 
 <details open>
-<summary>[2026-09-08] Release v1.6.0: <b>Cluster-Aware Partitioning; Config Validation & Migration; LiteLLM Backend</b></summary>
+<summary>[2026-09-08] Release v1.6.0: <b>Cluster-Aware Partitioning; Config Validation; LiteLLM Backend</b></summary>
 
 * 🧮 *Cluster-Aware Partitioning* — Automatic partition counts use live Ray cluster resources. Manual `partition.size` targets split data at row boundaries, including inputs with fewer blocks than partitions.
-* ✅ *Config Validation & Migration* — Pipeline preflight catches invalid operator settings and executor/schema mismatches before processing. Reader defaults now apply consistently across execution and analysis; obsolete global settings are removed, and `partition_size` is deprecated in favor of `partition.size`. Review the updated [global configuration](docs/GlobalConfig.md) and [partitioning guide](docs/PartitionAndCheckpoint.md) when upgrading.
+* ✅ *Config Validation* — Pipeline preflight catches invalid operator settings and executor/schema mismatches before processing. Reader defaults now apply consistently across execution and analysis.
 * 🔌 *LiteLLM Backend* — Select `api_backend="litellm"` in `prepare_api_model` for chat, embedding, and Responses requests through provider-specific model routing; the existing OpenAI-compatible backend remains the default.
 * 📚 *Documentation Refresh* — Rewritten English and Chinese guides cover installation, processing, analysis, configuration, export, and the playground. Added documentation for 28 existing operators, corrected examples, and separated guide and API navigation with incremental versioned documentation builds.
 * 🗄️ *Unified Remote Export* — Local, S3, and HDFS export share filesystem dispatch; JSONL export now serializes Python dates and datetimes in ISO format.
