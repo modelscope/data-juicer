@@ -35,17 +35,21 @@
         </a>
       </div>
 
+      <nav class="navbar-sections" aria-label="Documentation sections">
+        <a href="../docs_index_ZH.html" class="navbar-link active" aria-current="page">Doc</a>
+        <a href="../api.html" class="navbar-link">API</a>
+      </nav>
+
       <nav class="navbar-center">
+        
         <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
       </nav>
 
       <div class="navbar-right">
-        <button class="search-trigger" id="search-trigger" aria-label="Search">
+        <button class="search-trigger" id="search-trigger" aria-label="Search" title="Search (Ctrl/⌘ K)">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
-          <span>Search...</span>
-          <kbd>⌘K</kbd>
         </button>
         <div class="dropdown" id="lang-dropdown">
           <button class="dropdown-trigger" aria-haspopup="true" aria-expanded="false">
@@ -70,19 +74,6 @@
           </button>
           <div class="dropdown-panel">
             <a href="../../main/docs/Export_ZH.html" class="dropdown-item active">main</a>
-            <a href="../../v1.5.5/docs/Export_ZH.html" class="dropdown-item">v1.5.5</a>
-            <a href="../../v1.5.4/docs/Export_ZH.html" class="dropdown-item">v1.5.4</a>
-            <a href="../../v1.5.3/docs/Export_ZH.html" class="dropdown-item">v1.5.3</a>
-            <a href="../../v1.5.2/docs/Export_ZH.html" class="dropdown-item">v1.5.2</a>
-            <a href="../../v1.5.1/docs/Export_ZH.html" class="dropdown-item">v1.5.1</a>
-            <a href="../../v1.5.0/docs/Export_ZH.html" class="dropdown-item">v1.5.0</a>
-            <a href="../../v1.4.6/docs/Export_ZH.html" class="dropdown-item">v1.4.6</a>
-            <a href="../../v1.4.5/docs/Export_ZH.html" class="dropdown-item">v1.4.5</a>
-            <a href="../../v1.4.4/docs/Export_ZH.html" class="dropdown-item">v1.4.4</a>
-            <a href="../../v1.4.3/docs/Export_ZH.html" class="dropdown-item">v1.4.3</a>
-            <a href="../../v1.4.2/docs/Export_ZH.html" class="dropdown-item">v1.4.2</a>
-            <a href="../../v1.4.1/docs/Export_ZH.html" class="dropdown-item">v1.4.1</a>
-            <a href="../../v1.4.0/docs/Export_ZH.html" class="dropdown-item">v1.4.0</a>
           </div>
         </div>
 
@@ -106,306 +97,355 @@
               <a href="../index_ZH.html">首页</a>
             </li>
           </ul>
-          <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../docs_index_ZH.html">文档</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial/Installation_ZH.html">安装</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial/QuickStart_ZH.html">快速上手</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Operators.html">Operator Schemas 算子提要</a></li>
-<li class="toctree-l2"><a class="reference internal" href="DatasetCfg_ZH.html">数据集配置指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Juicer_ZH.html">Juicer：自然语言数据精炼模型</a></li>
-<li class="toctree-l2"><a class="reference internal" href="BadDataExhibition_ZH.html">“坏”数据展览</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Cache_ZH.html">缓存管理</a></li>
-<li class="toctree-l2"><a class="reference internal" href="DJ_SORA_ZH.html">DJ-SORA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="DJ_service_ZH.html">DJ_服务化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="DeveloperGuide_ZH.html">开发者指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">数据集导出</a></li>
-<li class="toctree-l2"><a class="reference internal" href="JobManagement_ZH.html">作业管理</a></li>
-<li class="toctree-l2"><a class="reference internal" href="OperatorPlugins_ZH.html">算子插件</a></li>
-<li class="toctree-l2"><a class="reference internal" href="PartitionAndCheckpoint_ZH.html">分区处理与检查点</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Tracing_ZH.html">数据追踪</a></li>
-<li class="toctree-l2"><a class="reference internal" href="awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
-<li class="toctree-l2"><a class="reference internal" href="operators/aggregator/index.html">Aggregator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/aggregator/entity_attribute_aggregator.html">entity_attribute_aggregator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/aggregator/meta_tags_aggregator.html">meta_tags_aggregator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/aggregator/most_relevant_entities_aggregator.html">most_relevant_entities_aggregator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/aggregator/nested_aggregator.html">nested_aggregator</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/index.html">Deduplicator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/document_deduplicator.html">document_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/document_minhash_deduplicator.html">document_minhash_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/document_minhash_deduplicator_with_uid.html">document_minhash_deduplicator_with_uid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/document_simhash_deduplicator.html">document_simhash_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/image_deduplicator.html">image_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/ray_bts_minhash_cpp_deduplicator.html">ray_bts_minhash_cpp_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/ray_bts_minhash_deduplicator.html">ray_bts_minhash_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/ray_bts_minhash_deduplicator_with_uid.html">ray_bts_minhash_deduplicator_with_uid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/ray_document_deduplicator.html">ray_document_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/ray_image_deduplicator.html">ray_image_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/ray_video_deduplicator.html">ray_video_deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/deduplicator/video_deduplicator.html">video_deduplicator</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="operators/filter/index.html">Filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/alphanumeric_filter.html">alphanumeric_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/audio_duration_filter.html">audio_duration_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/audio_nmf_snr_filter.html">audio_nmf_snr_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/audio_size_filter.html">audio_size_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/average_line_length_filter.html">average_line_length_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/character_repetition_filter.html">character_repetition_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/flagged_words_filter.html">flagged_words_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/general_field_filter.html">general_field_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_aesthetics_filter.html">image_aesthetics_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_aspect_ratio_filter.html">image_aspect_ratio_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_face_count_filter.html">image_face_count_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_face_ratio_filter.html">image_face_ratio_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_nsfw_filter.html">image_nsfw_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_pair_similarity_filter.html">image_pair_similarity_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_shape_filter.html">image_shape_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_size_filter.html">image_size_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_subplot_filter.html">image_subplot_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_text_matching_filter.html">image_text_matching_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_text_similarity_filter.html">image_text_similarity_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/image_watermark_filter.html">image_watermark_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/in_context_influence_filter.html">in_context_influence_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/instruction_following_difficulty_filter.html">instruction_following_difficulty_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/language_id_score_filter.html">language_id_score_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/llm_analysis_filter.html">llm_analysis_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/llm_condition_filter.html">llm_condition_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/llm_difficulty_score_filter.html">llm_difficulty_score_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/llm_perplexity_filter.html">llm_perplexity_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/llm_quality_score_filter.html">llm_quality_score_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/llm_task_relevance_filter.html">llm_task_relevance_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/maximum_line_length_filter.html">maximum_line_length_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/perplexity_filter.html">perplexity_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/phrase_grounding_recall_filter.html">phrase_grounding_recall_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/special_characters_filter.html">special_characters_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/specified_field_filter.html">specified_field_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/specified_numeric_field_filter.html">specified_numeric_field_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/stopwords_filter.html">stopwords_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/suffix_filter.html">suffix_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/text_action_filter.html">text_action_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/text_embd_similarity_filter.html">text_embd_similarity_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/text_entity_dependency_filter.html">text_entity_dependency_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/text_length_filter.html">text_length_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/text_pair_similarity_filter.html">text_pair_similarity_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/token_num_filter.html">token_num_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_aesthetics_filter.html">video_aesthetics_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_aspect_ratio_filter.html">video_aspect_ratio_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_duration_filter.html">video_duration_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_face_ratio_filter.html">video_face_ratio_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_frames_text_similarity_filter.html">video_frames_text_similarity_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_motion_score_filter.html">video_motion_score_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_motion_score_ptlflow_filter.html">video_motion_score_ptlflow_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_motion_score_raft_filter.html">video_motion_score_raft_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_nsfw_filter.html">video_nsfw_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_ocr_area_ratio_filter.html">video_ocr_area_ratio_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_resolution_filter.html">video_resolution_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_tagging_from_frames_filter.html">video_tagging_from_frames_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/video_watermark_filter.html">video_watermark_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/word_repetition_filter.html">word_repetition_filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/filter/words_num_filter.html">words_num_filter</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="operators/mapper/index.html">Mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/audio_add_gaussian_noise_mapper.html">audio_add_gaussian_noise_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/audio_ffmpeg_wrapped_mapper.html">audio_ffmpeg_wrapped_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/calibrate_qa_mapper.html">calibrate_qa_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/calibrate_query_mapper.html">calibrate_query_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/calibrate_response_mapper.html">calibrate_response_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/chinese_convert_mapper.html">chinese_convert_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/clean_copyright_mapper.html">clean_copyright_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/clean_email_mapper.html">clean_email_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/clean_html_mapper.html">clean_html_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/clean_ip_mapper.html">clean_ip_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/clean_links_mapper.html">clean_links_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/detect_character_attributes_mapper.html">detect_character_attributes_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/detect_character_locations_mapper.html">detect_character_locations_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/detect_main_character_mapper.html">detect_main_character_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/dialog_intent_detection_mapper.html">dialog_intent_detection_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/dialog_sentiment_detection_mapper.html">dialog_sentiment_detection_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/dialog_sentiment_intensity_mapper.html">dialog_sentiment_intensity_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/dialog_topic_detection_mapper.html">dialog_topic_detection_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/download_file_mapper.html">download_file_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/expand_macro_mapper.html">expand_macro_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/extract_entity_attribute_mapper.html">extract_entity_attribute_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/extract_entity_relation_mapper.html">extract_entity_relation_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/extract_event_mapper.html">extract_event_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/extract_keyword_mapper.html">extract_keyword_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/extract_nickname_mapper.html">extract_nickname_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/extract_support_text_mapper.html">extract_support_text_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/extract_tables_from_html_mapper.html">extract_tables_from_html_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/fix_unicode_mapper.html">fix_unicode_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/general_fused_op.html">general_fused_op</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/generate_qa_from_examples_mapper.html">generate_qa_from_examples_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/generate_qa_from_text_mapper.html">generate_qa_from_text_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/human_preference_annotation_mapper.html">human_preference_annotation_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_blur_mapper.html">image_blur_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_captioning_mapper.html">image_captioning_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_detection_yolo_mapper.html">image_detection_yolo_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_diffusion_mapper.html">image_diffusion_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_face_blur_mapper.html">image_face_blur_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_mmpose_mapper.html">image_mmpose_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_remove_background_mapper.html">image_remove_background_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_sam_3d_body_mapper.html">image_sam_3d_body_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_segment_mapper.html">image_segment_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_tagging_mapper.html">image_tagging_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/image_tagging_vlm_mapper.html">image_tagging_vlm_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/imgdiff_difference_area_generator_mapper.html">imgdiff_difference_area_generator_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/imgdiff_difference_caption_generator_mapper.html">imgdiff_difference_caption_generator_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/latex_figure_context_extractor_mapper.html">latex_figure_context_extractor_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/latex_merge_tex_mapper.html">latex_merge_tex_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/llm_extract_mapper.html">llm_extract_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/mllm_mapper.html">mllm_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/nlpaug_en_mapper.html">nlpaug_en_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/nlpcda_zh_mapper.html">nlpcda_zh_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/optimize_prompt_mapper.html">optimize_prompt_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/optimize_qa_mapper.html">optimize_qa_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/optimize_query_mapper.html">optimize_query_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/optimize_response_mapper.html">optimize_response_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/pair_preference_mapper.html">pair_preference_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/punctuation_normalization_mapper.html">punctuation_normalization_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/python_file_mapper.html">python_file_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/python_lambda_mapper.html">python_lambda_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/query_intent_detection_mapper.html">query_intent_detection_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/query_sentiment_detection_mapper.html">query_sentiment_detection_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/query_topic_detection_mapper.html">query_topic_detection_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/relation_identity_mapper.html">relation_identity_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_bibliography_mapper.html">remove_bibliography_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_comments_mapper.html">remove_comments_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_header_mapper.html">remove_header_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_long_words_mapper.html">remove_long_words_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_non_chinese_character_mapper.html">remove_non_chinese_character_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_repeat_sentences_mapper.html">remove_repeat_sentences_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_specific_chars_mapper.html">remove_specific_chars_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_table_text_mapper.html">remove_table_text_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/remove_words_with_incorrect_substrings_mapper.html">remove_words_with_incorrect_substrings_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/replace_content_mapper.html">replace_content_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/s3_download_file_mapper.html">s3_download_file_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/s3_upload_file_mapper.html">s3_upload_file_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/sdxl_prompt2prompt_mapper.html">sdxl_prompt2prompt_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/sentence_augmentation_mapper.html">sentence_augmentation_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/sentence_split_mapper.html">sentence_split_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/text_chunk_mapper.html">text_chunk_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/text_tagging_by_prompt_mapper.html">text_tagging_by_prompt_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/vggt_mapper.html">vggt_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_active_speaker_detect_mapper.html">video_active_speaker_detect_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_audio_ASR_mapper.html">video_audio_ASR_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_audio_detect_age_gender_mapper.html">video_audio_detect_age_gender_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_audio_speech_emotion_mapper.html">video_audio_speech_emotion_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_camera_calibration_deepcalib_mapper.html">video_camera_calibration_deepcalib_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_camera_calibration_moge_mapper.html">video_camera_calibration_moge_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_captioning_face_attribute_emotion_mapper.html">video_captioning_face_attribute_emotion_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_captioning_from_audio_mapper.html">video_captioning_from_audio_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_captioning_from_frames_mapper.html">video_captioning_from_frames_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_captioning_from_human_tracks_mapper.html">video_captioning_from_human_tracks_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_captioning_from_summarizer_mapper.html">video_captioning_from_summarizer_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_captioning_from_video_mapper.html">video_captioning_from_video_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_captioning_from_vlm_mapper.html">video_captioning_from_vlm_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_depth_estimation_mapper.html">video_depth_estimation_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_extract_frames_mapper.html">video_extract_frames_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_face_blur_mapper.html">video_face_blur_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_ffmpeg_wrapped_mapper.html">video_ffmpeg_wrapped_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_hand_reconstruction_mapper.html">video_hand_reconstruction_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_human_tracks_extraction_mapper.html">video_human_tracks_extraction_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_human_tracks_face_demographic_mapper.html">video_human_tracks_face_demographic_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_object_segmenting_mapper.html">video_object_segmenting_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_remove_watermark_mapper.html">video_remove_watermark_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_resize_aspect_ratio_mapper.html">video_resize_aspect_ratio_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_resize_resolution_mapper.html">video_resize_resolution_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_split_by_duration_mapper.html">video_split_by_duration_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_split_by_key_frame_mapper.html">video_split_by_key_frame_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_split_by_scene_mapper.html">video_split_by_scene_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_tagging_from_audio_mapper.html">video_tagging_from_audio_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_tagging_from_frames_mapper.html">video_tagging_from_frames_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_undistort_mapper.html">video_undistort_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/video_whole_body_pose_estimation_mapper.html">video_whole_body_pose_estimation_mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/mapper/whitespace_normalization_mapper.html">whitespace_normalization_mapper</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="operators/formatter/index.html">Formatter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/formatter/csv_formatter.html">csv_formatter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/formatter/empty_formatter.html">empty_formatter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/formatter/json_formatter.html">json_formatter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/formatter/parquet_formatter.html">parquet_formatter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/formatter/ray_empty_formatter.html">ray_empty_formatter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/formatter/text_formatter.html">text_formatter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/formatter/tsv_formatter.html">tsv_formatter</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="operators/grouper/index.html">Grouper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/grouper/key_value_grouper.html">key_value_grouper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/grouper/naive_grouper.html">naive_grouper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/grouper/naive_reverse_grouper.html">naive_reverse_grouper</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="operators/selector/index.html">Selector</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/selector/frequency_specified_field_selector.html">frequency_specified_field_selector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/selector/image_ohem_selector.html">image_ohem_selector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/selector/random_selector.html">random_selector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/selector/range_specified_field_selector.html">range_specified_field_selector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/selector/tags_specified_field_selector.html">tags_specified_field_selector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/selector/topk_specified_field_selector.html">topk_specified_field_selector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="operators/pipeline/index.html">Pipeline</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="operators/pipeline/llm_ray_vllm_engine_pipeline.html">llm_ray_vllm_engine_pipeline</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/pipeline/ray_repartition_pipeline.html">ray_repartition_pipeline</a></li>
-<li class="toctree-l3"><a class="reference internal" href="operators/pipeline/vlm_ray_vllm_engine_pipeline.html">vlm_ray_vllm_engine_pipeline</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/BAD_CASE_INSIGHTS.html">Agent 交互数据：Bad case 洞察</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/BAD_CASE_REPORT.html">Bad case 自助报告（简化入口）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/PERFORMANCE_LLM.html">Agent 流水线里 LLM 算子：加速与超参</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/QUICKSTART_BAD_CASE.html">Bad case 流水线：一键运行与端到端指南</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/README.html">Agent quality &amp; bad-case docs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/README.html#agent-bad-case">Agent 质检 / bad-case 文档索引</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/minimal_configs/README.html">Agent 流水线最小可运行配置（便于逐项调试）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/agent/scripts/README.html">Agent pipeline 后分析脚本</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/ego_hand_action_annotation/README.html">VLA Visualization Demo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/elastic_sharding/README_ZH.html">基于共享存储的多机弹性分片</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demos/video_humanvbench_simple/README_ZH.html">HumanVBench 算子演示</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/README_ZH.html">Auto Evaluation Toolkit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">Evaluation Results Recorder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/mm_eval/vbench_metrics/README_ZH.html">VBench metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/postprocess/README_ZH.html">Postprocess tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/humanvbench_models/README.html">HumanVBench Models Setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
-</ul>
-</li>
-</ul>
+          <p class="caption"><a href="../docs_index_ZH.html">文档</a></p>
+          <p class="caption" role="heading"><span class="caption-text">入门</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api/data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/Installation_ZH.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/QuickStart_ZH.html">快速上手</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/DJ-Cookbook_ZH.html">DJ-Cookbook</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">使用指南</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ProcessData_ZH.html">数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AnalyzeData_ZH.html">数据分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Playground_ZH.html">Web Playground</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DatasetCfg_ZH.html">数据集配置</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">数据集导出</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Cache_ZH.html">缓存管理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tracing_ZH.html">数据追踪</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">速查手册</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="GlobalConfig_ZH.html">全局配置参数速查</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Operators.html">Operator Schemas 算子提要</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">分布式处理</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Distributed_ZH.html">Data-Juicer 分布式数据处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PartitionAndCheckpoint_ZH.html">分区处理与检查点</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JobManagement_ZH.html">作业管理</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">扩展与开发</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="OperatorPlugins_ZH.html">算子插件</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DJ_service_ZH.html">DJ 服务化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DJ_SORA_ZH.html">DJ-SORA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Juicer_ZH.html">Juicer：自然语言数据精炼模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeveloperGuide_ZH.html">开发者指南</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">资源</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="awesome_llm_data.html">Awesome Data-Model Co-Development of MLLMs </a></li>
+<li class="toctree-l1"><a class="reference internal" href="BadDataExhibition_ZH.html">“坏”数据展览</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">算子</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="operators/aggregator/index.html">Aggregator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/aggregator/entity_attribute_aggregator.html">entity_attribute_aggregator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/aggregator/meta_tags_aggregator.html">meta_tags_aggregator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/aggregator/most_relevant_entities_aggregator.html">most_relevant_entities_aggregator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/aggregator/nested_aggregator.html">nested_aggregator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operators/deduplicator/index.html">Deduplicator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/document_deduplicator.html">document_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/document_line_deduplicator.html">document_line_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/document_minhash_deduplicator.html">document_minhash_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/document_minhash_deduplicator_with_uid.html">document_minhash_deduplicator_with_uid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/document_simhash_deduplicator.html">document_simhash_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/image_deduplicator.html">image_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/ray_bts_minhash_cpp_deduplicator.html">ray_bts_minhash_cpp_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/ray_bts_minhash_deduplicator.html">ray_bts_minhash_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/ray_bts_minhash_deduplicator_with_uid.html">ray_bts_minhash_deduplicator_with_uid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/ray_document_deduplicator.html">ray_document_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/ray_image_deduplicator.html">ray_image_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/ray_video_deduplicator.html">ray_video_deduplicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/deduplicator/video_deduplicator.html">video_deduplicator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operators/filter/index.html">Filter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/alphanumeric_filter.html">alphanumeric_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/audio_duration_filter.html">audio_duration_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/audio_nmf_snr_filter.html">audio_nmf_snr_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/audio_size_filter.html">audio_size_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/average_line_length_filter.html">average_line_length_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/character_repetition_filter.html">character_repetition_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/flagged_words_filter.html">flagged_words_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/general_field_filter.html">general_field_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_aesthetics_filter.html">image_aesthetics_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_aspect_ratio_filter.html">image_aspect_ratio_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_face_count_filter.html">image_face_count_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_face_ratio_filter.html">image_face_ratio_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_nsfw_filter.html">image_nsfw_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_pair_similarity_filter.html">image_pair_similarity_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_shape_filter.html">image_shape_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_size_filter.html">image_size_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_subplot_filter.html">image_subplot_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_text_matching_filter.html">image_text_matching_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_text_similarity_filter.html">image_text_similarity_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/image_watermark_filter.html">image_watermark_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/in_context_influence_filter.html">in_context_influence_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/instruction_following_difficulty_filter.html">instruction_following_difficulty_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/language_id_score_filter.html">language_id_score_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/llm_analysis_filter.html">llm_analysis_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/llm_condition_filter.html">llm_condition_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/llm_difficulty_score_filter.html">llm_difficulty_score_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/llm_perplexity_filter.html">llm_perplexity_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/llm_quality_score_filter.html">llm_quality_score_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/llm_task_relevance_filter.html">llm_task_relevance_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/maximum_line_length_filter.html">maximum_line_length_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/perplexity_filter.html">perplexity_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/phrase_grounding_recall_filter.html">phrase_grounding_recall_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/special_characters_filter.html">special_characters_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/specified_field_filter.html">specified_field_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/specified_numeric_field_filter.html">specified_numeric_field_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/stopwords_filter.html">stopwords_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/suffix_filter.html">suffix_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/text_action_filter.html">text_action_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/text_embd_similarity_filter.html">text_embd_similarity_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/text_entity_dependency_filter.html">text_entity_dependency_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/text_length_filter.html">text_length_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/text_pair_similarity_filter.html">text_pair_similarity_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/token_num_filter.html">token_num_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_aesthetics_filter.html">video_aesthetics_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_aspect_ratio_filter.html">video_aspect_ratio_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_duration_filter.html">video_duration_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_face_ratio_filter.html">video_face_ratio_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_frames_text_similarity_filter.html">video_frames_text_similarity_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_motion_score_filter.html">video_motion_score_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_motion_score_ptlflow_filter.html">video_motion_score_ptlflow_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_motion_score_raft_filter.html">video_motion_score_raft_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_nsfw_filter.html">video_nsfw_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_ocr_area_ratio_filter.html">video_ocr_area_ratio_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_resolution_filter.html">video_resolution_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_tagging_from_frames_filter.html">video_tagging_from_frames_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/video_watermark_filter.html">video_watermark_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/word_repetition_filter.html">word_repetition_filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/filter/words_num_filter.html">words_num_filter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operators/mapper/index.html">Mapper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/agent_bad_case_signal_mapper.html">agent_bad_case_signal_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/agent_dialog_normalize_mapper.html">agent_dialog_normalize_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/agent_insight_llm_mapper.html">agent_insight_llm_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/agent_skill_insight_mapper.html">agent_skill_insight_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/agent_tool_relevance_mapper.html">agent_tool_relevance_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/agent_tool_type_mapper.html">agent_tool_type_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/agent_trace_coherence_mapper.html">agent_trace_coherence_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/audio_add_gaussian_noise_mapper.html">audio_add_gaussian_noise_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/audio_ffmpeg_wrapped_mapper.html">audio_ffmpeg_wrapped_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/calibrate_qa_mapper.html">calibrate_qa_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/calibrate_query_mapper.html">calibrate_query_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/calibrate_response_mapper.html">calibrate_response_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/chinese_convert_mapper.html">chinese_convert_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/clean_copyright_mapper.html">clean_copyright_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/clean_email_mapper.html">clean_email_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/clean_html_mapper.html">clean_html_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/clean_ip_mapper.html">clean_ip_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/clean_links_mapper.html">clean_links_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/detect_character_attributes_mapper.html">detect_character_attributes_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/detect_character_locations_mapper.html">detect_character_locations_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/detect_main_character_mapper.html">detect_main_character_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_clarification_quality_mapper.html">dialog_clarification_quality_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_coreference_mapper.html">dialog_coreference_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_error_recovery_mapper.html">dialog_error_recovery_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_intent_detection_mapper.html">dialog_intent_detection_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_memory_consistency_mapper.html">dialog_memory_consistency_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_non_repetition_mapper.html">dialog_non_repetition_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_proactivity_mapper.html">dialog_proactivity_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_sentiment_detection_mapper.html">dialog_sentiment_detection_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_sentiment_intensity_mapper.html">dialog_sentiment_intensity_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_topic_detection_mapper.html">dialog_topic_detection_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/dialog_topic_shift_mapper.html">dialog_topic_shift_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/download_file_mapper.html">download_file_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/expand_macro_mapper.html">expand_macro_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/export_to_lerobot_mapper.html">export_to_lerobot_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/extract_entity_attribute_mapper.html">extract_entity_attribute_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/extract_entity_relation_mapper.html">extract_entity_relation_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/extract_event_mapper.html">extract_event_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/extract_keyword_mapper.html">extract_keyword_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/extract_nickname_mapper.html">extract_nickname_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/extract_support_text_mapper.html">extract_support_text_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/extract_tables_from_html_mapper.html">extract_tables_from_html_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/fix_unicode_mapper.html">fix_unicode_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/general_fused_op.html">general_fused_op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/generate_qa_from_examples_mapper.html">generate_qa_from_examples_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/generate_qa_from_text_mapper.html">generate_qa_from_text_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/human_preference_annotation_mapper.html">human_preference_annotation_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_blur_mapper.html">image_blur_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_captioning_mapper.html">image_captioning_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_detection_yolo_mapper.html">image_detection_yolo_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_diffusion_mapper.html">image_diffusion_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_face_blur_mapper.html">image_face_blur_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_mmpose_mapper.html">image_mmpose_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_remove_background_mapper.html">image_remove_background_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_sam_3d_body_mapper.html">image_sam_3d_body_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_segment_mapper.html">image_segment_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_tagging_mapper.html">image_tagging_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/image_tagging_vlm_mapper.html">image_tagging_vlm_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/imgdiff_difference_area_generator_mapper.html">imgdiff_difference_area_generator_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/imgdiff_difference_caption_generator_mapper.html">imgdiff_difference_caption_generator_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/latex_figure_context_extractor_mapper.html">latex_figure_context_extractor_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/latex_merge_tex_mapper.html">latex_merge_tex_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/llm_extract_mapper.html">llm_extract_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/mllm_mapper.html">mllm_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/nlpaug_en_mapper.html">nlpaug_en_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/nlpcda_zh_mapper.html">nlpcda_zh_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/optimize_prompt_mapper.html">optimize_prompt_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/optimize_qa_mapper.html">optimize_qa_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/optimize_query_mapper.html">optimize_query_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/optimize_response_mapper.html">optimize_response_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/pair_preference_mapper.html">pair_preference_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/pii_llm_suspect_mapper.html">pii_llm_suspect_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/pii_redaction_mapper.html">pii_redaction_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/punctuation_normalization_mapper.html">punctuation_normalization_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/python_file_mapper.html">python_file_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/python_lambda_mapper.html">python_lambda_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/query_intent_detection_mapper.html">query_intent_detection_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/query_sentiment_detection_mapper.html">query_sentiment_detection_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/query_topic_detection_mapper.html">query_topic_detection_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/relation_identity_mapper.html">relation_identity_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_bibliography_mapper.html">remove_bibliography_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_comments_mapper.html">remove_comments_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_header_mapper.html">remove_header_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_long_words_mapper.html">remove_long_words_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_non_chinese_character_mapper.html">remove_non_chinese_character_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_repeat_sentences_mapper.html">remove_repeat_sentences_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_specific_chars_mapper.html">remove_specific_chars_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_table_text_mapper.html">remove_table_text_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/remove_words_with_incorrect_substrings_mapper.html">remove_words_with_incorrect_substrings_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/replace_content_mapper.html">replace_content_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/s3_download_file_mapper.html">s3_download_file_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/s3_upload_file_mapper.html">s3_upload_file_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/sdxl_prompt2prompt_mapper.html">sdxl_prompt2prompt_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/sentence_augmentation_mapper.html">sentence_augmentation_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/sentence_split_mapper.html">sentence_split_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/text_chunk_mapper.html">text_chunk_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/text_tagging_by_prompt_mapper.html">text_tagging_by_prompt_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/tool_success_tagger_mapper.html">tool_success_tagger_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/usage_counter_mapper.html">usage_counter_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/vggt_mapper.html">vggt_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_active_speaker_detect_mapper.html">video_active_speaker_detect_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_atomic_action_segment_mapper.html">video_atomic_action_segment_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_audio_ASR_mapper.html">video_audio_ASR_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_audio_detect_age_gender_mapper.html">video_audio_detect_age_gender_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_audio_speech_emotion_mapper.html">video_audio_speech_emotion_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_camera_calibration_deepcalib_mapper.html">video_camera_calibration_deepcalib_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_camera_calibration_droidcalib_mapper.html">video_camera_calibration_droidcalib_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_camera_calibration_moge_mapper.html">video_camera_calibration_moge_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_camera_pose_megasam_mapper.html">video_camera_pose_megasam_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_captioning_face_attribute_emotion_mapper.html">video_captioning_face_attribute_emotion_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_captioning_from_audio_mapper.html">video_captioning_from_audio_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_captioning_from_frames_mapper.html">video_captioning_from_frames_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_captioning_from_human_tracks_mapper.html">video_captioning_from_human_tracks_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_captioning_from_summarizer_mapper.html">video_captioning_from_summarizer_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_captioning_from_video_mapper.html">video_captioning_from_video_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_captioning_from_vlm_mapper.html">video_captioning_from_vlm_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_clip_reassembly_mapper.html">video_clip_reassembly_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_depth_estimation_mapper.html">video_depth_estimation_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_extract_frames_mapper.html">video_extract_frames_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_face_blur_mapper.html">video_face_blur_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_ffmpeg_wrapped_mapper.html">video_ffmpeg_wrapped_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_hand_action_compute_mapper.html">video_hand_action_compute_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_hand_motion_smooth_mapper.html">video_hand_motion_smooth_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_hand_reconstruction_hawor_mapper.html">video_hand_reconstruction_hawor_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_hand_reconstruction_mapper.html">video_hand_reconstruction_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_human_tracks_extraction_mapper.html">video_human_tracks_extraction_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_human_tracks_face_demographic_mapper.html">video_human_tracks_face_demographic_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_object_segmenting_mapper.html">video_object_segmenting_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_remove_watermark_mapper.html">video_remove_watermark_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_resize_aspect_ratio_mapper.html">video_resize_aspect_ratio_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_resize_resolution_mapper.html">video_resize_resolution_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_split_by_duration_mapper.html">video_split_by_duration_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_split_by_key_frame_mapper.html">video_split_by_key_frame_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_split_by_scene_mapper.html">video_split_by_scene_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_tagging_from_audio_mapper.html">video_tagging_from_audio_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_tagging_from_frames_mapper.html">video_tagging_from_frames_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_trajectory_overlay_mapper.html">video_trajectory_overlay_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_undistort_mapper.html">video_undistort_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/video_whole_body_pose_estimation_mapper.html">video_whole_body_pose_estimation_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/mapper/whitespace_normalization_mapper.html">whitespace_normalization_mapper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operators/formatter/index.html">Formatter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/formatter/csv_formatter.html">csv_formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/formatter/empty_formatter.html">empty_formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/formatter/json_formatter.html">json_formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/formatter/parquet_formatter.html">parquet_formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/formatter/ray_empty_formatter.html">ray_empty_formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/formatter/text_formatter.html">text_formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/formatter/tsv_formatter.html">tsv_formatter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operators/grouper/index.html">Grouper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/grouper/key_value_grouper.html">key_value_grouper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/grouper/naive_grouper.html">naive_grouper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/grouper/naive_reverse_grouper.html">naive_reverse_grouper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operators/selector/index.html">Selector</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/selector/frequency_specified_field_selector.html">frequency_specified_field_selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/selector/image_ohem_selector.html">image_ohem_selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/selector/random_selector.html">random_selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/selector/range_specified_field_selector.html">range_specified_field_selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/selector/tags_specified_field_selector.html">tags_specified_field_selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/selector/topk_specified_field_selector.html">topk_specified_field_selector</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operators/pipeline/index.html">Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operators/pipeline/llm_inference_with_ray_vllm_pipeline.html">llm_ray_vllm_engine_pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/pipeline/ray_repartition_pipeline.html">ray_repartition_pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operators/pipeline/vlm_inference_with_ray_vllm_pipeline.html">vlm_ray_vllm_engine_pipeline</a></li>
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">demos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demos/README_ZH.html">演示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/agent/BAD_CASE_INSIGHTS_ZH.html">Agent 交互数据：Bad case 洞察</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/agent/BAD_CASE_REPORT_ZH.html">Bad case 自助报告（简化入口）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/agent/PERFORMANCE_LLM_ZH.html">Agent 流水线里 LLM 算子：加速与超参</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/agent/QUICKSTART_BAD_CASE_ZH.html">Bad case 流水线：一键运行与端到端指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/agent/README.html">Agent Quality &amp; Bad-Case Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/agent/minimal_configs/README_ZH.html">Agent 流水线最小可运行配置（便于逐项调试）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/agent/scripts/README_ZH.html">Agent pipeline 后分析脚本</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/auto_evaluation_helm/README_ZH.html">自动化评测：HELM 评测及可视化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/ego_hand_action_annotation/README.html">VLA Visualization Demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/elastic_sharding/README_ZH.html">基于共享存储的多机弹性分片</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/process_video_on_ray/data/Note.html">Note for dataset path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/role_playing_system_prompt/README_ZH.html">为LLM构造角色扮演的system prompt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/video_humanvbench_simple/README_ZH.html">HumanVBench 算子演示</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tools/distributed_deduplication/README_ZH.html">分布式模糊去重工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/README_ZH.html">自动评测工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/gpt_eval/README_ZH.html">GPT EVAL：使用 OpenAI API 评测大模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/evaluator/recorder/README_ZH.html">评测结果记录器</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/README_ZH.html">格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/multimodal/README_ZH.html">多模态格式转换工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/fmt_conversion/post_tuning_dialog/README_ZH.html">后微调工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/humanops/README.html">Label Studio Service Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/inception_metrics/README_ZH.html">视频生成测评工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mm_eval/vbench_metrics/README_ZH.html">VBench 视频质量指标</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/postprocess/README_ZH.html">后处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/preprocess/README_ZH.html">预处理工具</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">第三方</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/LLM_ecosystems/README_ZH.html">大语言模型生态</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/humanvbench_models/README.html">HumanVBench Models Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thirdparty/models/README_ZH.html">第三方模型库</a></li>
+</ul>
 
 
+        </nav>
+        <nav class="sidebar-projects" aria-label="相关项目">
+          <p class="sidebar-projects-title">相关项目</p>
+          
+        <a href="https://datajuicer.github.io/data-juicer-sandbox/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Sandbox<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-hub/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Hub<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
+        <a href="https://datajuicer.github.io/data-juicer-agents/zh_CN/main/" class="navbar-link" target="_blank" rel="noopener">Agents<svg class="external-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5h7v7M10.5 1.5L4 8"/></svg></a>
         </nav>
       </div>
     </aside>
@@ -415,10 +455,10 @@
         <article class="article" role="main">
   <section id="id1">
 <h1>数据集导出<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
-<p>本文档描述 DataJuicer 如何导出处理后的数据集，包括支持的格式、分片、并行导出、S3 导出以及统计信息/哈希管理。</p>
+<p>处理完成后，Data-Juicer 将结果数据集写入你在 <code class="docutils literal notranslate"><span class="pre">export_path</span></code> 中指定的路径。本页介绍支持的输出格式、将大数据集分片为多个文件、并行导出、直接写入 S3，以及控制哪些中间字段（统计信息、哈希）保留在输出中。</p>
 <section id="id2">
 <h2>概述<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
-<p>处理完成后，DataJuicer 使用 <code class="docutils literal notranslate"><span class="pre">Exporter</span></code>（默认模式）或 <code class="docutils literal notranslate"><span class="pre">RayExporter</span></code>（Ray 模式）将结果数据集导出到磁盘。导出系统支持：</p>
+<p>Data-Juicer 通过 <code class="docutils literal notranslate"><span class="pre">Exporter</span></code>（默认模式）或 <code class="docutils literal notranslate"><span class="pre">RayExporter</span></code>（Ray 模式）导出。导出系统支持：</p>
 <ul class="simple">
 <li><p><strong>多种输出格式</strong> — JSONL、JSON、Parquet，Ray 模式下支持更多格式</p></li>
 <li><p><strong>分片导出</strong> — 按大小将大型数据集拆分为多个文件</p></li>
@@ -433,8 +473,8 @@
 <h3>基本设置<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputs/result.jsonl</span><span class="w">       </span><span class="c1"># 输出文件路径（必需）</span>
 <span class="nt">export_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jsonl</span><span class="w">                         </span><span class="c1"># 格式类型（省略时从路径自动检测）</span>
-<span class="nt">export_shard_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">                       </span><span class="c1"># 分片大小（字节），0 = 单文件</span>
-<span class="nt">export_in_parallel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">                  </span><span class="c1"># 单文件模式下的并行导出</span>
+<span class="nt">export_shard_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">                       </span><span class="c1"># 本地模式：写入单文件；Ray：按数据块布局写入</span>
+<span class="nt">export_in_parallel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">                  </span><span class="c1"># 本地模式下并行写入单文件</span>
 <span class="nt">keep_stats_in_res_ds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">                </span><span class="c1"># 在输出中保留计算的统计信息</span>
 <span class="nt">keep_hashes_in_res_ds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">               </span><span class="c1"># 在输出中保留计算的哈希值</span>
 <span class="nt">export_extra_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w">                      </span><span class="c1"># 额外的格式特定参数</span>
@@ -526,10 +566,12 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>config.yaml<sp
 </tr>
 </tbody>
 </table>
+<p>在本地模式下，<code class="docutils literal notranslate"><span class="pre">export_path</span></code> 是文件路径。请提供 <code class="docutils literal notranslate"><span class="pre">.jsonl</span></code>、<code class="docutils literal notranslate"><span class="pre">.json</span></code> 或 <code class="docutils literal notranslate"><span class="pre">.parquet</span></code> 扩展名，或显式设置 <code class="docutils literal notranslate"><span class="pre">export_type</span></code>。</p>
+<p>在 Ray 模式下，<code class="docutils literal notranslate"><span class="pre">export_path</span></code> 是存放输出文件的目录，即使路径以 <code class="docutils literal notranslate"><span class="pre">.jsonl</span></code> 结尾也是如此。Ray 按数据块布局写入文件；<code class="docutils literal notranslate"><span class="pre">export_shard_size:</span> <span class="pre">0</span></code> 使用默认布局。</p>
 </section>
 </section>
 <section id="id7">
-<h2>分片导出<a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
+<h2>分片导出（本地模式）<a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
 <p>对于大型数据集，按大小将输出拆分为多个分片文件：</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputs/result.jsonl</span>
 <span class="nt">export_shard_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">268435456</span><span class="w">              </span><span class="c1"># 每片 256 MB</span>
@@ -543,13 +585,7 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>config.yaml<sp
 └── result-03-of-04.jsonl
 </pre></div>
 </div>
-<p><strong>分片大小计算方式：</strong></p>
-<ol class="arabic simple">
-<li><p>估算数据集的总字节大小</p></li>
-<li><p>分片数 = <code class="docutils literal notranslate"><span class="pre">ceil(dataset_bytes</span> <span class="pre">/</span> <span class="pre">export_shard_size)</span></code></p></li>
-<li><p>数据集被拆分为连续的分片</p></li>
-<li><p>每个分片使用多进程并行导出</p></li>
-</ol>
+<p>Data-Juicer 估算数据集大小，将连续的数据行分成多个分片，再使用多个进程写入。配置的大小是目标值，编码后的文件可能更大或更小。</p>
 <p><strong>推荐的分片大小：</strong></p>
 <table class="docutils align-default">
 <thead>
@@ -580,7 +616,7 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>config.yaml<sp
 <p>分片大小低于 1 MiB 或高于 1 TiB 将触发警告。</p>
 </section>
 <section id="id8">
-<h2>并行导出<a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
+<h2>并行导出（本地模式）<a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
 <p>对于单文件导出（<code class="docutils literal notranslate"><span class="pre">export_shard_size:</span> <span class="pre">0</span></code>），启用并行写入以加速导出过程：</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./outputs/result.jsonl</span>
 <span class="nt">export_shard_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
@@ -593,59 +629,31 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>config.yaml<sp
 </section>
 <section id="s3">
 <h2>S3 导出<a class="headerlink" href="#s3" title="链接到此标题。">¶</a></h2>
-<p>将结果直接导出到 Amazon S3 或 S3 兼容存储。</p>
+<p>本地和 Ray 模式都可以直接将结果写入 S3。先设置 <code class="docutils literal notranslate"><span class="pre">export_path</span></code>，例如：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="s">"s3://my-bucket/outputs/result.jsonl"</span>
+</pre></div>
+</div>
+<p>可以通过环境变量提供凭证：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span><span class="s2">"your-access-key-id"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span><span class="s2">"your-secret-access-key"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span><span class="s2">"us-east-1"</span>
+</pre></div>
+</div>
+<p>使用临时凭证时，还需要设置 <code class="docutils literal notranslate"><span class="pre">AWS_SESSION_TOKEN</span></code>。也可以在配方的 <code class="docutils literal notranslate"><span class="pre">export_aws_credentials</span></code> 中提供凭证；本地和 Ray 模式均支持此配置：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="s">"s3://my-bucket/outputs/result.jsonl"</span>
+<span class="nt">export_aws_credentials</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">aws_access_key_id</span><span class="p">:</span><span class="w"> </span><span class="s">"your-access-key-id"</span>
+<span class="w">  </span><span class="nt">aws_secret_access_key</span><span class="p">:</span><span class="w"> </span><span class="s">"your-secret-access-key"</span>
+<span class="w">  </span><span class="nt">aws_region</span><span class="p">:</span><span class="w"> </span><span class="s">"us-east-1"</span>
+<span class="w">  </span><span class="nt">endpoint_url</span><span class="p">:</span><span class="w"> </span><span class="s">"https://s3.example.com"</span><span class="w">  </span><span class="c1"># 使用 S3 兼容存储时设置</span>
+</pre></div>
+</div>
+<p>访问密钥、会话令牌和区域按字段依次从环境变量、显式配置读取。未提供访问密钥时，存储客户端会使用默认 AWS 凭证链，例如 IAM 角色或本地凭证文件。</p>
+<p>Ray 模式也接受 <code class="docutils literal notranslate"><span class="pre">export_extra_args</span></code> 中的凭证；同名配置以 <code class="docutils literal notranslate"><span class="pre">export_aws_credentials</span></code> 为准。本地模式通过 s3fs 访问 S3，Ray 模式通过 PyArrow 访问 S3。</p>
+<p>在本地模式中，设置 <code class="docutils literal notranslate"><span class="pre">export_shard_size:</span> <span class="pre">268435456</span></code> 可按约 256 MiB 的目标大小分片，输出对象形如 <code class="docutils literal notranslate"><span class="pre">result-00-of-04.jsonl</span></code>。Ray 模式将文件写入 <code class="docutils literal notranslate"><span class="pre">export_path</span></code> 对应的目录前缀。</p>
+</section>
 <section id="id9">
-<h3>默认模式<a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="s">"s3://my-bucket/outputs/result.jsonl"</span>
-<span class="nt">export_aws_credentials</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">aws_access_key_id</span><span class="p">:</span><span class="w"> </span><span class="s">"AKIA..."</span>
-<span class="w">  </span><span class="nt">aws_secret_access_key</span><span class="p">:</span><span class="w"> </span><span class="s">"secret..."</span>
-<span class="w">  </span><span class="nt">aws_region</span><span class="p">:</span><span class="w"> </span><span class="s">"us-east-1"</span>
-<span class="w">  </span><span class="nt">endpoint_url</span><span class="p">:</span><span class="w"> </span><span class="s">"https://s3.example.com"</span><span class="w">   </span><span class="c1"># 可选：用于 S3 兼容存储</span>
-</pre></div>
-</div>
-<p>默认导出器使用 HuggingFace 的 <code class="docutils literal notranslate"><span class="pre">storage_options</span></code> 配合 <code class="docutils literal notranslate"><span class="pre">fsspec</span></code>/<code class="docutils literal notranslate"><span class="pre">s3fs</span></code> 进行 S3 访问。</p>
-</section>
-<section id="ray">
-<h3>Ray 模式<a class="headerlink" href="#ray" title="链接到此标题。">¶</a></h3>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="s">"s3://my-bucket/outputs/result.jsonl"</span>
-<span class="nt">export_extra_args</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">aws_access_key_id</span><span class="p">:</span><span class="w"> </span><span class="s">"AKIA..."</span>
-<span class="w">  </span><span class="nt">aws_secret_access_key</span><span class="p">:</span><span class="w"> </span><span class="s">"secret..."</span>
-<span class="w">  </span><span class="nt">aws_region</span><span class="p">:</span><span class="w"> </span><span class="s">"us-east-1"</span>
-</pre></div>
-</div>
-<p>Ray 导出器使用 PyArrow 的 S3 文件系统进行 S3 访问。</p>
-</section>
-<section id="id10">
-<h3>S3 分片导出<a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
-<p>使用 S3 进行分片导出时，分片文件直接写入 S3：</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">export_path</span><span class="p">:</span><span class="w"> </span><span class="s">"s3://my-bucket/outputs/result.jsonl"</span>
-<span class="nt">export_shard_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">268435456</span>
-<span class="nt">export_aws_credentials</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">aws_access_key_id</span><span class="p">:</span><span class="w"> </span><span class="s">"AKIA..."</span>
-<span class="w">  </span><span class="nt">aws_secret_access_key</span><span class="p">:</span><span class="w"> </span><span class="s">"secret..."</span>
-</pre></div>
-</div>
-<p>生成的 S3 对象如下：</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s3</span><span class="p">:</span><span class="o">//</span><span class="n">my</span><span class="o">-</span><span class="n">bucket</span><span class="o">/</span><span class="n">outputs</span><span class="o">/</span><span class="n">result</span><span class="o">-</span><span class="mi">00</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="mf">04.</span><span class="n">jsonl</span>
-<span class="n">s3</span><span class="p">:</span><span class="o">//</span><span class="n">my</span><span class="o">-</span><span class="n">bucket</span><span class="o">/</span><span class="n">outputs</span><span class="o">/</span><span class="n">result</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="mf">04.</span><span class="n">jsonl</span>
-<span class="o">...</span>
-</pre></div>
-</div>
-</section>
-<section id="id11">
-<h3>凭证解析<a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
-<p>AWS 凭证按以下优先级解析：</p>
-<ol class="arabic simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">export_aws_credentials</span></code> 配置（默认模式）或 <code class="docutils literal notranslate"><span class="pre">export_extra_args</span></code>（Ray 模式）</p></li>
-<li><p>环境变量（<code class="docutils literal notranslate"><span class="pre">AWS_ACCESS_KEY_ID</span></code>、<code class="docutils literal notranslate"><span class="pre">AWS_SECRET_ACCESS_KEY</span></code>）</p></li>
-<li><p>默认凭证链（IAM 角色、<code class="docutils literal notranslate"><span class="pre">~/.aws/credentials</span></code>）</p></li>
-</ol>
-</section>
-</section>
-<section id="id12">
-<h2>统计信息和哈希管理<a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h2>
+<h2>统计信息和哈希管理<a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h2>
 <p>在处理过程中，DataJuicer 会计算中间字段：</p>
 <ul class="simple">
 <li><p><strong>统计信息</strong>（<code class="docutils literal notranslate"><span class="pre">__dj__stats__</span></code>、<code class="docutils literal notranslate"><span class="pre">__dj__meta__</span></code>）：由 Filter 算子计算</p></li>
@@ -656,15 +664,16 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>config.yaml<sp
 <span class="nt">keep_hashes_in_res_ds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">               </span><span class="c1"># 保留哈希字段</span>
 </pre></div>
 </div>
-<section id="id13">
-<h3>统计信息导出<a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h3>
-<p>无论 <code class="docutils literal notranslate"><span class="pre">keep_stats_in_res_ds</span></code> 如何设置，DataJuicer 始终会在主数据集旁边导出一个单独的统计信息文件：</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>outputs/
-├── result.jsonl                          # 主数据集（默认移除统计信息）
-└── result_stats.jsonl                    # 仅统计信息文件（始终导出）
+<section id="id10">
+<h3>统计信息导出<a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<p>本地模式下，数据包含 <code class="docutils literal notranslate"><span class="pre">__dj__stats__</span></code> 或 <code class="docutils literal notranslate"><span class="pre">__dj__meta__</span></code> 列时，会额外导出一份统计文件：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>outputs/
+├── result.jsonl
+└── result_stats.jsonl
 </pre></div>
 </div>
-<p>统计信息文件仅包含 <code class="docutils literal notranslate"><span class="pre">__dj__stats__</span></code> 和 <code class="docutils literal notranslate"><span class="pre">__dj__meta__</span></code> 列。</p>
+<p>统计文件只包含数据中已有的统计和元数据列。直接使用 Python <code class="docutils literal notranslate"><span class="pre">Exporter</span></code> 时，可以通过 <code class="docutils literal notranslate"><span class="pre">export_stats=False</span></code> 关闭该文件的导出。</p>
+<p>Ray 模式将统计信息与主数据集一起导出。需要保留它们时，请设置 <code class="docutils literal notranslate"><span class="pre">keep_stats_in_res_ds:</span> <span class="pre">true</span></code>；Ray 不会额外生成独立的 <code class="docutils literal notranslate"><span class="pre">_stats.jsonl</span></code> 文件。</p>
 </section>
 </section>
 <section id="webdataset-ray">
@@ -682,8 +691,8 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>config.yaml<sp
 </section>
 <section id="api">
 <h2>API 参考<a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
-<section id="id14">
-<h3>Exporter（默认模式）<a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
+<section id="id11">
+<h3>Exporter（默认模式）<a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.exporter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Exporter</span>
 
 <span class="n">exporter</span> <span class="o">=</span> <span class="n">Exporter</span><span class="p">(</span>
@@ -717,8 +726,8 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>config.yaml<sp
 </div>
 </section>
 </section>
-<section id="id15">
-<h2>故障排除<a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
+<section id="id12">
+<h2>故障排除<a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h2>
 <p><strong>导出格式不支持：</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 检查支持的格式</span>
 <span class="c1"># 默认模式：jsonl, json, parquet</span>
@@ -745,9 +754,18 @@ aws<span class="w"> </span>s3<span class="w"> </span>ls<span class="w"> </span>s
 <p><strong>导出的数据集中缺少统计信息：</strong></p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># 在结果数据集中保留统计信息</span>
 <span class="nt">keep_stats_in_res_ds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="c1"># 或检查单独的统计信息文件：result_stats.jsonl</span>
+<span class="c1"># 本地模式也可查看独立的统计文件：result_stats.jsonl</span>
 </pre></div>
 </div>
+</section>
+<hr class="docutils" />
+<section id="id13">
+<h2>下一步<a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="Cache_ZH.html"><span class="std std-doc">缓存管理</span></a>——通过缓存中间结果加速重复运行。</p></li>
+<li><p><a class="reference internal" href="Tracing_ZH.html"><span class="std std-doc">数据追踪</span></a>——调试流水线中样本级别的变化。</p></li>
+<li><p><a class="reference internal" href="Distributed_ZH.html"><span class="std std-doc">分布式处理</span></a>——在 Ray 集群上扩展导出。</p></li>
+</ul>
 </section>
 </section>
 
@@ -769,26 +787,21 @@ aws<span class="w"> </span>s3<span class="w"> </span>ls<span class="w"> </span>s
 <li><a class="reference internal" href="#ray-rayexporter">Ray 模式（RayExporter）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id7">分片导出</a></li>
-<li><a class="reference internal" href="#id8">并行导出</a></li>
-<li><a class="reference internal" href="#s3">S3 导出</a><ul>
-<li><a class="reference internal" href="#id9">默认模式</a></li>
-<li><a class="reference internal" href="#ray">Ray 模式</a></li>
-<li><a class="reference internal" href="#id10">S3 分片导出</a></li>
-<li><a class="reference internal" href="#id11">凭证解析</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id12">统计信息和哈希管理</a><ul>
-<li><a class="reference internal" href="#id13">统计信息导出</a></li>
+<li><a class="reference internal" href="#id7">分片导出（本地模式）</a></li>
+<li><a class="reference internal" href="#id8">并行导出（本地模式）</a></li>
+<li><a class="reference internal" href="#s3">S3 导出</a></li>
+<li><a class="reference internal" href="#id9">统计信息和哈希管理</a><ul>
+<li><a class="reference internal" href="#id10">统计信息导出</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#webdataset-ray">WebDataset 导出（Ray 模式）</a></li>
 <li><a class="reference internal" href="#api">API 参考</a><ul>
-<li><a class="reference internal" href="#id14">Exporter（默认模式）</a></li>
+<li><a class="reference internal" href="#id11">Exporter（默认模式）</a></li>
 <li><a class="reference internal" href="#rayexporter-ray">RayExporter（Ray 模式）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id15">故障排除</a></li>
+<li><a class="reference internal" href="#id12">故障排除</a></li>
+<li><a class="reference internal" href="#id13">下一步</a></li>
 </ul>
 </li>
 </ul>
@@ -797,13 +810,13 @@ aws<span class="w"> </span>s3<span class="w"> </span>ls<span class="w"> </span>s
         </aside>
       </div>
       <nav class="prev-next">
-        <a href="Distributed_ZH.html" class="prev-next-link prev">
+        <a href="DatasetCfg_ZH.html" class="prev-next-link prev">
           <span class="prev-next-label">Previous</span>
-          <span class="prev-next-title">Data-Juicer 分布式数据处理</span>
+          <span class="prev-next-title">数据集配置</span>
         </a>
-        <a href="JobManagement_ZH.html" class="prev-next-link next">
+        <a href="Cache_ZH.html" class="prev-next-link next">
           <span class="prev-next-label">Next</span>
-          <span class="prev-next-title">作业管理</span>
+          <span class="prev-next-title">缓存管理</span>
         </a>
       </nav>
       <footer class="footer">

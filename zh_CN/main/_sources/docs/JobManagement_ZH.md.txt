@@ -29,7 +29,7 @@ python -m data_juicer.utils.job.snapshot /path/to/job_dir --human-readable
 use_dag: null   # null 表示沿用执行器默认值
 ```
 
-默认 `null` 保持各执行器原有行为：`ray` 和 `ray_partitioned` 开启，`default` 关闭。可设为 `true` 或 `false` 覆盖。
+设为 `null` 时，`ray` 和 `ray_partitioned` 默认开启，`default` 默认关闭。设为 `true` 开启，设为 `false` 关闭。
 
 ## 资源感知分区
 
@@ -49,7 +49,7 @@ partition:
 
 ## 日志
 
-日志按作业组织：
+日志按作业组织。下图以 `log.txt` 为例，CLI 实际按导出路径和时间戳生成文件名。
 
 ```
 {job_dir}/
@@ -62,7 +62,9 @@ partition:
 └── job_summary.json           # 摘要（完成时）
 ```
 
-配置日志：
+在配方中设置 `event_log_dir` 可以选择应用日志目录，默认路径为 `<work_dir>/logs`。机器可读的事件文件 `events_*.jsonl` 保存在 `<work_dir>` 下，可用于查看作业进度。
+
+在 Python 中配置应用日志：
 ```python
 from data_juicer.utils.logger_utils import setup_logger
 
@@ -73,6 +75,8 @@ setup_logger(
     redirect=False
 )
 ```
+
+`setup_logger()` 使用 `save_dir` 和 `filename` 指定日志输出位置，并分别保存各级别日志。日志轮转和保留策略可在应用的日志集成中配置。
 
 ## API 参考
 
