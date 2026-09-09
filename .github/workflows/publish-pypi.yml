@@ -10,8 +10,6 @@ name: Publish PyPi Package
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
 
 permissions:
   contents: read
@@ -23,6 +21,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: cc914ee43b825dc91273040d728114cf636a4475 # pragma: allowlist secret
+    - name: Verify release source
+      run: test "$(git rev-parse HEAD)" = cc914ee43b825dc91273040d728114cf636a4475
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -39,7 +41,7 @@ jobs:
         python -c "import data_juicer; print(data_juicer.__version__)"
         dj-process --help
     - name: Publish package
-      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+      uses: pypa/gh-action-pypi-publish@v1.14.2
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
