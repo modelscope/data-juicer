@@ -388,6 +388,24 @@ class ConfigTest(DataJuicerTestCaseBase):
                     }
                 })
 
+    def test_partitioned_ray_config_keeps_operator_parallelism_automatic(self):
+        previous_ray_mode = os.environ.get(RAY_JOB_ENV_VAR)
+        os.environ[RAY_JOB_ENV_VAR] = "0"
+        try:
+            cfg = init_configs(
+                args=["--config", test_yaml_path, "--executor_type", "ray_partitioned"],
+                load_configs_only=True,
+            )
+        finally:
+            if previous_ray_mode is None:
+                os.environ.pop(RAY_JOB_ENV_VAR, None)
+            else:
+                os.environ[RAY_JOB_ENV_VAR] = previous_ray_mode
+
+        first_op_args = next(iter(cfg.process[0].values()))
+        self.assertNotIn("num_proc", first_op_args)
+        self.assertTrue(load_ops(cfg.process)[0].use_auto_proc())
+
     def test_op_params_parsing(self):
         from jsonargparse import ArgumentParser
         from data_juicer.config.config import (sort_op_by_types_and_names, _collect_config_info_from_class_docs)

@@ -17,6 +17,7 @@
 ```
 {work_dir}/{job_id}/
 ├── job_summary.json              # 作业元数据（完成时创建）
+├── gpu_probe_results.json         # 自动探测的 GPU Operator 资源
 ├── events_{timestamp}.jsonl      # 机器可读事件日志
 ├── dag_execution_plan.json       # DAG 执行计划
 ├── checkpoints/                  # 检查点数据
@@ -38,7 +39,20 @@ executor_type: ray_partitioned
 partition:
   mode: "auto"
   max_concurrent_partitions: "auto"  # 资源感知的 Driver 并发上限
-  target_size_mb: 256    # 自动模式规划使用的目标大小（MB）
+  max_gpu_workers_per_device: 5       # 每张 GPU 的保守模型副本上限
+  max_concurrent_gpu_probes: "auto"   # 默认逐个探测，设置正整数才开启并发探测
+  gpu_preflight_enabled: true          # false 时跳过 preflight，直接使用显式资源和 Actor 数
+  gpu_probe_timeout_seconds: null     # 可选的单任务超时；null 表示不主动终止
+  gpu_probe_warmup_batches: 1         # 稳态测速前的 warmup batch 数
+  gpu_probe_steady_batches: 3         # 用于稳态吞吐估计的 batch 数
+  gpu_probe_sample_offset: 0          # preflight 取样时跳过的开头行数
+  gpu_probe_sample_shuffle: false     # true 时先随机化 block 顺序再取样
+  gpu_probe_sample_seed: 42           # 随机取样的种子；null 表示每次运行都重新取样，因此永不复用报告
+  execution_group_size: "auto"       # 共用一次 GPU Actor 生命周期的逻辑分区数
+  max_initialization_overhead_ratio: 0.1  # 每个执行组允许的模型初始化时间占比
+  target_size_mb: 256    # 目标分区大小（128、256、512 或 1024）
+  size: 5000             # 自动分析失败时的回退值
+  max_size_mb: 256       # 回退最大大小
 ```
 
 **手动模式** - 指定确切的分区数量：
@@ -50,17 +64,45 @@ partition:
   max_concurrent_partitions: "auto"
 ```
 
-如果希望按每个分区的目标样本数切分，使用 `size`。手动模式下，`size` 和 `num_of_partitions` 只能选择一个。Data-Juicer 将分区数量四舍五入为整数，至少保留一个分区，最后一个分区容纳剩余数据。例如，12,000 条数据配合 `size: 5000` 会得到两个分区，分别包含 5,000 和 7,000 条数据。
+分区按精确行号边界切分，各分区行数最多相差一行。这里特意没有使用 Ray 的 `Dataset.split(n)`：它按整块（block）分配，当数据块数少于 `num_of_partitions` 时会产生空的尾部分区（单块 10 行切 4 份会得到 `[10, 0, 0, 0]`），块大小不均时即使块数足够也会造成分区严重倾斜。空分区并非零成本——每个空分区仍会构建算子图、占用一次 Actor 生命周期并写出 checkpoint；而倾斜会破坏 execution group 定容所依赖的“各分区行数均匀”假设。当分区数超过总行数时，会在任何 Actor 启动前直接报错，而不是静默下调：分区数是续跑校验的依据，必须与请求值一致。
+
+逻辑分区数与 GPU 执行并发现在相互独立：逻辑分区只决定 checkpoint 粒度、恢复边界和单分区数据上限；GPU Actor 数由 preflight 的稳态吞吐和集群资源统一规划。多个逻辑分区会组成 execution group，共用一次 Ray Actor pool 生命周期，但在每个 checkpoint 点仍按原逻辑分区分别落盘。`execution_group_size: "auto"` 会根据模型初始化时间、稳态吞吐、数据量和 `max_initialization_overhead_ratio` 选择组大小；显式正整数可覆盖该选择。续跑时可能存在不同 checkpoint 位置，因此会安全回退到逐分区串行执行。
+
+自动 Actor 规划先给每个待规划 GPU 阶段分配一个 Actor，然后反复给当前 pipeline 瓶颈阶段增加 Actor。每次增加都必须同时满足集群 CPU、Ray GPU 调度份额、每张卡的实测显存份额、每卡 Actor 上限以及有效 batch 数上限。若连“每阶段一个 Actor”的最低方案都无法放入集群，会在正式任务启动前直接报错，不会通过增加分区或超配显存来规避。
+
+#### GPU 显存预探测
+
+若希望运行固定资源的对照实验，可设置 `gpu_preflight_enabled: false`。此时不会读取小样本、初始化一次性探测 Actor 或生成 `gpu_probe_results.json`；CUDA 算子的 `num_gpus`、`memory` 和固定 `num_proc` 应由 recipe 显式给出，并建议同时关闭 `auto_op_parallelism`。
+
+在 `ray_partitioned` 模式下（包括手动分区），普通单卡 CUDA Mapper/Filter 会在正式实验启动前完成小样本 preflight。未配置 `memory`/`num_gpus` 的算子同时获得资源估计；显式值保持优先，但仍会测量吞吐用于自动 `num_proc` 规划：
+
+1. 只读取输入开头的固定样本，数量为所有待探测 GPU Operator 的最大 `batch_size`；若数据按长度、分辨率或来源排序，开头样本不具代表性，实测显存和吞吐都会有偏差。设置 `gpu_probe_sample_shuffle: true` 会先随机化 block 顺序，从随机 block 而不是第一个 block 取样；该操作只重排 block 引用，preflight 开销仍与样本量成正比，而不是与数据集规模成正比。也可以用 `gpu_probe_sample_offset` 跳过已知不具代表性的开头。两者是二选一而不是叠加：shuffle 成功后样本已经离开开头，此时 offset 会被忽略并给出告警。修改任一选项都会使 `gpu_probe_results.json` 失效，因为来自数据集不同位置的测量结果不可比较；未设置 `gpu_probe_sample_seed` 的 shuffle 每次取样都不同，其报告只用于观测，不会被当作缓存复用；
+2. Operator 可以通过 `input_columns` 和 `output_columns` 声明读写字段，支持 `__dj__meta__.quality_score` 这样的嵌套路径；执行器据此构建保守的数据依赖 DAG；
+3. 能证明相互独立、且祖先只包含兼容 CPU Mapper/Filter 的目标可以并行探测。每个一次性 Ray worker 接收轻量原始样本，在 worker 内重放所需 CPU 祖先，并为目标独占一张 GPU；因此不会再把大型 NumPy 中间值经 Driver 往返。`max_concurrent_gpu_probes: "auto"` 默认逐个探测：并发探测意味着同时初始化多个模型，而 checkpoint 存储和主机内存带宽都不是 Ray 资源，自动策略无法判断节点是否扛得住。checkpoint 在本地或已知 I/O 有余量时，可以设置正整数开启并发；该值仍受依赖安全的 GPU/CPU 槽位约束；
+   worker 会分别记录依赖重放和目标测量耗时，Driver 在每个任务完成时立即记录，并每 30 秒输出一次存活任务心跳；可通过 `gpu_probe_timeout_seconds` 让卡住的目标带算子名超时失败，默认 `null` 不主动终止；
+4. 缺少字段契约、存在 GPU-to-GPU 依赖、runtime environment 不兼容或包含 Dataset 级 Operator 时，安全回退到原有 recipe 有序重放。若前序 Filter 导致样本不足，则循环补齐目标的一个 batch；
+5. 在同一个一次性 worker 内只初始化一次算子，分别记录模型初始化、warmup 和多个稳态 batch 的耗时，并统计稳态输入吞吐与输出比例；默认 warmup 1 个 batch、测量 3 个 batch。依赖重放和目标测量都沿用 recipe 的 `skip_op_error`，少量非法样本会像正式运行一样被跳过，而不是在 preflight 阶段直接终止任务；但由于测量只重复同一个 batch，若该 batch 完全没有输出，则测量结果不可用：Mapper 返回空一定会带算子名让 preflight 失败（`skip_op_error` 开启时说明整批走了错误路径，关闭时说明算子本该抛异常却返回了空），Filter 全部过滤则只告警说明吞吐为最坏情况。preflight 不再设置 `DATA_JUICER_GPU_PREFLIGHT_OP` 标记（曾有算子据此增加 CUDA 同步，把一次正常的模型搬运拖成数分钟停顿），自定义算子不应再依赖读取该环境变量；
+6. probe 不会在模型初始化期间从后台线程轮询 CUDA，以免 `cudaMemGetInfo` 与大量参数的 `model.to(cuda)` 竞争同一 CUDA context。一次性 worker 会像正式 Actor 一样让 Operator 自行初始化 CUDA，调用完成后合并 PyTorch allocator 的全过程峰值和设备持久占用（后者也覆盖 Paddle 等非 PyTorch runtime），再增加 10% 余量得到 `memory_fraction`；缺省资源时 Ray 使用的 `num_gpus` 为 `max(memory_fraction, 1 / max_gpu_workers_per_device)`，默认每张卡最多调度 5 个自动探测的模型 Actor；
+7. 将测量值、调度值、分阶段耗时、吞吐、输出比例、探测模式、重放依赖以及样本实际来源保存到 `{work_dir}/gpu_probe_results.json`。Operator 配置、GPU 型号/容量、测速 batch 数、每卡 worker 上限或取样策略变化时会重新探测。原始 YAML 不会被覆盖。
+
+例如，共享一个 CPU resize 的多个独立图像打标算子可以只在 recipe 中声明字段契约，无需修改 Python 类：
 
 ```yaml
-partition:
-  mode: "manual"
-  size: 5000
+process:
+  - bucket_resize_mapper:
+      input_columns: [images]
+      output_columns: [_bucket_img]
+  - image_quality_mapper:
+      input_columns: [images, _bucket_img]
+      output_columns: [__dj__meta__.quality_score]
+  - image_rotation_mapper:
+      input_columns: [images, _bucket_img]
+      output_columns: [__dj__meta__.rotation_*]
 ```
 
-自动模式下，可以从 `target_size_mb: 256` 开始调整分区大小。它是规划目标，实际内存占用和输出文件大小可能有所不同。也可以设置 `partition.size`，作为自动规划无法给出样本数建议时的回退值。
+省略字段契约表示“未知”，而不是“没有读写字段”；因此旧 recipe 会继续使用有序探测，直到相关 Operator 补齐契约。
 
-`max_concurrent_partitions: "auto"` 是默认值。该值会在 Operator 资源规划完成后解析：含 GPU Operator 的 pipeline 根据 Ray 集群可容纳的最小 CPU/GPU worker 数确定，纯 CPU pipeline 的外层并发保守限制为 4。实际并发还会受到 Partition 数量和显式全局 Actor `num_proc` 预算的限制。需要手动调优时，可将其设置为正整数来覆盖自动值。
+显式配置的 `memory` 或 `num_gpus` 优先于实测值，但当显式 `num_gpus` 低于实测显存份额时会被抬升到该份额并给出告警：Ray 只按 `num_gpus` 打包 Actor，更小的请求会让它在单卡上放入超出显存容量的 Actor。当前 preflight 仅支持能装入单张 GPU 的普通 Mapper/Filter；GPU `Pipeline`、待探测 Operator 之前的 `Pipeline`，以及需要多张 GPU 的 Operator 必须显式配置资源和并发。空输入、探测异常、OOM 或无有效显存峰值都会在正式 partition worker 启动前终止任务。
 
 ### 检查点
 

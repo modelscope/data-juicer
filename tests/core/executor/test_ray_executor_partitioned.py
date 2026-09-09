@@ -48,9 +48,12 @@ class PartitionedRayExecutorTest(DataJuicerTestCaseBase):
 
         with open(os.path.join(cfg.checkpoint_dir, 'partitioning_info.json')) as f:
             partitioning_info = json.load(f)
+        # partition.size decides the partition *count* (11 rows / 5 -> 2); the row
+        # boundaries are then balanced, so the extra row goes to the leading
+        # partition instead of piling up in the tail.
         self.assertEqual(
             [partition['row_count'] for partition in partitioning_info['partitions']],
-            [5, 6],
+            [6, 5],
         )
 
     @TEST_TAG('ray')

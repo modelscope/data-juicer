@@ -4,7 +4,7 @@ Covers:
 - Shared cluster topology detection (real node count, fallback behavior)
 - PartitionSizeOptimizer cluster fixes (node count, cluster-wide capacity)
 - Executor sentinel parsing (num_of_partitions: auto / int / invalid)
-- Cluster partition bounds formula (floor, target, data-driven ceiling)
+- Cluster partition bounds formula (capacity target and data-driven ceiling)
 """
 
 import math
@@ -12,13 +12,8 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from data_juicer.core.executor.ray_executor_partitioned import (
-    PartitionedRayExecutor,
-)
-from data_juicer.utils.ray_cluster_utils import (
-    ClusterTopology,
-    detect_cluster_topology,
-)
+from data_juicer.core.executor.ray_executor_partitioned import PartitionedRayExecutor
+from data_juicer.utils.ray_cluster_utils import ClusterTopology, detect_cluster_topology
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 MULTINODE_NODES = [
@@ -67,9 +62,7 @@ class ClusterTopologyTest(unittest.TestCase):
 
 class OptimizerClusterFixTest(unittest.TestCase):
     def test_detect_ray_cluster_uses_real_node_count(self):
-        from data_juicer.core.executor.partition_size_optimizer import (
-            ResourceDetector,
-        )
+        from data_juicer.core.executor.partition_size_optimizer import ResourceDetector
 
         patches = _patch_ray_multinode()
         for p in patches:
@@ -158,6 +151,68 @@ class SentinelParsingTest(DataJuicerTestCaseBase):
         fake = self._configure({"mode": "manual", "size": 500})
         self.assertEqual(fake.partition_size_cfg, 500)
 
+    def test_absent_size_leaves_the_sample_target_unset(self):
+        # A default samples-per-partition target would silently override every
+        # partition count that was never asked for one.
+        fake = self._configure({"mode": "manual", "num_of_partitions": 4})
+        self.assertIsNone(fake.partition_size_cfg)
+
+    def test_gpu_probe_concurrency_auto_and_explicit_values(self):
+        automatic = self._configure({"max_concurrent_gpu_probes": "auto"})
+        explicit = self._configure({"max_concurrent_gpu_probes": 3})
+        invalid = self._configure({"max_concurrent_gpu_probes": "invalid"})
+
+        self.assertIsNone(automatic.max_concurrent_gpu_probes)
+        self.assertEqual(explicit.max_concurrent_gpu_probes, 3)
+        self.assertIsNone(invalid.max_concurrent_gpu_probes)
+
+    def test_gpu_preflight_can_be_disabled_explicitly(self):
+        default = self._configure({})
+        disabled = self._configure({"gpu_preflight_enabled": False})
+        string_disabled = self._configure({"gpu_preflight_enabled": "false"})
+        invalid = self._configure({"gpu_preflight_enabled": "invalid"})
+
+        self.assertTrue(default.gpu_preflight_enabled)
+        self.assertFalse(disabled.gpu_preflight_enabled)
+        self.assertFalse(string_disabled.gpu_preflight_enabled)
+        self.assertTrue(invalid.gpu_preflight_enabled)
+
+    def test_gpu_probe_timeout_disabled_explicit_and_invalid_values(self):
+        disabled = self._configure({"gpu_probe_timeout_seconds": None})
+        explicit = self._configure({"gpu_probe_timeout_seconds": 300})
+        invalid = self._configure({"gpu_probe_timeout_seconds": 0})
+
+        self.assertIsNone(disabled.gpu_probe_timeout_seconds)
+        self.assertEqual(explicit.gpu_probe_timeout_seconds, 300.0)
+        self.assertIsNone(invalid.gpu_probe_timeout_seconds)
+
+    def test_gpu_probe_sampling_defaults_to_the_dataset_head(self):
+        default = self._configure({})
+
+        self.assertEqual(default.gpu_probe_sample_offset, 0)
+        self.assertFalse(default.gpu_probe_sample_shuffle)
+        self.assertEqual(default.gpu_probe_sample_seed, 42)
+
+    def test_gpu_probe_sampling_explicit_and_invalid_values(self):
+        offset = self._configure({"gpu_probe_sample_offset": 1000})
+        shuffled = self._configure({"gpu_probe_sample_shuffle": "true", "gpu_probe_sample_seed": 7})
+        unseeded = self._configure({"gpu_probe_sample_seed": None})
+        invalid = self._configure(
+            {
+                "gpu_probe_sample_offset": -5,
+                "gpu_probe_sample_shuffle": "invalid",
+                "gpu_probe_sample_seed": "invalid",
+            }
+        )
+
+        self.assertEqual(offset.gpu_probe_sample_offset, 1000)
+        self.assertTrue(shuffled.gpu_probe_sample_shuffle)
+        self.assertEqual(shuffled.gpu_probe_sample_seed, 7)
+        self.assertIsNone(unseeded.gpu_probe_sample_seed)
+        self.assertEqual(invalid.gpu_probe_sample_offset, 0)
+        self.assertFalse(invalid.gpu_probe_sample_shuffle)
+        self.assertEqual(invalid.gpu_probe_sample_seed, 42)
+
 
 class PartitionSizeCountTest(DataJuicerTestCaseBase):
     def test_empty_dataset_uses_one_partition(self):
@@ -185,6 +240,17 @@ class PartitionSizeCountTest(DataJuicerTestCaseBase):
         with self.assertRaises(RuntimeError):
             PartitionedRayExecutor._partition_count_from_size(object(), 500)
 
+    def test_known_row_count_skips_the_dataset(self):
+        # Callers that already counted the rows must not pay for a second pass.
+        def _fail():
+            raise AssertionError("dataset must not be counted again")
+
+        dataset = SimpleNamespace(count=_fail)
+        self.assertEqual(
+            PartitionedRayExecutor._partition_count_from_size(dataset, 500, total_samples=1001),
+            2,
+        )
+
 
 class ClusterPartitionBoundsTest(unittest.TestCase):
     MULTINODE = ClusterTopology(
@@ -195,7 +261,7 @@ class ClusterPartitionBoundsTest(unittest.TestCase):
         available_gpus=16.0,
     )
 
-    def _apply(self, fake, ops):
+    def _apply(self, fake, ops, total_samples=None):
         fake._resolve_partitions_per_node = lambda op_list, topology: (
             PartitionedRayExecutor._resolve_partitions_per_node(fake, op_list, topology)
         )
@@ -203,11 +269,11 @@ class ClusterPartitionBoundsTest(unittest.TestCase):
             "data_juicer.utils.ray_cluster_utils.detect_cluster_topology",
             return_value=self.MULTINODE,
         ):
-            PartitionedRayExecutor._apply_cluster_partition_bounds(fake, ops)
+            PartitionedRayExecutor._apply_cluster_partition_bounds(fake, ops, total_samples=total_samples)
         return fake
 
     def test_target_reaches_twice_concurrency(self):
-        # 2 nodes x 8 GPUs, ops at 0.5 GPU each -> per_node=16, floor=32.
+        # 2 nodes x 8 GPUs, ops at 0.5 GPU each -> per_node=16.
         fake = _fake_executor(num_partitions=200, max_concurrent_partitions=32)
         self._apply(fake, [_gpu_op(0.5)])
         self.assertEqual(fake.num_partitions, 64)
@@ -217,15 +283,42 @@ class ClusterPartitionBoundsTest(unittest.TestCase):
         self._apply(fake, [_gpu_op(0.5)])
         self.assertEqual(fake.num_partitions, 40)
 
-    def test_count_below_floor_is_raised(self):
+    def test_count_below_cluster_capacity_is_not_raised(self):
         fake = _fake_executor(num_partitions=10, max_concurrent_partitions=32)
         self._apply(fake, [_gpu_op(0.5)])
-        self.assertEqual(fake.num_partitions, 32)
+        self.assertEqual(fake.num_partitions, 10)
 
-    def test_unresolved_concurrency_uses_node_floor(self):
+    def test_unresolved_concurrency_does_not_expand_workload(self):
         fake = _fake_executor(num_partitions=4, max_concurrent_partitions="auto")
         self._apply(fake, [_gpu_op(0.5)])
-        self.assertEqual(fake.num_partitions, 32)  # 2 nodes x 16 per node
+        self.assertEqual(fake.num_partitions, 4)
+
+    def test_fractional_gpu_capacity_does_not_expand_small_dataset(self):
+        h20_pair = ClusterTopology(
+            num_nodes=1,
+            total_cpus=32.0,
+            total_gpus=2.0,
+            available_cpus=32.0,
+            available_gpus=2.0,
+        )
+        fake = _fake_executor(num_partitions=1, max_concurrent_partitions=32)
+        fake._resolve_partitions_per_node = lambda op_list, topology: (
+            PartitionedRayExecutor._resolve_partitions_per_node(fake, op_list, topology)
+        )
+        with patch(
+            "data_juicer.utils.ray_cluster_utils.detect_cluster_topology",
+            return_value=h20_pair,
+        ):
+            PartitionedRayExecutor._apply_cluster_partition_bounds(fake, [_gpu_op(0.25)], total_samples=24)
+
+        self.assertEqual(fake.num_partitions, 1)
+        self.assertEqual(fake.cfg._resolved_partition_plan["partitions_per_node"], 8)
+        self.assertEqual(fake.cfg._resolved_partition_plan["total_samples"], 24)
+
+    def test_total_samples_is_a_hard_ceiling(self):
+        fake = _fake_executor(num_partitions=200, max_concurrent_partitions=32)
+        self._apply(fake, [_gpu_op(0.5)], total_samples=24)
+        self.assertEqual(fake.num_partitions, 24)
 
     def test_cpu_only_pipeline_uses_overlap_factor(self):
         cpu_topology = ClusterTopology(
@@ -244,7 +337,7 @@ class ClusterPartitionBoundsTest(unittest.TestCase):
             return_value=cpu_topology,
         ):
             PartitionedRayExecutor._apply_cluster_partition_bounds(fake, [])
-        # per_node=2 -> floor=max(8,4,8)=8, target=16, ceiling=1000.
+        # per_node=2 -> capacity target=8, overlap target=16, ceiling=1000.
         self.assertEqual(fake.num_partitions, 16)
 
     def test_resolved_plan_published_on_cfg(self):
@@ -267,23 +360,17 @@ class PartitionsPerNodeTest(unittest.TestCase):
 
     def test_explicit_multiplier_wins(self):
         fake = _fake_executor(_partitions_per_node_cfg=3)
-        value = PartitionedRayExecutor._resolve_partitions_per_node(
-            fake, [_gpu_op(0.5)], self.TOPOLOGY
-        )
+        value = PartitionedRayExecutor._resolve_partitions_per_node(fake, [_gpu_op(0.5)], self.TOPOLOGY)
         self.assertEqual(value, 3)
 
     def test_gpu_slot_derivation(self):
         fake = _fake_executor()
-        value = PartitionedRayExecutor._resolve_partitions_per_node(
-            fake, [_gpu_op(0.5)], self.TOPOLOGY
-        )
+        value = PartitionedRayExecutor._resolve_partitions_per_node(fake, [_gpu_op(0.5)], self.TOPOLOGY)
         self.assertEqual(value, 16)  # 8 GPUs/node / 0.5 GPU per worker
 
     def test_tightest_stage_dominates(self):
         fake = _fake_executor()
-        value = PartitionedRayExecutor._resolve_partitions_per_node(
-            fake, [_gpu_op(0.5), _gpu_op(1.0)], self.TOPOLOGY
-        )
+        value = PartitionedRayExecutor._resolve_partitions_per_node(fake, [_gpu_op(0.5), _gpu_op(1.0)], self.TOPOLOGY)
         self.assertEqual(value, 8)  # 8 GPUs/node / 1.0 GPU
 
     def test_cpu_only_fallback(self):
@@ -307,16 +394,12 @@ class PartitionsPerNodeTest(unittest.TestCase):
     def test_cuda_flag_marks_gpu_pipeline_without_num_gpus(self):
         cuda_op = SimpleNamespace(num_gpus=None, use_cuda=lambda: True, _name="cuda_op")
         fake = _fake_executor()
-        value = PartitionedRayExecutor._resolve_partitions_per_node(
-            fake, [cuda_op], self.TOPOLOGY
-        )
+        value = PartitionedRayExecutor._resolve_partitions_per_node(fake, [cuda_op], self.TOPOLOGY)
         self.assertEqual(value, 8)  # 8 GPUs/node / 1.0 GPU implicit
 
     def test_invalid_multiplier_falls_back_to_auto(self):
         fake = _fake_executor(_partitions_per_node_cfg="bogus")
-        value = PartitionedRayExecutor._resolve_partitions_per_node(
-            fake, [_gpu_op(0.5)], self.TOPOLOGY
-        )
+        value = PartitionedRayExecutor._resolve_partitions_per_node(fake, [_gpu_op(0.5)], self.TOPOLOGY)
         self.assertEqual(value, 16)
 
 
@@ -361,39 +444,67 @@ class OptimizerFallbackTest(DataJuicerTestCaseBase):
         fake._resolve_partitions_per_node = lambda op_list, topology: (
             PartitionedRayExecutor._resolve_partitions_per_node(fake, op_list, topology)
         )
-        fake._apply_cluster_partition_bounds = lambda op_list: (
-            PartitionedRayExecutor._apply_cluster_partition_bounds(fake, op_list)
+        fake._apply_cluster_partition_bounds = lambda op_list, total_samples=None: (
+            PartitionedRayExecutor._apply_cluster_partition_bounds(fake, op_list, total_samples=total_samples)
         )
         return fake
 
     def test_cluster_bounds_applied_when_optimizer_raises(self):
         fake = self._bound_fake(num_partitions=4, max_concurrent_partitions=8)
-        with patch(
-            "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
-            side_effect=RuntimeError("optimizer unavailable"),
-        ), patch(
-            "data_juicer.utils.ray_cluster_utils.detect_cluster_topology",
-            return_value=ClusterPartitionBoundsTest.MULTINODE,
+        with (
+            patch(
+                "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
+                side_effect=RuntimeError("optimizer unavailable"),
+            ),
+            patch(
+                "data_juicer.utils.ray_cluster_utils.detect_cluster_topology",
+                return_value=ClusterPartitionBoundsTest.MULTINODE,
+            ),
         ):
             PartitionedRayExecutor._configure_auto_partitioning(fake, None, [_gpu_op(0.5)])
-        # floor = 2 nodes x 16 per node = 32; placeholder 4 is raised.
-        self.assertEqual(fake.num_partitions, 32)
+        self.assertEqual(fake.num_partitions, 4)
 
     def test_cluster_bounds_applied_when_optimizer_import_fails(self):
         fake = self._bound_fake(num_partitions=4, max_concurrent_partitions=8)
-        with patch(
-            "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
-            side_effect=ImportError("missing dependency"),
-        ), patch(
-            "data_juicer.utils.ray_cluster_utils.detect_cluster_topology",
-            return_value=ClusterPartitionBoundsTest.MULTINODE,
+        with (
+            patch(
+                "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
+                side_effect=ImportError("missing dependency"),
+            ),
+            patch(
+                "data_juicer.utils.ray_cluster_utils.detect_cluster_topology",
+                return_value=ClusterPartitionBoundsTest.MULTINODE,
+            ),
         ):
             PartitionedRayExecutor._configure_auto_partitioning(fake, None, [_gpu_op(0.5)])
-        self.assertEqual(fake.num_partitions, 32)
+        self.assertEqual(fake.num_partitions, 4)
+
+    def test_optimizer_failure_still_caps_partitions_by_row_count(self):
+        fake = self._bound_fake(num_partitions=200, max_concurrent_partitions=32)
+        dataset = SimpleNamespace(count=lambda: 24)
+        with (
+            patch(
+                "data_juicer.core.executor.partition_size_optimizer.auto_configure_resources",
+                side_effect=RuntimeError("optimizer unavailable"),
+            ),
+            patch(
+                "data_juicer.utils.ray_cluster_utils.detect_cluster_topology",
+                return_value=ClusterPartitionBoundsTest.MULTINODE,
+            ),
+        ):
+            PartitionedRayExecutor._configure_auto_partitioning(fake, dataset, [_gpu_op(0.5)])
+        self.assertEqual(fake.num_partitions, 24)
 
 
 class SampleBasedSplitTest(DataJuicerTestCaseBase):
-    """Verify that manual+size mode uses split_at_indices for row-level cuts."""
+    """A fresh split always cuts at row boundaries, never at Ray block boundaries.
+
+    ``_split_dataset_deterministic`` routes every mode through
+    ``_split_into_row_balanced_partitions``, so the requested partition count is
+    honoured exactly and no partition comes back empty. The block-based
+    ``Dataset.split(n)`` path it replaced handed out whole blocks, which yields
+    empty trailing partitions whenever there are fewer blocks than partitions.
+    """
 
     def _make_executor(self, partition_size_cfg, num_partitions):
         fake = _fake_executor(
@@ -409,73 +520,70 @@ class SampleBasedSplitTest(DataJuicerTestCaseBase):
             start_row=0, end_row=0,
         )
         fake._save_partitioning_info = lambda info: None
+        fake._balanced_split_indices = PartitionedRayExecutor._balanced_split_indices
+        fake._split_into_row_balanced_partitions = lambda ds: (
+            PartitionedRayExecutor._split_into_row_balanced_partitions(fake, ds)
+        )
         return fake
 
-    def test_manual_size_uses_target_boundaries_without_recount(self):
+    @staticmethod
+    def _mock_data(total_rows, num_parts):
+        """Mock a Ray dataset that reports ``total_rows`` once materialized."""
         data = MagicMock()
-        data.split_at_indices.return_value = [MagicMock() for _ in range(3)]
-        for p in data.split_at_indices.return_value:
-            p.count.return_value = 2
-            p.take.return_value = [{"x": 1}]
+        materialized = MagicMock()
+        materialized.count.return_value = total_rows
+        data.materialize.return_value = materialized
+        parts = [MagicMock() for _ in range(num_parts)]
+        for part in parts:
+            part.count.return_value = total_rows // num_parts
+            part.take.return_value = [{"x": 1}]
+        materialized.split_at_indices.return_value = parts
+        return data, materialized
 
-        dataset = SimpleNamespace(data=data)
+    def test_manual_size_cuts_at_row_boundaries(self):
+        data, materialized = self._mock_data(total_rows=6, num_parts=3)
         fake = self._make_executor(partition_size_cfg=2, num_partitions=3)
 
-        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
-        data.split_at_indices.assert_called_once()
-        indices = data.split_at_indices.call_args[0][0]
-        self.assertEqual(indices, [2, 4])
-        data.count.assert_not_called()
+        materialized.split_at_indices.assert_called_once_with([2, 4])
         data.split.assert_not_called()
 
     def test_single_partition_materializes_without_split_indices(self):
-        data = MagicMock()
-        materialized = MagicMock()
-        data.materialize.return_value = materialized
-        dataset = SimpleNamespace(data=data)
+        data, materialized = self._mock_data(total_rows=100, num_parts=1)
         fake = self._make_executor(partition_size_cfg=100, num_partitions=1)
 
-        partitions, _ = PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        partitions, _ = PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
         self.assertEqual(partitions, [materialized])
         data.materialize.assert_called_once_with()
-        data.split_at_indices.assert_not_called()
+        materialized.split_at_indices.assert_not_called()
         data.split.assert_not_called()
 
-    def test_count_based_uses_block_split(self):
-        """When partition_size_cfg is None (count-based), split() is used."""
-        data = MagicMock()
-        data.split.return_value = [MagicMock() for _ in range(4)]
-        for p in data.split.return_value:
-            p.count.return_value = 250
-            p.take.return_value = [{"x": 1}]
-
-        dataset = SimpleNamespace(data=data)
+    def test_count_based_split_is_row_balanced_not_block_based(self):
+        """With partition_size_cfg unset the boundaries still come from the row count."""
+        data, materialized = self._mock_data(total_rows=1000, num_parts=4)
         fake = self._make_executor(partition_size_cfg=None, num_partitions=4)
 
-        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
-        data.split.assert_called_once_with(4)
-        data.split_at_indices.assert_not_called()
+        materialized.split_at_indices.assert_called_once_with([250, 500, 750])
+        data.split.assert_not_called()
 
-    def test_auto_mode_with_size_uses_block_split(self):
-        """Auto mode uses block-based split even when partition_size_cfg is set
-        (size is only an optimizer fallback in auto mode, not a row-level guarantee)."""
-        data = MagicMock()
-        data.split.return_value = [MagicMock() for _ in range(4)]
-        for p in data.split.return_value:
-            p.count.return_value = 250
-            p.take.return_value = [{"x": 1}]
+    def test_auto_mode_boundaries_follow_the_partition_count_not_size(self):
+        """In auto mode partition.size is only an optimizer fallback.
 
-        dataset = SimpleNamespace(data=data)
+        It has already been folded into num_partitions by then, so it must not
+        move the row boundaries a second time.
+        """
+        data, materialized = self._mock_data(total_rows=1000, num_parts=4)
         fake = self._make_executor(partition_size_cfg=500, num_partitions=4)
         fake.partition_mode = "auto"
 
-        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
-        data.split.assert_called_once_with(4)
-        data.split_at_indices.assert_not_called()
+        materialized.split_at_indices.assert_called_once_with([250, 500, 750])
+        data.split.assert_not_called()
 
 
 if __name__ == "__main__":
