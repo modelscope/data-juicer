@@ -25,6 +25,8 @@ Whether you're deduplicating web-scale pre-training corpora, curating agent inte
 
 > **Alibaba Cloud PAI** has deeply integrated Data-Juicer into its data processing products.  See **[Quickly submit a DataJuicer job](https://www.alibabacloud.com/help/en/pai/user-guide/quickly-submit-a-datajuicer-task)**.
 
+> 🧃 **Juicer**, our natural-language data-refinement model, turns cleaning instructions, filtering rules, and semantic-tagging requirements into structured outputs. Try it on [HuggingFace](https://huggingface.co/datajuicer/Juicer-35B-A3B) or [ModelScope](https://www.modelscope.cn/models/Data-Juicer/Juicer-35B-A3B), or see the **[Juicer docs](docs/Juicer.md)**.
+
 ---
 
 ## 🚀 Quick Start
@@ -86,7 +88,26 @@ for s in res_ds:
 
 ## 📰 News
 
-- 🎉 [2026-08-25] We release [Juicer](docs/Juicer.md), a locally deployable data-refinement model that follows natural-language instructions for text cleaning, filtering, and semantic labeling. Explore the [model](https://huggingface.co/datajuicer/Juicer-35B-A3B) and try recipes in the [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground).
+<details open>
+<summary>[2026-09-08] Release v1.6.0: <b>Juicer Model Release; Cluster-Aware Partitioning; Config Validation; LiteLLM Backend</b></summary>
+
+* 🧮 *Cluster-Aware Partitioning* — Automatic partition counts use live Ray cluster resources. Manual `partition.size` targets split data at row boundaries, including inputs with fewer blocks than partitions.
+* ✅ *Config Validation* — Pipeline preflight catches invalid operator settings and executor/schema mismatches before processing. Reader defaults now apply consistently across execution and analysis.
+* 🔌 *LiteLLM Backend* — Select `api_backend="litellm"` in `prepare_api_model` for chat, embedding, and Responses requests through provider-specific model routing; the existing OpenAI-compatible backend remains the default.
+* 📚 *Documentation Refresh* — Rewritten English and Chinese guides cover installation, processing, analysis, configuration, export, and the playground. Added documentation for 28 existing operators, corrected examples, and separated guide and API navigation with incremental versioned documentation builds.
+* 🗄️ *Unified Remote Export* — Local, S3, and HDFS export share filesystem dispatch; JSONL export now serializes Python dates and datetimes in ISO format.
+* 🖼️ *Image OHEM Selector* — New `image_ohem_selector` selects high-loss image samples using a user-supplied scoring function and a top-k or ratio budget.
+* ⚡ *Bounded Tokenizer Batches* — Token-count filters limit tokenizer batch sizes to reduce peak memory on long inputs.
+* 🔧 *Robustness Fixes* — Fixed fused-filter cache isolation, MinHash state reuse and empty inputs, deduplicator execution-mode declarations, empty text chunks, gzip JSONL HPO sampling, and pandas extension-dtype handling. HPO modules can now be imported without starting a sweep.
+</details>
+
+<details open>
+<summary>[2026-08-25] Juicer Model Release: <b>Natural-Language Data Refinement; Local Deployment; Playground</b></summary>
+
+* 🧃 *Natural-Language Data Refinement* — [Juicer](docs/Juicer.md) follows natural-language instructions for text cleaning, filtering, and semantic labeling.
+* 🏠 *Local Deployment* — Download the [model](https://huggingface.co/datajuicer/Juicer-35B-A3B) for local deployment.
+* 🧪 *Playground* — Try data-refinement recipes in the [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground).
+</details>
 
 <details open>
 <summary>[2026-08-07] Release v1.5.5: <b>External OP Plugins; HDFS I/O & Ray Data Optimizations; Elastic Multi-node Sharding</b></summary>
@@ -100,7 +121,7 @@ for s in res_ds:
 * 🔧 *Robustness & Dependency Fixes* — Fixed `text_chunk_mapper` delimiter leakage, `calibrate_response_mapper` `output_pattern` handling, and null captions in `image_diffusion_mapper`; added membership operators to `general_field_filter`; relaxed `numpy`/`fsspec`/`pandas` bounds for Python 3.13+ and pyarrow>=17.
 </details>
 
-<details open>
+<details>
 <summary>[2026-07-17] Release v1.5.4: <b>HumanVBench Video OPs; Batch-local Stage Fusion; Robustness Fixes</b></summary>
 
 * 🧑‍🤝‍🧑 *New OPs* — Added 9 human-centric video understanding operators (human track extraction, active-speaker detection, audio ASR, speech emotion & age/gender detection, face demographic & attribute/emotion captioning, face-ratio filtering) for building HumanVBench (CVPR'26)-style pipelines.

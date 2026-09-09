@@ -26,6 +26,8 @@ Data-Juicer (DJ) 将原始数据转化为 AI 就绪的智能。它将数据处�
 
 > **阿里云 PAI** 已深度集成 Data-Juicer 到其数据处理产品中。请参阅 **[快速提交 DataJuicer 任务](https://www.alibabacloud.com/help/zh/pai/user-guide/quickly-submit-a-datajuicer-task)**。
 
+> 🧃 **Juicer** 是我们的自然语言数据精炼模型，可将清洗指令、过滤规则和语义标注需求转化为结构化输出。欢迎在 [HuggingFace](https://huggingface.co/datajuicer/Juicer-35B-A3B) 或 [ModelScope](https://www.modelscope.cn/models/Data-Juicer/Juicer-35B-A3B) 上试用，或查阅 **[Juicer 文档](docs/Juicer_ZH.md)**。
+
 ---
 
 ## 🚀 快速开始
@@ -85,7 +87,26 @@ for s in res_ds:
 
 ## 📰 动态
 
-- 🎉 [2026-08-25] 我们发布了 [Juicer](docs/Juicer_ZH.md)，一个支持本地部署的数据精炼模型，可通过自然语言指令完成文本清洗、过滤与语义标注。欢迎下载[模型](https://huggingface.co/datajuicer/Juicer-35B-A3B)，并在 [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground) 中体验数据处理配方。
+<details open>
+<summary>[2026-09-08] Release v1.6.0: <b>Juicer 模型发布；集群感知分区；配置校验；LiteLLM 后端</b></summary>
+
+* 🧮 集群感知分区 — 自动分区数量根据实时 Ray 集群资源确定；手动 `partition.size` 按样本行切分，在输入 block 数少于分区数时也能正确划分数据。
+* ✅ 配置校验 — 管道预检在处理前发现算子配置错误及执行模式、数据字段不匹配；执行与分析统一应用读取默认参数。
+* 🔌 LiteLLM 后端 — 在 `prepare_api_model` 中选择 `api_backend="litellm"`，通过提供商模型路由调用聊天、embedding 和 Responses 接口；原有 OpenAI 兼容后端仍为默认值。
+* 📚 文档更新 — 重写安装、数据处理、分析、配置、导出及 playground 的中英文指南，为 28 个已有算子补充文档并修正示例；指南与 API 导航独立组织，文档支持按版本增量构建。
+* 🗄️ 统一远程导出 — 本地、S3 和 HDFS 导出共用文件系统分发；JSONL 导出支持将 Python 日期和时间值序列化为 ISO 格式。
+* 🖼️ 图像 OHEM 选择器 — 新增 `image_ohem_selector`，通过用户提供的评分函数及 top-k 或比例预算选择高损失图像样本。
+* ⚡ 分词批次限制 — token 计数过滤器限制分词批大小，降低长输入的内存峰值。
+* 🔧 健壮性修复 — 修复融合过滤器缓存隔离、MinHash 状态复用与空输入、去重器执行模式声明、文本空分块、gzip JSONL 的 HPO 采样及 pandas 扩展 dtype 处理；导入 HPO 模块不再启动 sweep。
+</details>
+
+<details open>
+<summary>[2026-08-25] Juicer 模型发布：<b>自然语言数据精炼；本地部署；Playground</b></summary>
+
+* 🧃 自然语言数据精炼 — [Juicer](docs/Juicer_ZH.md) 可遵循自然语言指令完成文本清洗、过滤与语义标注。
+* 🏠 本地部署 — 下载[模型](https://huggingface.co/datajuicer/Juicer-35B-A3B)，在本地部署和使用。
+* 🧪 Playground — 在 [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground) 中体验数据精炼配方。
+</details>
 
 <details open>
 <summary>[2026-08-07] Release v1.5.5: <b>外部算子插件；HDFS I/O 与 Ray Data 优化；多节点弹性分片</b></summary>
@@ -99,7 +120,7 @@ for s in res_ds:
 * 🔧 健壮性与依赖修复 — 修复 `text_chunk_mapper` 分隔符泄漏、`calibrate_response_mapper` 的 `output_pattern` 处理以及 `image_diffusion_mapper` 的空 caption 问题；为 `general_field_filter` 增加成员运算符；放宽 `numpy`/`fsspec`/`pandas` 版本约束以兼容 Python 3.13+ 与 pyarrow>=17。
 </details>
 
-<details open>
+<details>
 <summary>[2026-07-17] Release v1.5.4: <b>HumanVBench 视频算子；批内阶段算子融合；健壮性修复</b></summary>
 
 * 🧑‍🤝‍🧑 新算子 — 新增 9 个以人为中心的视频理解算子（人物轨迹提取、活跃说话人检测、音频 ASR、语音情绪与年龄/性别检测、人脸人口统计与属性/情绪描述、人脸占比过滤），用于构建 HumanVBench (CVPR'26) 风格的处理流水线。
