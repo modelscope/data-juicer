@@ -411,7 +411,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             "max_initialization_overhead_ratio",
             _DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO,
         )
-        partition_size = ConfigAccessor.get(partition_cfg, "size", 5000)
+        partition_size = ConfigAccessor.get(partition_cfg, "size", None)
         max_size_mb = ConfigAccessor.get(partition_cfg, "max_size_mb", 64)
 
         # Fallback to legacy configuration if partition config is not available
@@ -579,7 +579,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 f"{_DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO}"
             )
             self.max_initialization_overhead_ratio = _DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO
-        self.partition_size = partition_size
+        self.partition_size_cfg = partition_size
         self.max_size_mb = max_size_mb
 
         if mode == "manual":
@@ -596,20 +596,23 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 logger.info(f"Optimizer fallback: targeting {self.partition_size_cfg} samples per partition")
 
     @staticmethod
-    def _partition_count_from_size(dataset, partition_size: int) -> int:
-        """Derive the nearest partition count for a samples-per-partition target."""
+    def _partition_count_from_size(dataset, partition_size: int, total_samples: Optional[int] = None) -> int:
+        """Derive the nearest partition count for a samples-per-partition target.
+
+        ``total_samples`` lets callers reuse a row count they already paid for
+        instead of triggering a second Ray ``count()`` over the same dataset.
+        """
         if partition_size <= 0:
             raise ValueError(f"partition_size must be positive, got {partition_size}")
 
-        if hasattr(dataset, "count"):
-            try:
-                total_samples = dataset.count()
-            except TypeError:
-                total_samples = len(dataset) if hasattr(dataset, "__len__") else None
-        elif hasattr(dataset, "__len__"):
-            total_samples = len(dataset)
-        else:
-            total_samples = None
+        if total_samples is None:
+            if hasattr(dataset, "count"):
+                try:
+                    total_samples = dataset.count()
+                except TypeError:
+                    total_samples = len(dataset) if hasattr(dataset, "__len__") else None
+            elif hasattr(dataset, "__len__"):
+                total_samples = len(dataset)
 
         if total_samples is None:
             raise RuntimeError(
@@ -643,18 +646,18 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             recommended_size = ConfigAccessor.get(recommendations, "recommended_partition_size", None)
             recommended_workers = ConfigAccessor.get(recommendations, "recommended_worker_count", recommended_workers)
 
-            # Calculate optimal number of partitions based on dataset size and recommended partition size
-            try:
-                if total_samples is None:
-                    if hasattr(dataset, "count"):
-                        total_samples = dataset.count()
-                    elif hasattr(dataset, "__len__"):
-                        total_samples = len(dataset)
-                    else:
-                        total_samples = 10000  # Fallback estimate
+        # A missing or nonsensical recommendation must not silently size the
+        # run; fall back to the explicit partition.size target when there is one.
+        if not isinstance(recommended_size, (int, float)) or recommended_size <= 0:
+            recommended_size = self.partition_size_cfg
+            if recommended_size is not None:
+                logger.info(f"Using partition.size fallback: {recommended_size} samples per partition")
 
-                # Calculate number of partitions needed
-                self.num_partitions = max(1, math.ceil(total_samples / recommended_size))
+        if recommended_size is not None:
+            try:
+                self.num_partitions = self._partition_count_from_size(
+                    dataset, recommended_size, total_samples=total_samples
+                )
 
                 # Cap auto-mode work submission at 2x the recommended workers.
                 max_partitions = max(32, recommended_workers * 2)

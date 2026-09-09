@@ -14,6 +14,7 @@ from unittest.mock import MagicMock, patch
 
 from data_juicer.core.executor.ray_executor_partitioned import PartitionedRayExecutor
 from data_juicer.utils.ray_cluster_utils import ClusterTopology, detect_cluster_topology
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 MULTINODE_NODES = [
     {"Alive": True, "NodeID": "n1"},
@@ -146,6 +147,16 @@ class SentinelParsingTest(DataJuicerTestCaseBase):
         self.assertEqual(fake.partition_mode, "manual")
         self.assertEqual(fake.num_partitions, 16)
 
+    def test_sample_target_is_recorded(self):
+        fake = self._configure({"mode": "manual", "size": 500})
+        self.assertEqual(fake.partition_size_cfg, 500)
+
+    def test_absent_size_leaves_the_sample_target_unset(self):
+        # A default samples-per-partition target would silently override every
+        # partition count that was never asked for one.
+        fake = self._configure({"mode": "manual", "num_of_partitions": 4})
+        self.assertIsNone(fake.partition_size_cfg)
+
     def test_gpu_probe_concurrency_auto_and_explicit_values(self):
         automatic = self._configure({"max_concurrent_gpu_probes": "auto"})
         explicit = self._configure({"max_concurrent_gpu_probes": 3})
@@ -201,6 +212,44 @@ class SentinelParsingTest(DataJuicerTestCaseBase):
         self.assertEqual(invalid.gpu_probe_sample_offset, 0)
         self.assertFalse(invalid.gpu_probe_sample_shuffle)
         self.assertEqual(invalid.gpu_probe_sample_seed, 42)
+
+
+class PartitionSizeCountTest(DataJuicerTestCaseBase):
+    def test_empty_dataset_uses_one_partition(self):
+        self.assertEqual(PartitionedRayExecutor._partition_count_from_size([], 500), 1)
+
+    def test_count_uses_nearest_target(self):
+        self.assertEqual(PartitionedRayExecutor._partition_count_from_size(list(range(1001)), 500), 2)
+        self.assertEqual(PartitionedRayExecutor._partition_count_from_size(list(range(1499)), 500), 3)
+        self.assertEqual(PartitionedRayExecutor._partition_count_from_size(list(range(14)), 10), 1)
+        self.assertEqual(PartitionedRayExecutor._partition_count_from_size(list(range(15)), 10), 2)
+
+    def test_ray_style_count_method(self):
+        dataset = SimpleNamespace(count=lambda: 1001)
+        self.assertEqual(PartitionedRayExecutor._partition_count_from_size(dataset, 500), 2)
+
+    def test_large_count_uses_exact_half_up_rounding(self):
+        total_samples = 2**53 + 1
+        dataset = SimpleNamespace(count=lambda: total_samples)
+        self.assertEqual(
+            PartitionedRayExecutor._partition_count_from_size(dataset, 2),
+            2**52 + 1,
+        )
+
+    def test_unknown_dataset_size_is_rejected(self):
+        with self.assertRaises(RuntimeError):
+            PartitionedRayExecutor._partition_count_from_size(object(), 500)
+
+    def test_known_row_count_skips_the_dataset(self):
+        # Callers that already counted the rows must not pay for a second pass.
+        def _fail():
+            raise AssertionError("dataset must not be counted again")
+
+        dataset = SimpleNamespace(count=_fail)
+        self.assertEqual(
+            PartitionedRayExecutor._partition_count_from_size(dataset, 500, total_samples=1001),
+            2,
+        )
 
 
 class ClusterPartitionBoundsTest(unittest.TestCase):
@@ -448,7 +497,14 @@ class OptimizerFallbackTest(DataJuicerTestCaseBase):
 
 
 class SampleBasedSplitTest(DataJuicerTestCaseBase):
-    """Verify that manual+size mode uses split_at_indices for row-level cuts."""
+    """A fresh split always cuts at row boundaries, never at Ray block boundaries.
+
+    ``_split_dataset_deterministic`` routes every mode through
+    ``_split_into_row_balanced_partitions``, so the requested partition count is
+    honoured exactly and no partition comes back empty. The block-based
+    ``Dataset.split(n)`` path it replaced handed out whole blocks, which yields
+    empty trailing partitions whenever there are fewer blocks than partitions.
+    """
 
     def _make_executor(self, partition_size_cfg, num_partitions):
         fake = _fake_executor(
@@ -464,73 +520,70 @@ class SampleBasedSplitTest(DataJuicerTestCaseBase):
             start_row=0, end_row=0,
         )
         fake._save_partitioning_info = lambda info: None
+        fake._balanced_split_indices = PartitionedRayExecutor._balanced_split_indices
+        fake._split_into_row_balanced_partitions = lambda ds: (
+            PartitionedRayExecutor._split_into_row_balanced_partitions(fake, ds)
+        )
         return fake
 
-    def test_manual_size_uses_target_boundaries_without_recount(self):
+    @staticmethod
+    def _mock_data(total_rows, num_parts):
+        """Mock a Ray dataset that reports ``total_rows`` once materialized."""
         data = MagicMock()
-        data.split_at_indices.return_value = [MagicMock() for _ in range(3)]
-        for p in data.split_at_indices.return_value:
-            p.count.return_value = 2
-            p.take.return_value = [{"x": 1}]
+        materialized = MagicMock()
+        materialized.count.return_value = total_rows
+        data.materialize.return_value = materialized
+        parts = [MagicMock() for _ in range(num_parts)]
+        for part in parts:
+            part.count.return_value = total_rows // num_parts
+            part.take.return_value = [{"x": 1}]
+        materialized.split_at_indices.return_value = parts
+        return data, materialized
 
-        dataset = SimpleNamespace(data=data)
+    def test_manual_size_cuts_at_row_boundaries(self):
+        data, materialized = self._mock_data(total_rows=6, num_parts=3)
         fake = self._make_executor(partition_size_cfg=2, num_partitions=3)
 
-        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
-        data.split_at_indices.assert_called_once()
-        indices = data.split_at_indices.call_args[0][0]
-        self.assertEqual(indices, [2, 4])
-        data.count.assert_not_called()
+        materialized.split_at_indices.assert_called_once_with([2, 4])
         data.split.assert_not_called()
 
     def test_single_partition_materializes_without_split_indices(self):
-        data = MagicMock()
-        materialized = MagicMock()
-        data.materialize.return_value = materialized
-        dataset = SimpleNamespace(data=data)
+        data, materialized = self._mock_data(total_rows=100, num_parts=1)
         fake = self._make_executor(partition_size_cfg=100, num_partitions=1)
 
-        partitions, _ = PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        partitions, _ = PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
         self.assertEqual(partitions, [materialized])
         data.materialize.assert_called_once_with()
-        data.split_at_indices.assert_not_called()
+        materialized.split_at_indices.assert_not_called()
         data.split.assert_not_called()
 
-    def test_count_based_uses_block_split(self):
-        """When partition_size_cfg is None (count-based), split() is used."""
-        data = MagicMock()
-        data.split.return_value = [MagicMock() for _ in range(4)]
-        for p in data.split.return_value:
-            p.count.return_value = 250
-            p.take.return_value = [{"x": 1}]
-
-        dataset = SimpleNamespace(data=data)
+    def test_count_based_split_is_row_balanced_not_block_based(self):
+        """With partition_size_cfg unset the boundaries still come from the row count."""
+        data, materialized = self._mock_data(total_rows=1000, num_parts=4)
         fake = self._make_executor(partition_size_cfg=None, num_partitions=4)
 
-        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
-        data.split.assert_called_once_with(4)
-        data.split_at_indices.assert_not_called()
+        materialized.split_at_indices.assert_called_once_with([250, 500, 750])
+        data.split.assert_not_called()
 
-    def test_auto_mode_with_size_uses_block_split(self):
-        """Auto mode uses block-based split even when partition_size_cfg is set
-        (size is only an optimizer fallback in auto mode, not a row-level guarantee)."""
-        data = MagicMock()
-        data.split.return_value = [MagicMock() for _ in range(4)]
-        for p in data.split.return_value:
-            p.count.return_value = 250
-            p.take.return_value = [{"x": 1}]
+    def test_auto_mode_boundaries_follow_the_partition_count_not_size(self):
+        """In auto mode partition.size is only an optimizer fallback.
 
-        dataset = SimpleNamespace(data=data)
+        It has already been folded into num_partitions by then, so it must not
+        move the row boundaries a second time.
+        """
+        data, materialized = self._mock_data(total_rows=1000, num_parts=4)
         fake = self._make_executor(partition_size_cfg=500, num_partitions=4)
         fake.partition_mode = "auto"
 
-        PartitionedRayExecutor._split_dataset_deterministic(fake, dataset)
+        PartitionedRayExecutor._split_dataset_deterministic(fake, SimpleNamespace(data=data))
 
-        data.split.assert_called_once_with(4)
-        data.split_at_indices.assert_not_called()
+        materialized.split_at_indices.assert_called_once_with([250, 500, 750])
+        data.split.assert_not_called()
 
 
 if __name__ == "__main__":
