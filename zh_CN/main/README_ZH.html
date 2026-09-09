@@ -74,19 +74,6 @@
           </button>
           <div class="dropdown-panel">
             <a href="./../main/README_ZH.html" class="dropdown-item active">main</a>
-            <a href="./../v1.5.5/README_ZH.html" class="dropdown-item">v1.5.5</a>
-            <a href="./../v1.5.4/README_ZH.html" class="dropdown-item">v1.5.4</a>
-            <a href="./../v1.5.3/README_ZH.html" class="dropdown-item">v1.5.3</a>
-            <a href="./../v1.5.2/README_ZH.html" class="dropdown-item">v1.5.2</a>
-            <a href="./../v1.5.1/README_ZH.html" class="dropdown-item">v1.5.1</a>
-            <a href="./../v1.5.0/README_ZH.html" class="dropdown-item">v1.5.0</a>
-            <a href="./../v1.4.6/README_ZH.html" class="dropdown-item">v1.4.6</a>
-            <a href="./../v1.4.5/README_ZH.html" class="dropdown-item">v1.4.5</a>
-            <a href="./../v1.4.4/README_ZH.html" class="dropdown-item">v1.4.4</a>
-            <a href="./../v1.4.3/README_ZH.html" class="dropdown-item">v1.4.3</a>
-            <a href="./../v1.4.2/README_ZH.html" class="dropdown-item">v1.4.2</a>
-            <a href="./../v1.4.1/README_ZH.html" class="dropdown-item">v1.4.1</a>
-            <a href="./../v1.4.0/README_ZH.html" class="dropdown-item">v1.4.0</a>
           </div>
         </div>
 
@@ -491,6 +478,9 @@
 <blockquote>
 <div><p><strong>阿里云 PAI</strong> 已深度集成 Data-Juicer 到其数据处理产品中。请参阅 <strong><a class="reference external" href="https://www.alibabacloud.com/help/zh/pai/user-guide/quickly-submit-a-datajuicer-task">快速提交 DataJuicer 任务</a></strong>。</p>
 </div></blockquote>
+<blockquote>
+<div><p>🧃 <strong>Juicer</strong> 是我们的自然语言数据精炼模型，可将清洗指令、过滤规则和语义标注需求转化为结构化输出。欢迎在 <a class="reference external" href="https://huggingface.co/datajuicer/Juicer-35B-A3B">HuggingFace</a> 或 <a class="reference external" href="https://www.modelscope.cn/models/Data-Juicer/Juicer-35B-A3B">ModelScope</a> 上试用，或查阅 <strong><a class="reference internal" href="docs/Juicer_ZH.html"><span class="std std-doc">Juicer 文档</span></a></strong>。</p>
+</div></blockquote>
 <hr class="docutils" />
 <section id="id1">
 <h2>🚀 快速开始<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
@@ -558,9 +548,27 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>demos/process_
 <hr class="docutils" />
 <section id="id6">
 <h2>📰 动态<a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<details open>
+<summary>[2026-09-08] Release v1.6.0: <b>Juicer 模型发布；集群感知分区；配置校验；LiteLLM 后端</b></summary>
 <ul class="simple">
-<li><p>🎉 [2026-08-25] 我们发布了 <a class="reference internal" href="docs/Juicer_ZH.html"><span class="std std-doc">Juicer</span></a>，一个支持本地部署的数据精炼模型，可通过自然语言指令完成文本清洗、过滤与语义标注。欢迎下载<a class="reference external" href="https://huggingface.co/datajuicer/Juicer-35B-A3B">模型</a>，并在 <a class="reference external" href="https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground">Juicer Playground</a> 中体验数据处理配方。</p></li>
+<li><p>🧮 集群感知分区 — 自动分区数量根据实时 Ray 集群资源确定；手动 <code class="docutils literal notranslate"><span class="pre">partition.size</span></code> 按样本行切分，在输入 block 数少于分区数时也能正确划分数据。</p></li>
+<li><p>✅ 配置校验 — 管道预检在处理前发现算子配置错误及执行模式、数据字段不匹配；执行与分析统一应用读取默认参数。</p></li>
+<li><p>🔌 LiteLLM 后端 — 在 <code class="docutils literal notranslate"><span class="pre">prepare_api_model</span></code> 中选择 <code class="docutils literal notranslate"><span class="pre">api_backend=&quot;litellm&quot;</span></code>，通过提供商模型路由调用聊天、embedding 和 Responses 接口；原有 OpenAI 兼容后端仍为默认值。</p></li>
+<li><p>📚 文档更新 — 重写安装、数据处理、分析、配置、导出及 playground 的中英文指南，为 28 个已有算子补充文档并修正示例；指南与 API 导航独立组织，文档支持按版本增量构建。</p></li>
+<li><p>🗄️ 统一远程导出 — 本地、S3 和 HDFS 导出共用文件系统分发；JSONL 导出支持将 Python 日期和时间值序列化为 ISO 格式。</p></li>
+<li><p>🖼️ 图像 OHEM 选择器 — 新增 <code class="docutils literal notranslate"><span class="pre">image_ohem_selector</span></code>，通过用户提供的评分函数及 top-k 或比例预算选择高损失图像样本。</p></li>
+<li><p>⚡ 分词批次限制 — token 计数过滤器限制分词批大小，降低长输入的内存峰值。</p></li>
+<li><p>🔧 健壮性修复 — 修复融合过滤器缓存隔离、MinHash 状态复用与空输入、去重器执行模式声明、文本空分块、gzip JSONL 的 HPO 采样及 pandas 扩展 dtype 处理；导入 HPO 模块不再启动 sweep。</p></li>
 </ul>
+</details>
+<details open>
+<summary>[2026-08-25] Juicer 模型发布：<b>自然语言数据精炼；本地部署；Playground</b></summary>
+<ul class="simple">
+<li><p>🧃 自然语言数据精炼 — <a class="reference internal" href="docs/Juicer_ZH.html"><span class="std std-doc">Juicer</span></a> 可遵循自然语言指令完成文本清洗、过滤与语义标注。</p></li>
+<li><p>🏠 本地部署 — 下载<a class="reference external" href="https://huggingface.co/datajuicer/Juicer-35B-A3B">模型</a>，在本地部署和使用。</p></li>
+<li><p>🧪 Playground — 在 <a class="reference external" href="https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground">Juicer Playground</a> 中体验数据精炼配方。</p></li>
+</ul>
+</details>
 <details open>
 <summary>[2026-08-07] Release v1.5.5: <b>外部算子插件；HDFS I/O 与 Ray Data 优化；多节点弹性分片</b></summary>
 <ul class="simple">
@@ -573,7 +581,7 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>demos/process_
 <li><p>🔧 健壮性与依赖修复 — 修复 <code class="docutils literal notranslate"><span class="pre">text_chunk_mapper</span></code> 分隔符泄漏、<code class="docutils literal notranslate"><span class="pre">calibrate_response_mapper</span></code> 的 <code class="docutils literal notranslate"><span class="pre">output_pattern</span></code> 处理以及 <code class="docutils literal notranslate"><span class="pre">image_diffusion_mapper</span></code> 的空 caption 问题；为 <code class="docutils literal notranslate"><span class="pre">general_field_filter</span></code> 增加成员运算符；放宽 <code class="docutils literal notranslate"><span class="pre">numpy</span></code>/<code class="docutils literal notranslate"><span class="pre">fsspec</span></code>/<code class="docutils literal notranslate"><span class="pre">pandas</span></code> 版本约束以兼容 Python 3.13+ 与 pyarrow&gt;=17。</p></li>
 </ul>
 </details>
-<details open>
+<details>
 <summary>[2026-07-17] Release v1.5.4: <b>HumanVBench 视频算子；批内阶段算子融合；健壮性修复</b></summary>
 <ul class="simple">
 <li><p>🧑‍🤝‍🧑 新算子 — 新增 9 个以人为中心的视频理解算子（人物轨迹提取、活跃说话人检测、音频 ASR、语音情绪与年龄/性别检测、人脸人口统计与属性/情绪描述、人脸占比过滤），用于构建 HumanVBench (CVPR'26) 风格的处理流水线。</p></li>

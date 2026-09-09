@@ -74,19 +74,6 @@
           </button>
           <div class="dropdown-panel">
             <a href="./../main/README.html" class="dropdown-item active">main</a>
-            <a href="./../v1.5.5/README.html" class="dropdown-item">v1.5.5</a>
-            <a href="./../v1.5.4/README.html" class="dropdown-item">v1.5.4</a>
-            <a href="./../v1.5.3/README.html" class="dropdown-item">v1.5.3</a>
-            <a href="./../v1.5.2/README.html" class="dropdown-item">v1.5.2</a>
-            <a href="./../v1.5.1/README.html" class="dropdown-item">v1.5.1</a>
-            <a href="./../v1.5.0/README.html" class="dropdown-item">v1.5.0</a>
-            <a href="./../v1.4.6/README.html" class="dropdown-item">v1.4.6</a>
-            <a href="./../v1.4.5/README.html" class="dropdown-item">v1.4.5</a>
-            <a href="./../v1.4.4/README.html" class="dropdown-item">v1.4.4</a>
-            <a href="./../v1.4.3/README.html" class="dropdown-item">v1.4.3</a>
-            <a href="./../v1.4.2/README.html" class="dropdown-item">v1.4.2</a>
-            <a href="./../v1.4.1/README.html" class="dropdown-item">v1.4.1</a>
-            <a href="./../v1.4.0/README.html" class="dropdown-item">v1.4.0</a>
           </div>
         </div>
 
@@ -483,6 +470,9 @@
 <blockquote>
 <div><p><strong>Alibaba Cloud PAI</strong> has deeply integrated Data-Juicer into its data processing products.  See <strong><a class="reference external" href="https://www.alibabacloud.com/help/en/pai/user-guide/quickly-submit-a-datajuicer-task">Quickly submit a DataJuicer job</a></strong>.</p>
 </div></blockquote>
+<blockquote>
+<div><p>🧃 <strong>Juicer</strong>, our natural-language data-refinement model, turns cleaning instructions, filtering rules, and semantic-tagging requirements into structured outputs. Try it on <a class="reference external" href="https://huggingface.co/datajuicer/Juicer-35B-A3B">HuggingFace</a> or <a class="reference external" href="https://www.modelscope.cn/models/Data-Juicer/Juicer-35B-A3B">ModelScope</a>, or see the <strong><a class="reference internal" href="docs/Juicer.html"><span class="std std-doc">Juicer docs</span></a></strong>.</p>
+</div></blockquote>
 <hr class="docutils" />
 <section id="quick-start">
 <h2>🚀 Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
@@ -550,9 +540,27 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>demos/process_
 <hr class="docutils" />
 <section id="news">
 <h2>📰 News<a class="headerlink" href="#news" title="Link to this heading">¶</a></h2>
+<details open>
+<summary>[2026-09-08] Release v1.6.0: <b>Juicer Model Release; Cluster-Aware Partitioning; Config Validation; LiteLLM Backend</b></summary>
 <ul class="simple">
-<li><p>🎉 [2026-08-25] We release <a class="reference internal" href="docs/Juicer.html"><span class="std std-doc">Juicer</span></a>, a locally deployable data-refinement model that follows natural-language instructions for text cleaning, filtering, and semantic labeling. Explore the <a class="reference external" href="https://huggingface.co/datajuicer/Juicer-35B-A3B">model</a> and try recipes in the <a class="reference external" href="https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground">Juicer Playground</a>.</p></li>
+<li><p>🧮 <em>Cluster-Aware Partitioning</em> — Automatic partition counts use live Ray cluster resources. Manual <code class="docutils literal notranslate"><span class="pre">partition.size</span></code> targets split data at row boundaries, including inputs with fewer blocks than partitions.</p></li>
+<li><p>✅ <em>Config Validation</em> — Pipeline preflight catches invalid operator settings and executor/schema mismatches before processing. Reader defaults now apply consistently across execution and analysis.</p></li>
+<li><p>🔌 <em>LiteLLM Backend</em> — Select <code class="docutils literal notranslate"><span class="pre">api_backend=&quot;litellm&quot;</span></code> in <code class="docutils literal notranslate"><span class="pre">prepare_api_model</span></code> for chat, embedding, and Responses requests through provider-specific model routing; the existing OpenAI-compatible backend remains the default.</p></li>
+<li><p>📚 <em>Documentation Refresh</em> — Rewritten English and Chinese guides cover installation, processing, analysis, configuration, export, and the playground. Added documentation for 28 existing operators, corrected examples, and separated guide and API navigation with incremental versioned documentation builds.</p></li>
+<li><p>🗄️ <em>Unified Remote Export</em> — Local, S3, and HDFS export share filesystem dispatch; JSONL export now serializes Python dates and datetimes in ISO format.</p></li>
+<li><p>🖼️ <em>Image OHEM Selector</em> — New <code class="docutils literal notranslate"><span class="pre">image_ohem_selector</span></code> selects high-loss image samples using a user-supplied scoring function and a top-k or ratio budget.</p></li>
+<li><p>⚡ <em>Bounded Tokenizer Batches</em> — Token-count filters limit tokenizer batch sizes to reduce peak memory on long inputs.</p></li>
+<li><p>🔧 <em>Robustness Fixes</em> — Fixed fused-filter cache isolation, MinHash state reuse and empty inputs, deduplicator execution-mode declarations, empty text chunks, gzip JSONL HPO sampling, and pandas extension-dtype handling. HPO modules can now be imported without starting a sweep.</p></li>
 </ul>
+</details>
+<details open>
+<summary>[2026-08-25] Juicer Model Release: <b>Natural-Language Data Refinement; Local Deployment; Playground</b></summary>
+<ul class="simple">
+<li><p>🧃 <em>Natural-Language Data Refinement</em> — <a class="reference internal" href="docs/Juicer.html"><span class="std std-doc">Juicer</span></a> follows natural-language instructions for text cleaning, filtering, and semantic labeling.</p></li>
+<li><p>🏠 <em>Local Deployment</em> — Download the <a class="reference external" href="https://huggingface.co/datajuicer/Juicer-35B-A3B">model</a> for local deployment.</p></li>
+<li><p>🧪 <em>Playground</em> — Try data-refinement recipes in the <a class="reference external" href="https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground">Juicer Playground</a>.</p></li>
+</ul>
+</details>
 <details open>
 <summary>[2026-08-07] Release v1.5.5: <b>External OP Plugins; HDFS I/O & Ray Data Optimizations; Elastic Multi-node Sharding</b></summary>
 <ul class="simple">
@@ -565,7 +573,7 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>demos/process_
 <li><p>🔧 <em>Robustness &amp; Dependency Fixes</em> — Fixed <code class="docutils literal notranslate"><span class="pre">text_chunk_mapper</span></code> delimiter leakage, <code class="docutils literal notranslate"><span class="pre">calibrate_response_mapper</span></code> <code class="docutils literal notranslate"><span class="pre">output_pattern</span></code> handling, and null captions in <code class="docutils literal notranslate"><span class="pre">image_diffusion_mapper</span></code>; added membership operators to <code class="docutils literal notranslate"><span class="pre">general_field_filter</span></code>; relaxed <code class="docutils literal notranslate"><span class="pre">numpy</span></code>/<code class="docutils literal notranslate"><span class="pre">fsspec</span></code>/<code class="docutils literal notranslate"><span class="pre">pandas</span></code> bounds for Python 3.13+ and pyarrow&gt;=17.</p></li>
 </ul>
 </details>
-<details open>
+<details>
 <summary>[2026-07-17] Release v1.5.4: <b>HumanVBench Video OPs; Batch-local Stage Fusion; Robustness Fixes</b></summary>
 <ul class="simple">
 <li><p>🧑‍🤝‍🧑 <em>New OPs</em> — Added 9 human-centric video understanding operators (human track extraction, active-speaker detection, audio ASR, speech emotion &amp; age/gender detection, face demographic &amp; attribute/emotion captioning, face-ratio filtering) for building HumanVBench (CVPR’26)-style pipelines.</p></li>
