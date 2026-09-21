@@ -1316,27 +1316,24 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         return RayDataset(merged_dataset, cfg=self.cfg)
 
     def _should_use_execution_groups(self, dataset: RayDataset, ops: List) -> bool:
-        """Return whether logical partitions can safely share one GPU execution."""
-        if getattr(self, "_is_resuming", False):
-            logger.info("Using per-partition execution while resuming heterogeneous checkpoints.")
-            return False
-        has_gpu_actor = any(
-            getattr(op, "accelerator", None) == "cuda"
-            and (float(getattr(op, "num_gpus", 0) or 0) > 0 or op.use_ray_actor())
-            for op in ops
-        )
-        if not has_gpu_actor:
-            return False
-        if any(not isinstance(op, (Mapper, Filter)) for op in ops):
-            logger.info("GPU execution grouping is disabled because the segment contains a dataset-level operator.")
-            return False
+        """The execution-group barrier path is retired from selection.
+
+        recovery_mode=streaming is handled by the tee-sink frontier (dispatched
+        before this is ever reached), and recovery_mode=partition is defined as
+        the plain per-partition path — "no execution groups" — so this must not
+        route a partition-mode run into the group barrier. Keeping the method
+        (rather than deleting the branch) preserves the reserved-column guard as
+        a single documented decision point should the path ever be revived.
+        """
+        # Guard against the reserved logical-partition column even though we no
+        # longer select the group path, so a revival keeps the invariant.
         try:
             names = self._schema_names(dataset.data)
         except Exception:
             names = set()
         if _LOGICAL_PARTITION_COLUMN in names:
             raise RuntimeError(f"Input dataset contains reserved execution-group column {_LOGICAL_PARTITION_COLUMN!r}.")
-        return True
+        return False
 
     def _should_use_streaming_recovery(self, dataset: RayDataset, ops: List) -> bool:
         """Return whether this segment should use streaming tee-sink row-level
