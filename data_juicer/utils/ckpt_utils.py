@@ -12,18 +12,34 @@ from loguru import logger
 STREAM_MANIFEST_SCHEMA_VERSION = 1
 
 
-def atomic_write_json(path: str, payload: dict) -> None:
+def atomic_write_json(path: str, payload: dict, fsync: bool = False) -> None:
     """Write ``payload`` as JSON atomically (write-tmp then os.replace).
 
     Crash-safe and concurrency-safe on POSIX: a reader either sees the old file
     or the fully-written new one, never a partial. A half-written ``.tmp`` left
     by a crash is ignored by the reconciler.
+
+    ``os.replace`` gives atomicity, not durability: after a process-kill the
+    page cache preserves the write, but a power-loss/NFS crash can lose or
+    reorder it. Pass ``fsync=True`` to flush the file and its directory to
+    stable storage before returning, which additionally guarantees ordering
+    against a later write in the same directory.
     """
     tmp = f"{path}.tmp"
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    directory = os.path.dirname(path)
+    os.makedirs(directory, exist_ok=True)
     with open(tmp, "w") as f:
         json.dump(payload, f)
+        if fsync:
+            f.flush()
+            os.fsync(f.fileno())
     os.replace(tmp, path)
+    if fsync:
+        dir_fd = os.open(directory, os.O_RDONLY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
 
 
 def merge_row_id_ranges(ranges: List[Tuple[int, int]]) -> List[Tuple[int, int]]:

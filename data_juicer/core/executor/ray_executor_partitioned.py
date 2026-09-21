@@ -15,7 +15,6 @@ import math
 import os
 import shutil
 import time
-import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -67,6 +66,20 @@ _LOGICAL_PARTITION_COLUMN = "__data_juicer_logical_partition_id__"
 # recovery. Mappers/Filters carry it unchanged; it is the frontier key and is
 # dropped just before export. Reserved: rejected if present in the input schema.
 _ROW_ID_COLUMN = "__data_juicer_row_id__"
+# Known row-EXPANDING (1:many) mappers. Streaming recovery's row-id frontier
+# assumes 1:1 / row-dropping ops (each input row keeps its one unique id); a
+# 1:many op copies a parent id onto every sub-row, which the frontier cannot
+# represent. DJ exposes no cardinality flag, so this is a best-effort static
+# fast-fail; the real guarantee is the runtime row-id-uniqueness assertion in
+# _StreamTeeSink, which catches any expander regardless of this list.
+_ROW_EXPANDING_MAPPERS = frozenset(
+    {
+        "generate_qa_from_text_mapper",
+        "image_diffusion_mapper",
+        "nlpaug_en_mapper",
+        "nlpcda_zh_mapper",
+    }
+)
 _PARTITION_CONTENT_HASH_ALGORITHM = "sha256-sequence-v1"
 _PARTITION_CONTENT_HASH_MODULUS = 1 << 256
 _PARTITION_CONTENT_HASH_BASE = int.from_bytes(hashlib.sha256(b"data-juicer-partition-sequence-v1").digest(), "big") | 1
@@ -166,6 +179,7 @@ class _StreamTeeSink:
         op_name: str,
         job_id: str,
         row_id_column: str = _ROW_ID_COLUMN,
+        fsync: bool = True,
     ):
         self.ckpt_dir = ckpt_dir
         self.data_dir = data_dir
@@ -175,8 +189,17 @@ class _StreamTeeSink:
         self.op_name = op_name
         self.job_id = job_id
         self.row_id_column = row_id_column
+        self.fsync = fsync
         os.makedirs(self.data_dir, exist_ok=True)
         os.makedirs(self.manifest_dir, exist_ok=True)
+
+    @staticmethod
+    def _fsync_path(path):
+        fd = os.open(path, os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
 
     def __call__(self, batch):
         import pyarrow.parquet as pq
@@ -189,13 +212,35 @@ class _StreamTeeSink:
                 "an operator must have dropped it, breaking recovery provenance."
             )
 
-        block_uuid = uuid.uuid4().hex
-        block_name = f"block_{block_uuid}.parquet"
-        block_path = os.path.join(self.data_dir, block_name)
+        row_ids = [int(x) for x in batch.column(self.row_id_column).to_pylist()]
+        sorted_ids = sorted(row_ids)
+        # Cardinality guard (runtime out<=in enforcement): a 1:1/row-dropping op
+        # keeps every input row's unique stamped id, so ids stay unique. A
+        # row-expanding (1:many) mapper copies a parent id onto each sub-row,
+        # producing duplicates -- which the row-id frontier cannot represent.
+        # Fail closed and tell the user to fall back to the partition path.
+        if len(set(sorted_ids)) != len(sorted_ids):
+            raise RuntimeError(
+                f"Streaming recovery requires 1:1 / row-dropping ops, but segment {self.segment_index} "
+                f"(op '{self.op_name}') produced duplicate row ids -- a row-expanding (1:many) operator. "
+                "Set partition.recovery_mode=partition for this pipeline."
+            )
+
+        # Content-key filename: stable across Ray lineage recompute of this
+        # side-effecting tee. If Ray recomputes a lost block with the same rows,
+        # it overwrites its own file instead of writing a fresh uuid-named
+        # duplicate that would double-count on a future resume.
+        content_key = hashlib.sha1((",".join(map(str, sorted_ids))).encode()).hexdigest()[:16]
+        stem = f"block_{content_key}_{self.segment_index:04d}"
+        block_path = os.path.join(self.data_dir, f"{stem}.parquet")
         # Durable block write (all columns, including the row-id provenance).
         pq.write_table(batch, block_path)
+        if self.fsync:
+            # Block durable (file + its dir) before the manifest that points at
+            # it, and before the batch flows to the next segment.
+            self._fsync_path(block_path)
+            self._fsync_path(self.data_dir)
 
-        row_ids = batch.column(self.row_id_column).to_pylist()
         payload = {
             "schema_version": STREAM_MANIFEST_SCHEMA_VERSION,
             "job_id": self.job_id,
@@ -204,11 +249,13 @@ class _StreamTeeSink:
             "op_name": self.op_name,
             "block_uri": os.path.relpath(block_path, self.ckpt_dir),
             "frontier_key": "row_id",
-            "committed_row_id_ranges": _contiguous_row_id_ranges(row_ids),
+            "committed_row_id_ranges": _contiguous_row_id_ranges(sorted_ids),
             "row_count": batch.num_rows,
             "written_at": time.time(),
         }
-        atomic_write_json(os.path.join(self.manifest_dir, f"block_{block_uuid}.json"), payload)
+        # atomic_write_json(fsync=...) flushes the shard + manifest dir when on,
+        # so on return both block and manifest are durable for this segment.
+        atomic_write_json(os.path.join(self.manifest_dir, f"{stem}.json"), payload, fsync=self.fsync)
         # Pass through unchanged: downstream keeps consuming while later blocks tee.
         return batch
 
@@ -505,7 +552,8 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         )
         execution_group_size = ConfigAccessor.get(partition_cfg, "execution_group_size", "auto")
         recovery_mode = ConfigAccessor.get(partition_cfg, "recovery_mode", "streaming")
-        stream_block_size = ConfigAccessor.get(partition_cfg, "stream_block_size", None)
+        stream_segments = ConfigAccessor.get(partition_cfg, "stream_segments", 1)
+        stream_fsync = ConfigAccessor.get(partition_cfg, "stream_fsync", True)
         max_initialization_overhead_ratio = ConfigAccessor.get(
             partition_cfg,
             "max_initialization_overhead_ratio",
@@ -689,17 +737,23 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             logger.warning(f"Invalid partition.recovery_mode={recovery_mode!r}; using 'streaming'")
             normalized_recovery = "streaming"
         self.recovery_mode = normalized_recovery
-        # Rows per committed stream block. Bounds the crash blast radius (an
-        # uncommitted block re-runs) and the resume re-read granularity. None/0
-        # means "preserve the upstream block boundaries" (one committed block
-        # per Ray input block, no rebatching).
+        # Number of contiguous op-segments; a tee-sink is inserted after each.
+        # More segments => finer resume (re-run only ops after the deepest
+        # committed segment) at the cost of more committed blocks. Clamped to
+        # >= 1 here; further clamped to <= len(ops) when the segments are built.
+        # Blocks are always block-preserving (batch_size=None, no rebatch) so a
+        # 1:many op's expansion is not split across committed blocks by us; the
+        # former stream_block_size knob was redundant with override_num_blocks
+        # / the read block_size and is removed.
         try:
-            self.stream_block_size = int(stream_block_size) if stream_block_size else None
-            if self.stream_block_size is not None and self.stream_block_size <= 0:
-                self.stream_block_size = None
+            self.stream_segments = max(1, int(stream_segments)) if stream_segments else 1
         except (TypeError, ValueError):
-            logger.warning(f"Invalid partition.stream_block_size={stream_block_size!r}; using block-preserving (None)")
-            self.stream_block_size = None
+            logger.warning(f"Invalid partition.stream_segments={stream_segments!r}; using 1")
+            self.stream_segments = 1
+        # fsync committed block + manifest (and dirs) before the tee returns, so
+        # segment k is durable before its rows reach segment k+1 (nested frontier
+        # holds under power-loss, not just process-kill).
+        self.stream_fsync = bool(stream_fsync) if stream_fsync is not None else True
         self.partition_size_cfg = partition_size
         self.max_size_mb = max_size_mb
 
@@ -1310,6 +1364,13 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             if any(not isinstance(op, (Mapper, Filter)) for op in ops):
                 logger.info("Streaming recovery disabled: segment contains a dataset-level operator.")
                 return False
+            # Cardinality guard (static fast-fail): a known 1:many mapper breaks
+            # the row-id frontier. Best-effort; _StreamTeeSink asserts row-id
+            # uniqueness at runtime for any expander not on this list.
+            expanders = [getattr(op, "_name", "") for op in ops if getattr(op, "_name", "") in _ROW_EXPANDING_MAPPERS]
+            if expanders:
+                logger.info(f"Streaming recovery disabled: row-expanding (1:many) operator(s) {expanders}.")
+                return False
             # Block + manifest commits rely on POSIX-atomic os.replace; a remote
             # checkpoint dir gives no such guarantee, so fall back.
             if is_remote_path(self.ckpt_manager.ckpt_dir):
@@ -1355,88 +1416,147 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         stamped = base.zip(row_ids)
         return RayDataset(stamped, cfg=self.cfg)
 
-    def _process_streaming_with_tee_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
-        """Phase 1 single-segment, block-level streaming recovery.
+    def _split_ops_into_segments(self, ops: List) -> List[dict]:
+        """Split the op chain into ``stream_segments`` contiguous, non-empty,
+        as-evenly-sized-as-possible segments.
 
-        The whole Mapper/Filter chain is one segment. Rows are stamped with a
-        stable global id, processed as one lazy stream, then teed per block by a
-        hot pass-through actor pool that durably commits (block parquet + atomic
-        manifest shard) WITHOUT a materialize barrier. On resume the committed
-        frontier is read back and only uncommitted rows are re-processed, so the
-        crash blast radius is the set of uncommitted rows -- not G partitions.
+        Each segment records the ops it runs, the GLOBAL index of its last op
+        (the tee boundary), and that op's name for the manifest. The count is
+        clamped to ``len(ops)`` so every segment has at least one op.
+        """
+        n = len(ops)
+        s = max(1, min(int(getattr(self, "stream_segments", 1)), n)) if n else 1
+        segments: List[dict] = []
+        start = 0
+        for i in range(s):
+            size = n // s + (1 if i < n % s else 0)
+            seg_ops = ops[start : start + size]
+            boundary_idx = start + size - 1
+            op_name = getattr(ops[boundary_idx], "_name", f"op_{boundary_idx}") if seg_ops else "identity"
+            segments.append({"ops": seg_ops, "boundary_idx": boundary_idx, "op_name": op_name})
+            start += size
+        return segments
+
+    def _thread_segments(self, source_data, segments: List[dict], start_seg: int, concurrency: int):
+        """Thread a lazy stream through segments ``start_seg..end``, applying
+        each segment's ops then a pass-through tee, with NO materialize barrier
+        between segments (one lazy plan)."""
+        data = source_data
+        for k in range(start_seg, len(segments)):
+            seg = segments[k]
+            data = RayDataset(data, cfg=self.cfg).process(seg["ops"]).data
+            tee_kwargs = dict(
+                ckpt_dir=self.ckpt_manager.ckpt_dir,
+                data_dir=self.ckpt_manager.stream_data_dir(k),
+                manifest_dir=self.ckpt_manager.stream_manifest_dir(k),
+                segment_index=k,
+                op_boundary_idx=seg["boundary_idx"],
+                op_name=seg["op_name"],
+                job_id=self.job_id,
+                row_id_column=_ROW_ID_COLUMN,
+                fsync=getattr(self, "stream_fsync", True),
+            )
+            # batch_size None => one tee block per upstream block (block-preserving,
+            # no rebatch) so a 1:many expansion is never split across our blocks.
+            data = data.map_batches(
+                _StreamTeeSink,
+                fn_constructor_kwargs=tee_kwargs,
+                concurrency=concurrency,
+                batch_format="pyarrow",
+                batch_size=None,
+            )
+        return data
+
+    def _process_streaming_with_tee_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
+        """Multi-segment, block-level streaming recovery.
+
+        The Mapper/Filter chain is split into ``stream_segments`` contiguous
+        segments; a hot pass-through tee actor pool durably commits (block
+        parquet + atomic manifest shard) after each segment WITHOUT a
+        materialize barrier -- still one lazy stream. Rows carry a stable global
+        id, so on resume each segment's committed frontier F_k is reconciled
+        (nested F_0 >= F_1 >= ... >= F_{S-1} under kill + local FS; fsync extends
+        that to power-loss). A row is re-processed only from the segment AFTER
+        the DEEPEST tee that already committed it -- so the crash blast radius is
+        (uncommitted rows) x (ops after their deepest committed segment), strictly
+        finer than the single-segment whole-chain re-run.
         """
         stamped = self._stamp_row_ids(dataset)
+        segments = self._split_ops_into_segments(ops)
+        s = len(segments)
         concurrency = self._resolve_tee_sink_concurrency(ops)
+        resuming = getattr(self, "_is_resuming", False)
         logger.info(
-            f"Streaming tee-sink recovery: concurrency={concurrency}, "
-            f"resuming={getattr(self, '_is_resuming', False)}"
+            f"Streaming tee-sink recovery: segments={s}, concurrency={concurrency}, "
+            f"fsync={getattr(self, 'stream_fsync', True)}, resuming={resuming}"
         )
-        last_op_idx = len(ops) - 1
-        last_op_name = getattr(ops[last_op_idx], "_name", f"op_{last_op_idx}") if ops else "identity"
-        data_dir = self.ckpt_manager.stream_data_dir(0)
-        manifest_dir = self.ckpt_manager.stream_manifest_dir(0)
 
-        committed_ranges: List[Tuple[int, int]] = []
-        committed_blocks: List[str] = []
-        if getattr(self, "_is_resuming", False):
-            committed_ranges, committed_blocks, shard_count = self.ckpt_manager.reconcile_stream_frontier(0)
-            committed_rows = sum(hi - lo for lo, hi in committed_ranges)
-            logger.info(
-                f"Streaming resume: {shard_count} committed block shard(s), "
-                f"{committed_rows} committed row(s); re-processing only the remainder."
-            )
+        # Reconcile every segment's committed frontier (resume only).
+        frontiers: List[List[Tuple[int, int]]] = [[] for _ in range(s)]
+        block_uris: List[List[str]] = [[] for _ in range(s)]
+        if resuming:
+            for k in range(s):
+                fr, bu, sc = self.ckpt_manager.reconcile_stream_frontier(k)
+                frontiers[k], block_uris[k] = fr, bu
+                logger.info(
+                    f"Streaming resume: segment {k} has {sc} committed shard(s), "
+                    f"{sum(hi - lo for lo, hi in fr)} committed row(s)."
+                )
 
-        # Rows still outside the committed frontier must be (re)processed.
-        if committed_ranges:
-            frozen = committed_ranges
-            remaining_src = stamped.data.filter(
-                lambda row, r=frozen: not row_id_in_ranges(int(row[_ROW_ID_COLUMN]), r)
+        # Each row enters the pipeline once, right AFTER the deepest tee that
+        # committed it. Partition the work into disjoint streams by that depth
+        # and union their endpoints:
+        #   - depth S-1 (fully done): restore final output, no reprocessing.
+        #   - depth k in [0, S-2]: restore segment k's output for rows in
+        #     F_k \ F_{k+1}, run segments k+1..S-1.
+        #   - fresh (not in F_0): run all segments from the raw stamped input.
+        # (block_uris[k] contains exactly F_k's rows, so filtering out F_{k+1}
+        #  yields F_k \ F_{k+1} without an explicit range difference.)
+        output_streams = []
+
+        if resuming and block_uris[s - 1]:
+            # Already through the whole chain -- restore verbatim, no ops/tee.
+            output_streams.append(ray.data.read_parquet(block_uris[s - 1]))
+
+        if resuming:
+            for k in range(s - 2, -1, -1):
+                if not block_uris[k]:
+                    continue
+                next_frontier = frontiers[k + 1]
+                restored_k = ray.data.read_parquet(block_uris[k])
+                if next_frontier:
+                    restored_k = restored_k.filter(
+                        lambda row, r=next_frontier: not row_id_in_ranges(int(row[_ROW_ID_COLUMN]), r)
+                    )
+                output_streams.append(self._thread_segments(restored_k, segments, k + 1, concurrency))
+
+        # Fresh rows: everything not yet committed by the first tee.
+        f0 = frontiers[0] if resuming else []
+        if f0:
+            fresh_src = stamped.data.filter(
+                lambda row, r=f0: not row_id_in_ranges(int(row[_ROW_ID_COLUMN]), r)
             )
         else:
-            remaining_src = stamped.data
+            fresh_src = stamped.data
+        output_streams.append(self._thread_segments(fresh_src, segments, 0, concurrency))
 
-        remaining = RayDataset(remaining_src, cfg=self.cfg).process(ops)
-
-        tee_kwargs = dict(
-            ckpt_dir=self.ckpt_manager.ckpt_dir,
-            data_dir=data_dir,
-            manifest_dir=manifest_dir,
-            segment_index=0,
-            op_boundary_idx=last_op_idx,
-            op_name=last_op_name,
-            job_id=self.job_id,
-            row_id_column=_ROW_ID_COLUMN,
-        )
-        # batch_size None => one tee block per upstream block (block-preserving,
-        # no rebatch). A configured stream_block_size bounds each committed block
-        # (and thus the crash blast) to that many rows.
-        remaining.data = remaining.data.map_batches(
-            _StreamTeeSink,
-            fn_constructor_kwargs=tee_kwargs,
-            concurrency=concurrency,
-            batch_format="pyarrow",
-            batch_size=getattr(self, "stream_block_size", None),
-        )
-
-        if committed_blocks:
-            restored = ray.data.read_parquet(committed_blocks)
-            merged = restored.union(remaining.data)
-        else:
-            merged = remaining.data
+        merged = output_streams[0]
+        for stream in output_streams[1:]:
+            merged = merged.union(stream)
 
         # Row-id provenance is internal; strip it before final export.
         merged = merged.drop_columns([_ROW_ID_COLUMN])
 
-        # Terminal materialize == exactly-once execution of this streaming
-        # segment. The tee sink has side effects (block parquet + manifest
-        # shard); Ray runs a lazy plan once per terminal action, and the
-        # downstream exporter alone triggers TWO (a .columns() schema probe
-        # then the write), which would double-commit every block. Collecting
-        # here pins one streaming pass -- the tee commits each block once and
-        # the manifest is still written incrementally as blocks flow -- while
-        # the exporter's later .columns()/write read cached blocks without
-        # re-teeing. This is a single end-of-segment barrier, NOT #1054's
-        # per-op-group barriers: one hot actor pool, row-level crash blast.
+        # Terminal materialize == exactly-once execution of this streaming plan.
+        # The tee sinks have side effects (block parquet + manifest shard); Ray
+        # runs a lazy plan once per terminal action, and the downstream exporter
+        # alone triggers TWO (a .columns() schema probe then the write), which
+        # would double-commit every block. Collecting here pins one streaming
+        # pass -- each tee commits its blocks once and manifests are written
+        # incrementally as blocks flow -- while the exporter's later
+        # .columns()/write read cached blocks without re-teeing. This is a single
+        # end-of-plan barrier, NOT #1054's per-op-group barriers: hot actor
+        # pools, row-level crash blast.
         merged = merged.materialize()
         return RayDataset(merged, cfg=self.cfg)
 

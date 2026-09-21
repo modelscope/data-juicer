@@ -830,13 +830,26 @@ def build_base_parser() -> ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--partition.stream_block_size",
+        "--partition.stream_segments",
         type=Optional[int],
-        default=None,
+        default=1,
         help=(
-            "Rows per committed stream block under recovery_mode=streaming. Bounds the crash blast "
-            "radius (an uncommitted block re-runs) and the resume re-read granularity. None/0 (default) "
-            "preserves the upstream Ray block boundaries (one committed block per input block, no rebatch)."
+            "Number of contiguous op-segments the (Mapper/Filter) chain is split into under "
+            "recovery_mode=streaming. A pass-through tee-sink is inserted after each segment, so a "
+            "resume re-runs only the ops AFTER the deepest segment that already committed a row "
+            "(finer recovery than the single-segment default). Still ONE lazy stream, no per-segment "
+            "materialize barrier. 1 (default) = single segment (whole chain). Clamped to <= number of ops."
+        ),
+    )
+    parser.add_argument(
+        "--partition.stream_fsync",
+        type=bool,
+        default=True,
+        help=(
+            "Under recovery_mode=streaming, fsync each committed block parquet and manifest shard (and "
+            "their directories) BEFORE the tee returns the batch downstream. This makes segment k's "
+            "commit durable before its rows can reach segment k+1, so the nested frontier holds even "
+            "under power-loss/NFS (not just process-kill). Default True; set False for a no-fsync A/B."
         ),
     )
     parser.add_argument(
