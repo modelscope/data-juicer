@@ -818,6 +818,28 @@ def build_base_parser() -> ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--partition.recovery_mode",
+        type=Literal["streaming", "partition"],
+        default="streaming",
+        help=(
+            "How the GPU + all-(Mapper/Filter) segment is processed. 'streaming' (default) uses a "
+            "pass-through tee-sink with a row-level manifest frontier: crash blast radius equals the "
+            "uncommitted-row lag and model loads equal the actor-pool size, decoupling the two. "
+            "'partition' forces the plain per-partition path (no execution groups). The legacy "
+            "execution-group barrier path is retired from selection."
+        ),
+    )
+    parser.add_argument(
+        "--partition.stream_block_size",
+        type=Optional[int],
+        default=None,
+        help=(
+            "Rows per committed stream block under recovery_mode=streaming. Bounds the crash blast "
+            "radius (an uncommitted block re-runs) and the resume re-read granularity. None/0 (default) "
+            "preserves the upstream Ray block boundaries (one committed block per input block, no rebatch)."
+        ),
+    )
+    parser.add_argument(
         "--partition.max_initialization_overhead_ratio",
         type=float,
         default=0.1,

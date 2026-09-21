@@ -15,10 +15,11 @@ import math
 import os
 import shutil
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from jsonargparse import Namespace
@@ -40,7 +41,13 @@ from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin, Eve
 from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-from data_juicer.utils.ckpt_utils import CheckpointStrategy, RayCheckpointManager
+from data_juicer.utils.ckpt_utils import (
+    STREAM_MANIFEST_SCHEMA_VERSION,
+    CheckpointStrategy,
+    RayCheckpointManager,
+    atomic_write_json,
+    row_id_in_ranges,
+)
 from data_juicer.utils.config_utils import ConfigAccessor
 from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -56,6 +63,10 @@ _DEFAULT_GPU_PROBE_STEADY_BATCHES = 3
 _DEFAULT_GPU_PROBE_SAMPLE_SEED = 42
 _DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO = 0.10
 _LOGICAL_PARTITION_COLUMN = "__data_juicer_logical_partition_id__"
+# Stable global read-order row id injected at ingestion for streaming tee-sink
+# recovery. Mappers/Filters carry it unchanged; it is the frontier key and is
+# dropped just before export. Reserved: rejected if present in the input schema.
+_ROW_ID_COLUMN = "__data_juicer_row_id__"
 _PARTITION_CONTENT_HASH_ALGORITHM = "sha256-sequence-v1"
 _PARTITION_CONTENT_HASH_MODULUS = 1 << 256
 _PARTITION_CONTENT_HASH_BASE = int.from_bytes(hashlib.sha256(b"data-juicer-partition-sequence-v1").digest(), "big") | 1
@@ -117,6 +128,89 @@ def _add_logical_partition_id(batch, partition_id: int):
 
 def _matches_logical_partition(row: Dict, partition_id: int) -> bool:
     return row[_LOGICAL_PARTITION_COLUMN] == partition_id
+
+
+def _contiguous_row_id_ranges(row_ids: List[int]) -> List[list]:
+    """Compress a set of row ids into sorted, disjoint half-open [lo, hi) ranges.
+
+    Row ids are contiguous in read order, but a Filter upstream may punch holes,
+    so we compute the actual runs present in this block rather than assume one range.
+    """
+    ranges: List[list] = []
+    for rid in sorted(int(x) for x in row_ids):
+        if ranges and rid == ranges[-1][1]:
+            ranges[-1][1] = rid + 1
+        else:
+            ranges.append([rid, rid + 1])
+    return ranges
+
+
+class _StreamTeeSink:
+    """Pass-through Ray Data actor that durably tees each block, then returns it
+    unchanged so the pipeline keeps streaming (no materialize barrier).
+
+    Verified in experiments/seg_grid/ray_stream_probe.py (V1/V2): a hot actor
+    pool of this class writes one parquet block + one atomic manifest shard per
+    input block without triggering an implicit materialize, and concurrent shard
+    commits are crash-safe (write-tmp then os.replace; a leftover .tmp is ignored
+    by RayCheckpointManager.reconcile_stream_frontier).
+    """
+
+    def __init__(
+        self,
+        ckpt_dir: str,
+        data_dir: str,
+        manifest_dir: str,
+        segment_index: int,
+        op_boundary_idx: int,
+        op_name: str,
+        job_id: str,
+        row_id_column: str = _ROW_ID_COLUMN,
+    ):
+        self.ckpt_dir = ckpt_dir
+        self.data_dir = data_dir
+        self.manifest_dir = manifest_dir
+        self.segment_index = segment_index
+        self.op_boundary_idx = op_boundary_idx
+        self.op_name = op_name
+        self.job_id = job_id
+        self.row_id_column = row_id_column
+        os.makedirs(self.data_dir, exist_ok=True)
+        os.makedirs(self.manifest_dir, exist_ok=True)
+
+    def __call__(self, batch):
+        import pyarrow.parquet as pq
+
+        if batch.num_rows == 0:
+            return batch
+        if self.row_id_column not in batch.column_names:
+            raise RuntimeError(
+                f"Stream tee-sink lost the row-id column '{self.row_id_column}'; "
+                "an operator must have dropped it, breaking recovery provenance."
+            )
+
+        block_uuid = uuid.uuid4().hex
+        block_name = f"block_{block_uuid}.parquet"
+        block_path = os.path.join(self.data_dir, block_name)
+        # Durable block write (all columns, including the row-id provenance).
+        pq.write_table(batch, block_path)
+
+        row_ids = batch.column(self.row_id_column).to_pylist()
+        payload = {
+            "schema_version": STREAM_MANIFEST_SCHEMA_VERSION,
+            "job_id": self.job_id,
+            "segment_index": self.segment_index,
+            "op_boundary_idx": self.op_boundary_idx,
+            "op_name": self.op_name,
+            "block_uri": os.path.relpath(block_path, self.ckpt_dir),
+            "frontier_key": "row_id",
+            "committed_row_id_ranges": _contiguous_row_id_ranges(row_ids),
+            "row_count": batch.num_rows,
+            "written_at": time.time(),
+        }
+        atomic_write_json(os.path.join(self.manifest_dir, f"block_{block_uuid}.json"), payload)
+        # Pass through unchanged: downstream keeps consuming while later blocks tee.
+        return batch
 
 
 class TempDirManager:
@@ -410,6 +504,8 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             _DEFAULT_GPU_PROBE_SAMPLE_SEED,
         )
         execution_group_size = ConfigAccessor.get(partition_cfg, "execution_group_size", "auto")
+        recovery_mode = ConfigAccessor.get(partition_cfg, "recovery_mode", "streaming")
+        stream_block_size = ConfigAccessor.get(partition_cfg, "stream_block_size", None)
         max_initialization_overhead_ratio = ConfigAccessor.get(
             partition_cfg,
             "max_initialization_overhead_ratio",
@@ -583,6 +679,27 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 f"{_DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO}"
             )
             self.max_initialization_overhead_ratio = _DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO
+        # Recovery mode selects how the GPU + all-(Mapper/Filter) segment is
+        # processed. "streaming" (default) uses the tee-sink row-level frontier
+        # that decouples actor reuse from crash blast radius; "partition" forces
+        # the plain per-partition path (no execution groups), which is the honest
+        # A/B baseline. The execution_group barrier path is retired from selection.
+        normalized_recovery = str(recovery_mode).strip().lower() if recovery_mode is not None else "streaming"
+        if normalized_recovery not in {"streaming", "partition"}:
+            logger.warning(f"Invalid partition.recovery_mode={recovery_mode!r}; using 'streaming'")
+            normalized_recovery = "streaming"
+        self.recovery_mode = normalized_recovery
+        # Rows per committed stream block. Bounds the crash blast radius (an
+        # uncommitted block re-runs) and the resume re-read granularity. None/0
+        # means "preserve the upstream block boundaries" (one committed block
+        # per Ray input block, no rebatching).
+        try:
+            self.stream_block_size = int(stream_block_size) if stream_block_size else None
+            if self.stream_block_size is not None and self.stream_block_size <= 0:
+                self.stream_block_size = None
+        except (TypeError, ValueError):
+            logger.warning(f"Invalid partition.stream_block_size={stream_block_size!r}; using block-preserving (None)")
+            self.stream_block_size = None
         self.partition_size_cfg = partition_size
         self.max_size_mb = max_size_mb
 
@@ -956,10 +1073,16 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # only after the generic schema/environment validation has succeeded.
         self._configure_pre_partition_resources(dataset, ops)
 
+        # Streaming tee-sink recovery keeps the input as one lazy stream and
+        # never manually partitions, so the whole partition-count negotiation
+        # below (including the resume partitioning_info.json requirement) is
+        # bypassed; its frontier lives in the stream manifest instead.
+        streaming_selected = self._should_use_streaming_recovery(dataset, ops)
+
         # A resumed job must reuse the saved partition count before DAG
         # initialization. Auto mode can otherwise choose a different count if
         # the Ray cluster resources changed between runs.
-        if resume_requested:
+        if resume_requested and not streaming_selected:
             saved_info = self._load_partitioning_info()
             if saved_info is None:
                 raise RuntimeError(
@@ -972,7 +1095,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # (DAG needs final partition count). At this point GPU preflight and
         # automatic operator parallelism have both populated the real
         # per-worker requests used by the cluster-aware bounds.
-        if not resume_requested and self.partition_mode == "auto":
+        if streaming_selected:
+            logger.info("Streaming tee-sink recovery selected; skipping manual partitioning.")
+        elif not resume_requested and self.partition_mode == "auto":
             self._configure_auto_partitioning(dataset, ops)
         elif self.partition_size_cfg is not None:
             # split_at_indices() materializes the input too. Retaining that
@@ -1056,6 +1181,12 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         Uses deterministic splitting to ensure reproducible partitions for
         checkpoint resumption.
         """
+        # Streaming tee-sink row-level recovery replaces manual partitioning
+        # entirely (no split, no per-partition materialize barrier). Dispatch
+        # before splitting so it never pays for partitions it will not use.
+        if self._should_use_streaming_recovery(dataset, ops):
+            return self._process_streaming_with_tee_recovery(dataset, ops)
+
         logger.info("Processing with real partitioning using Ray Data's split and union...")
 
         # Split the dataset deterministically with metadata collection
@@ -1152,6 +1283,162 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         if _LOGICAL_PARTITION_COLUMN in names:
             raise RuntimeError(f"Input dataset contains reserved execution-group column {_LOGICAL_PARTITION_COLUMN!r}.")
         return True
+
+    def _should_use_streaming_recovery(self, dataset: RayDataset, ops: List) -> bool:
+        """Return whether this segment should use streaming tee-sink row-level
+        recovery instead of manual per-partition checkpointing.
+
+        Cached on first call (both ``_run_impl`` and
+        ``_process_with_simple_partitioning`` consult it). Streaming replaces
+        #1054's per-partition ``.materialize()`` barrier with one lazy stream +
+        one hot pass-through sink actor pool, decoupling model loads (= pool
+        size) from crash blast radius (= uncommitted rows).
+        """
+        cached = getattr(self, "_streaming_selected_cache", None)
+        if cached is not None:
+            return cached
+
+        def _decide() -> bool:
+            if getattr(self, "recovery_mode", "streaming") != "streaming":
+                return False
+            if self.ckpt_manager is None or self.ckpt_manager.checkpoint_strategy == CheckpointStrategy.DISABLED:
+                logger.info("Streaming recovery disabled: checkpointing is off.")
+                return False
+            # A single lazy segment only keeps a meaningful row-id frontier for
+            # row-preserving / row-dropping map-style ops (Phase 1 envelope,
+            # identical to execution grouping).
+            if any(not isinstance(op, (Mapper, Filter)) for op in ops):
+                logger.info("Streaming recovery disabled: segment contains a dataset-level operator.")
+                return False
+            # Block + manifest commits rely on POSIX-atomic os.replace; a remote
+            # checkpoint dir gives no such guarantee, so fall back.
+            if is_remote_path(self.ckpt_manager.ckpt_dir):
+                logger.info("Streaming recovery disabled: checkpoint dir is a remote path.")
+                return False
+            try:
+                names = self._schema_names(dataset.data)
+            except Exception:
+                names = set()
+            if _ROW_ID_COLUMN in names:
+                raise RuntimeError(f"Input dataset contains reserved streaming row-id column {_ROW_ID_COLUMN!r}.")
+            return True
+
+        result = _decide()
+        self._streaming_selected_cache = result
+        return result
+
+    def _resolve_tee_sink_concurrency(self, ops: List) -> int:
+        """Fixed actor-pool size for the pass-through tee sink.
+
+        The sink is I/O-bound (one parquet block + one atomic manifest shard per
+        input block) and must stay a small HOT pool so it never turns into a
+        materialize barrier.
+        """
+        raw = getattr(self, "max_concurrent_partitions", 4)
+        try:
+            base = int(raw)
+        except (TypeError, ValueError):
+            base = 4
+        return max(1, min(4, base))
+
+    def _stamp_row_ids(self, dataset: RayDataset) -> RayDataset:
+        """Inject a dense, unique, read-order-stable global row id.
+
+        preserve_order is already enabled for deterministic execution, so a
+        materialized snapshot zipped with ``ray.data.range(N)`` produces
+        identical ids across runs (verified: zip block-alignment is dense +
+        unique + deterministic in experiments/seg_grid).
+        """
+        base = dataset.data.materialize()
+        n = base.count()
+        row_ids = ray.data.range(n).rename_columns({"id": _ROW_ID_COLUMN})
+        stamped = base.zip(row_ids)
+        return RayDataset(stamped, cfg=self.cfg)
+
+    def _process_streaming_with_tee_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
+        """Phase 1 single-segment, block-level streaming recovery.
+
+        The whole Mapper/Filter chain is one segment. Rows are stamped with a
+        stable global id, processed as one lazy stream, then teed per block by a
+        hot pass-through actor pool that durably commits (block parquet + atomic
+        manifest shard) WITHOUT a materialize barrier. On resume the committed
+        frontier is read back and only uncommitted rows are re-processed, so the
+        crash blast radius is the set of uncommitted rows -- not G partitions.
+        """
+        stamped = self._stamp_row_ids(dataset)
+        concurrency = self._resolve_tee_sink_concurrency(ops)
+        logger.info(
+            f"Streaming tee-sink recovery: concurrency={concurrency}, "
+            f"resuming={getattr(self, '_is_resuming', False)}"
+        )
+        last_op_idx = len(ops) - 1
+        last_op_name = getattr(ops[last_op_idx], "_name", f"op_{last_op_idx}") if ops else "identity"
+        data_dir = self.ckpt_manager.stream_data_dir(0)
+        manifest_dir = self.ckpt_manager.stream_manifest_dir(0)
+
+        committed_ranges: List[Tuple[int, int]] = []
+        committed_blocks: List[str] = []
+        if getattr(self, "_is_resuming", False):
+            committed_ranges, committed_blocks, shard_count = self.ckpt_manager.reconcile_stream_frontier(0)
+            committed_rows = sum(hi - lo for lo, hi in committed_ranges)
+            logger.info(
+                f"Streaming resume: {shard_count} committed block shard(s), "
+                f"{committed_rows} committed row(s); re-processing only the remainder."
+            )
+
+        # Rows still outside the committed frontier must be (re)processed.
+        if committed_ranges:
+            frozen = committed_ranges
+            remaining_src = stamped.data.filter(
+                lambda row, r=frozen: not row_id_in_ranges(int(row[_ROW_ID_COLUMN]), r)
+            )
+        else:
+            remaining_src = stamped.data
+
+        remaining = RayDataset(remaining_src, cfg=self.cfg).process(ops)
+
+        tee_kwargs = dict(
+            ckpt_dir=self.ckpt_manager.ckpt_dir,
+            data_dir=data_dir,
+            manifest_dir=manifest_dir,
+            segment_index=0,
+            op_boundary_idx=last_op_idx,
+            op_name=last_op_name,
+            job_id=self.job_id,
+            row_id_column=_ROW_ID_COLUMN,
+        )
+        # batch_size None => one tee block per upstream block (block-preserving,
+        # no rebatch). A configured stream_block_size bounds each committed block
+        # (and thus the crash blast) to that many rows.
+        remaining.data = remaining.data.map_batches(
+            _StreamTeeSink,
+            fn_constructor_kwargs=tee_kwargs,
+            concurrency=concurrency,
+            batch_format="pyarrow",
+            batch_size=getattr(self, "stream_block_size", None),
+        )
+
+        if committed_blocks:
+            restored = ray.data.read_parquet(committed_blocks)
+            merged = restored.union(remaining.data)
+        else:
+            merged = remaining.data
+
+        # Row-id provenance is internal; strip it before final export.
+        merged = merged.drop_columns([_ROW_ID_COLUMN])
+
+        # Terminal materialize == exactly-once execution of this streaming
+        # segment. The tee sink has side effects (block parquet + manifest
+        # shard); Ray runs a lazy plan once per terminal action, and the
+        # downstream exporter alone triggers TWO (a .columns() schema probe
+        # then the write), which would double-commit every block. Collecting
+        # here pins one streaming pass -- the tee commits each block once and
+        # the manifest is still written incrementally as blocks flow -- while
+        # the exporter's later .columns()/write read cached blocks without
+        # re-teeing. This is a single end-of-segment barrier, NOT #1054's
+        # per-op-group barriers: one hot actor pool, row-level crash blast.
+        merged = merged.materialize()
+        return RayDataset(merged, cfg=self.cfg)
 
     def _resolve_execution_group_size(
         self,

@@ -6,6 +6,48 @@ from typing import Any, List, Optional, Tuple
 
 from loguru import logger
 
+# ===== Streaming tee-sink recovery (row-level manifest) =====
+# Schema version for per-block stream manifest shards. Bump on incompatible
+# manifest layout changes so resume can fail closed instead of misreading.
+STREAM_MANIFEST_SCHEMA_VERSION = 1
+
+
+def atomic_write_json(path: str, payload: dict) -> None:
+    """Write ``payload`` as JSON atomically (write-tmp then os.replace).
+
+    Crash-safe and concurrency-safe on POSIX: a reader either sees the old file
+    or the fully-written new one, never a partial. A half-written ``.tmp`` left
+    by a crash is ignored by the reconciler.
+    """
+    tmp = f"{path}.tmp"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(tmp, "w") as f:
+        json.dump(payload, f)
+    os.replace(tmp, path)
+
+
+def merge_row_id_ranges(ranges: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    """Merge a list of half-open [lo, hi) row-id ranges into sorted, disjoint ones."""
+    normalized = sorted((int(lo), int(hi)) for lo, hi in ranges if int(hi) > int(lo))
+    merged: List[Tuple[int, int]] = []
+    for lo, hi in normalized:
+        if merged and lo <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], hi))
+        else:
+            merged.append((lo, hi))
+    return merged
+
+
+def row_id_in_ranges(row_id: int, ranges: List[Tuple[int, int]]) -> bool:
+    """Membership test for a row id against sorted, disjoint [lo, hi) ranges."""
+    import bisect
+
+    if not ranges:
+        return False
+    los = [lo for lo, _ in ranges]
+    idx = bisect.bisect_right(los, row_id) - 1
+    return idx >= 0 and ranges[idx][0] <= row_id < ranges[idx][1]
+
 
 class CheckpointManagerBase(ABC):
     """
@@ -448,3 +490,63 @@ class RayCheckpointManager(CheckpointManagerBase):
             groups.append((current_start, len(ops), ops[current_start:]))
 
         return groups
+
+    # ===== Streaming tee-sink recovery =====
+    # Durable layout under ckpt_dir (never collides with the legacy
+    # checkpoint_op_*_partition_*.parquet files that find_latest_checkpoint globs):
+    #   stream_data/segment_{S:04d}/block_<uuid>.parquet   -- teed output blocks
+    #   stream_manifest/segment_{S:04d}/block_<uuid>.json  -- per-block manifest shards
+
+    def stream_data_dir(self, segment_index: int) -> str:
+        """Directory holding teed output block parquet files for a segment."""
+        return os.path.join(self.ckpt_dir, "stream_data", f"segment_{segment_index:04d}")
+
+    def stream_manifest_dir(self, segment_index: int) -> str:
+        """Directory holding per-block manifest shards for a segment."""
+        return os.path.join(self.ckpt_dir, "stream_manifest", f"segment_{segment_index:04d}")
+
+    def reconcile_stream_frontier(self, segment_index: int) -> Tuple[List[Tuple[int, int]], List[str], int]:
+        """Reconstruct the committed frontier of a segment from durable manifest shards.
+
+        Lists the manifest dir, ignores ``.tmp`` shards left by a crash, skips
+        unparseable JSON, and unions ``committed_row_id_ranges`` across all valid
+        shards. Shards whose ``schema_version`` differs are skipped defensively
+        (the caller enforces fail-closed resume separately).
+
+        :return: (merged_ranges, block_uris, shard_count) where merged_ranges is a
+            sorted list of disjoint half-open [lo, hi) row-id ranges, block_uris are
+            absolute parquet paths to restore, and shard_count is the number of
+            valid shards reconciled.
+        """
+        manifest_dir = self.stream_manifest_dir(segment_index)
+        ranges: List[Tuple[int, int]] = []
+        block_uris: List[str] = []
+        shard_count = 0
+        if not os.path.isdir(manifest_dir):
+            return ranges, block_uris, shard_count
+
+        for name in sorted(os.listdir(manifest_dir)):
+            if name.endswith(".tmp") or not name.endswith(".json"):
+                continue
+            shard_path = os.path.join(manifest_dir, name)
+            try:
+                with open(shard_path) as f:
+                    shard = json.load(f)
+            except Exception as e:  # partial/corrupt shard: ignore, do not resume past it
+                logger.warning(f"Skipping unparseable stream manifest shard {shard_path}: {e}")
+                continue
+            if shard.get("schema_version") != STREAM_MANIFEST_SCHEMA_VERSION:
+                logger.warning(
+                    f"Stream manifest shard {shard_path} has schema_version="
+                    f"{shard.get('schema_version')} != {STREAM_MANIFEST_SCHEMA_VERSION}; skipping"
+                )
+                continue
+            for lo, hi in shard.get("committed_row_id_ranges", []):
+                ranges.append((int(lo), int(hi)))
+            block_uri = shard.get("block_uri")
+            if block_uri:
+                # block_uri is stored relative to ckpt_dir
+                block_uris.append(os.path.join(self.ckpt_dir, block_uri))
+            shard_count += 1
+
+        return merge_row_id_ranges(ranges), block_uris, shard_count
