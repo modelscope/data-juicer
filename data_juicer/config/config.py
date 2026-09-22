@@ -853,6 +853,20 @@ def build_base_parser() -> ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--partition.stream_allow_row_expansion",
+        type=Union[str, bool],
+        default="auto",
+        help=(
+            "Under recovery_mode=streaming, whether a segment may contain a row-EXPANDING (1:many) "
+            "op. The row-id frontier commits a SET of INPUT ids (decoupled from output count) and the "
+            "block-preserving tee keeps a parent's whole expansion in one block, so 1:many is "
+            "recoverable -- but the tee's per-block id-uniqueness guard must be relaxed for that "
+            "segment. 'auto' (default) detects known expanders per segment and relaxes only those; "
+            "True forces relaxation for all segments (needed for a CUSTOM expander not in the known "
+            "list); False keeps the guard armed everywhere (a 1:many op then fails closed)."
+        ),
+    )
+    parser.add_argument(
         "--partition.max_initialization_overhead_ratio",
         type=float,
         default=0.1,

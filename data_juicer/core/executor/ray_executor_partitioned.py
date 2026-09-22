@@ -45,7 +45,7 @@ from data_juicer.utils.ckpt_utils import (
     CheckpointStrategy,
     RayCheckpointManager,
     atomic_write_json,
-    row_id_in_ranges,
+    make_row_id_membership,
 )
 from data_juicer.utils.config_utils import ConfigAccessor
 from data_juicer.utils.file_utils import is_remote_path
@@ -174,9 +174,15 @@ class _StreamTeeSink:
 
     Verified in experiments/seg_grid/ray_stream_probe.py (V1/V2): a hot actor
     pool of this class writes one parquet block + one atomic manifest shard per
-    input block without triggering an implicit materialize, and concurrent shard
-    commits are crash-safe (write-tmp then os.replace; a leftover .tmp is ignored
-    by RayCheckpointManager.reconcile_stream_frontier).
+    input block without triggering an implicit materialize.
+
+    Commit ordering is data-before-pointer and each step is atomic: the block
+    parquet is written to a unique ``*.tmp`` then ``os.replace``-d into its
+    content-keyed final name, and only then is the manifest shard written the
+    same write-tmp-then-replace way. A crash therefore leaves at most a stray
+    ``*.tmp`` (ignored by RayCheckpointManager.reconcile_stream_frontier) and
+    never a manifest pointing at a half-written or absent block; the reconciler
+    additionally drops any shard whose block file is missing.
     """
 
     def __init__(
@@ -256,8 +262,18 @@ class _StreamTeeSink:
         content_key = hashlib.sha1((",".join(map(str, sorted(set(sorted_ids))))).encode()).hexdigest()[:16]
         stem = f"block_{content_key}_{self.segment_index:04d}"
         block_path = os.path.join(self.data_dir, f"{stem}.parquet")
-        # Durable block write (all columns, including the row-id provenance).
-        pq.write_table(batch, block_path)
+        # Atomic, durable block write (all columns, including the row-id
+        # provenance). Write to a per-writer-unique tmp then os.replace into the
+        # content-keyed final name: a reader (a resume reconcile) sees either no
+        # file or the whole file, never a partial parquet, even if Ray recomputes
+        # this side-effecting block or a speculative duplicate races on the same
+        # target. The manifest shard below is only written AFTER this returns, so
+        # a manifest never points at a half-written block.
+        tmp_block = f"{block_path}.{os.getpid()}.{os.urandom(4).hex()}.tmp"
+        pq.write_table(batch, tmp_block)
+        if self.fsync:
+            self._fsync_path(tmp_block)
+        os.replace(tmp_block, block_path)
         if self.fsync:
             # Block durable (file + its dir) before the manifest that points at
             # it, and before the batch flows to the next segment.
@@ -1471,6 +1487,8 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         """
         n = len(ops)
         s = max(1, min(int(getattr(self, "stream_segments", 1)), n)) if n else 1
+        force = getattr(self, "stream_allow_row_expansion", "auto")
+        force_auto = isinstance(force, str) and force.lower() == "auto"
         segments: List[dict] = []
         start = 0
         for i in range(s):
@@ -1478,7 +1496,24 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             seg_ops = ops[start : start + size]
             boundary_idx = start + size - 1
             op_name = getattr(ops[boundary_idx], "_name", f"op_{boundary_idx}") if seg_ops else "identity"
-            segments.append({"ops": seg_ops, "boundary_idx": boundary_idx, "op_name": op_name})
+            # Per-segment cardinality guard (P2): relax the tee's row-id
+            # uniqueness check ONLY for the segment(s) that actually contain a
+            # row-expanding op. A single global flag would disarm the guard for
+            # every 1:1 segment too, hiding a buggy op that duplicates ids
+            # outside the declared expander. Under "auto" we detect per segment;
+            # an explicit True/False config forces all segments uniformly.
+            if force_auto:
+                seg_allow = any(getattr(op, "_name", "") in _ROW_EXPANDING_MAPPERS for op in seg_ops)
+            else:
+                seg_allow = bool(force)
+            segments.append(
+                {
+                    "ops": seg_ops,
+                    "boundary_idx": boundary_idx,
+                    "op_name": op_name,
+                    "allow_expansion": seg_allow,
+                }
+            )
             start += size
         return segments
 
@@ -1500,7 +1535,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 job_id=self.job_id,
                 row_id_column=_ROW_ID_COLUMN,
                 fsync=getattr(self, "stream_fsync", True),
-                allow_expansion=getattr(self, "_stream_allow_expansion", False),
+                allow_expansion=bool(seg.get("allow_expansion", getattr(self, "_stream_allow_expansion", False))),
             )
             # batch_size None => one tee block per upstream block (block-preserving,
             # no rebatch) so a 1:many expansion is never split across our blocks.
@@ -1512,6 +1547,104 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 batch_size=None,
             )
         return data
+
+    def _stream_run_path(self) -> str:
+        """Path to the run-level streaming provenance manifest."""
+        return os.path.join(self.ckpt_manager.ckpt_dir, "stream_run.json")
+
+    def _compute_stream_run_signature(self, stamped: RayDataset, segments: List[dict], ops: List) -> dict:
+        """Capture what the committed frontier is only valid against.
+
+        The row-id frontier commits INPUT row positions. It is only meaningful
+        for the SAME input, read in the SAME order, run through the SAME op
+        chain split the SAME way. This signature pins all of that so resume can
+        fail closed instead of splicing a stale frontier onto different work:
+
+        - ``input_content_hash`` / ``input_row_count``: an order-sensitive
+          content hash over the stamped input (row-id included -- it is a pure
+          function of read order, so the hash captures both content AND order).
+          A changed input file, a reorder, or a row count change all flip it.
+        - ``op_names`` / ``segment_layout`` / ``stream_segments``: the op chain
+          and how it was cut into tee boundaries. Resuming with an edited
+          pipeline would map committed frontiers onto the wrong ops.
+        - ``job_id`` / ``allow_expansion`` / ``schema_version``: run identity and
+          manifest-format guards.
+        """
+        content_hash, row_count = self._compute_partition_content_hash(stamped.data)
+        return {
+            "schema_version": STREAM_MANIFEST_SCHEMA_VERSION,
+            "job_id": self.job_id,
+            "row_id_column": _ROW_ID_COLUMN,
+            "stream_segments": len(segments),
+            "op_names": [getattr(op, "_name", f"op_{i}") for i, op in enumerate(ops)],
+            "segment_layout": [{"boundary_idx": s["boundary_idx"], "op_name": s["op_name"]} for s in segments],
+            "allow_expansion": bool(getattr(self, "_stream_allow_expansion", False)),
+            "input_content_hash": content_hash,
+            "input_row_count": row_count,
+        }
+
+    def _write_or_validate_stream_run(self, signature: dict, resuming: bool) -> None:
+        """Fail closed on resume unless the provenance signature matches.
+
+        Fresh run: record ``signature`` durably. Resume: the committed frontier
+        we are about to splice in is only trustworthy if the manifest exists and
+        every critical field matches what we are running NOW. A missing manifest
+        (frontier of unknown provenance) or any mismatch (different input, op
+        chain, or segmentation) raises instead of silently emitting a corrupted
+        mix of old committed blocks and freshly reprocessed rows.
+        """
+        path = self._stream_run_path()
+        if not resuming:
+            atomic_write_json(path, signature, fsync=getattr(self, "stream_fsync", True))
+            logger.info(
+                f"Streaming provenance recorded: {signature['input_row_count']} input row(s), "
+                f"content_hash={signature['input_content_hash'][:16]}..., "
+                f"segments={signature['stream_segments']}."
+            )
+            return
+
+        if not os.path.exists(path):
+            raise RuntimeError(
+                f"Streaming resume refused: no provenance manifest at {path}. The committed frontier "
+                "cannot be trusted against the current input/op-chain. Start a fresh job_id, or use "
+                "partition.recovery_mode=partition."
+            )
+        try:
+            with open(path) as f:
+                prior = json.load(f)
+        except Exception as e:
+            raise RuntimeError(f"Streaming resume refused: unreadable provenance manifest {path}: {e}")
+
+        # Critical fields whose change invalidates the committed frontier.
+        critical = [
+            "schema_version",
+            "row_id_column",
+            "stream_segments",
+            "op_names",
+            "segment_layout",
+            "input_content_hash",
+            "input_row_count",
+        ]
+        mismatches = []
+        for key in critical:
+            if prior.get(key) != signature.get(key):
+                mismatches.append(f"{key}: checkpoint={prior.get(key)!r} != current={signature.get(key)!r}")
+        # job_id is expected to match by construction (ckpt dir is job-scoped);
+        # a mismatch means a cross-wired checkpoint dir -- also fatal.
+        if prior.get("job_id") != signature.get("job_id"):
+            mismatches.append(f"job_id: checkpoint={prior.get('job_id')!r} != current={signature.get('job_id')!r}")
+        if mismatches:
+            detail = "\n  - ".join(mismatches)
+            raise RuntimeError(
+                "Streaming resume refused: provenance mismatch -- the committed frontier does not "
+                "belong to the current run. Resuming would splice stale committed blocks onto "
+                f"different work and corrupt the output. Mismatches:\n  - {detail}\n"
+                "Start a fresh job_id, or use partition.recovery_mode=partition."
+            )
+        logger.info(
+            f"Streaming provenance validated on resume: {signature['input_row_count']} input row(s), "
+            f"content_hash={signature['input_content_hash'][:16]}..., segments={signature['stream_segments']}."
+        )
 
     def _process_streaming_with_tee_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
         """Multi-segment, block-level streaming recovery.
@@ -1536,6 +1669,14 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             f"Streaming tee-sink recovery: segments={s}, concurrency={concurrency}, "
             f"fsync={getattr(self, 'stream_fsync', True)}, resuming={resuming}"
         )
+
+        # Provenance gate (P0): a committed frontier is only valid against the
+        # SAME input, order, op chain, and segmentation. Fail closed on resume
+        # unless the recorded signature matches exactly; record it on a fresh
+        # run. Done BEFORE any reconcile so a stale/foreign frontier is never
+        # spliced into the output.
+        signature = self._compute_stream_run_signature(stamped, segments, ops)
+        self._write_or_validate_stream_run(signature, resuming)
 
         # Reconcile every segment's committed frontier (resume only).
         frontiers: List[List[Tuple[int, int]]] = [[] for _ in range(s)]
@@ -1571,17 +1712,15 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 next_frontier = frontiers[k + 1]
                 restored_k = ray.data.read_parquet(block_uris[k])
                 if next_frontier:
-                    restored_k = restored_k.filter(
-                        lambda row, r=next_frontier: not row_id_in_ranges(int(row[_ROW_ID_COLUMN]), r)
-                    )
+                    is_committed = make_row_id_membership(next_frontier)
+                    restored_k = restored_k.filter(lambda row, m=is_committed: not m(int(row[_ROW_ID_COLUMN])))
                 output_streams.append(self._thread_segments(restored_k, segments, k + 1, concurrency))
 
         # Fresh rows: everything not yet committed by the first tee.
         f0 = frontiers[0] if resuming else []
         if f0:
-            fresh_src = stamped.data.filter(
-                lambda row, r=f0: not row_id_in_ranges(int(row[_ROW_ID_COLUMN]), r)
-            )
+            is_committed_f0 = make_row_id_membership(f0)
+            fresh_src = stamped.data.filter(lambda row, m=is_committed_f0: not m(int(row[_ROW_ID_COLUMN])))
         else:
             fresh_src = stamped.data
         output_streams.append(self._thread_segments(fresh_src, segments, 0, concurrency))
