@@ -9,7 +9,7 @@ from loguru import logger
 # ===== Streaming tee-sink recovery (row-level manifest) =====
 # Schema version for per-block stream manifest shards. Bump on incompatible
 # manifest layout changes so resume can fail closed instead of misreading.
-STREAM_MANIFEST_SCHEMA_VERSION = 1
+STREAM_MANIFEST_SCHEMA_VERSION = 2
 
 
 def atomic_write_json(path: str, payload: dict, fsync: bool = False) -> None:
@@ -611,4 +611,15 @@ class RayCheckpointManager(CheckpointManagerBase):
             block_uris.append(abs_block)
             shard_count += 1
 
+        # Two different committed blocks claiming the same input row cannot be
+        # restored by simply unioning their Parquet files. It can happen when a
+        # lazy plan is executed twice with different block boundaries. Refuse
+        # resume instead of emitting duplicate output or silently choosing one.
+        ordered_ranges = sorted(ranges)
+        for (_, previous_hi), (current_lo, _) in zip(ordered_ranges, ordered_ranges[1:]):
+            if current_lo < previous_hi:
+                raise RuntimeError(
+                    f"Streaming checkpoint segment {segment_index} has overlapping committed row ids; "
+                    "refusing to resume from ambiguous blocks."
+                )
         return merge_row_id_ranges(ranges), block_uris, shard_count

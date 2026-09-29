@@ -38,7 +38,7 @@ from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.executor.dag_execution_mixin import DAGExecutionMixin
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin, EventType
 from data_juicer.core.ray_exporter import RayExporter
-from data_juicer.ops import Filter, Mapper, load_ops
+from data_juicer.ops import Mapper, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.ckpt_utils import (
     STREAM_MANIFEST_SCHEMA_VERSION,
@@ -66,23 +66,14 @@ _LOGICAL_PARTITION_COLUMN = "__data_juicer_logical_partition_id__"
 # recovery. Mappers/Filters carry it unchanged; it is the frontier key and is
 # dropped just before export. Reserved: rejected if present in the input schema.
 _ROW_ID_COLUMN = "__data_juicer_row_id__"
-# Known row-EXPANDING (1:many) mappers. A 1:many op copies a parent id onto
-# every sub-row. Streaming recovery SUPPORTS this: the row-id frontier commits a
-# SET of INPUT ids (presence, decoupled from output count -- the same decoupling
-# that makes row-dropping filters safe), and the block-preserving tee
-# (batch_size=None) keeps a parent's whole expansion inside one committed block,
-# so committing that input id is exactly-once. This list is the best-effort
-# auto-detector that flips the tee into expansion mode (relaxing its uniqueness
-# guard); a custom expander not listed here can force it via
-# partition.stream_allow_row_expansion=true. DJ exposes no cardinality flag, so
-# a listed-but-1:1 op is harmless (no dups => guard never triggers anyway).
-_ROW_EXPANDING_MAPPERS = frozenset(
+# These known row-expanding mappers cannot use the row-id frontier: the first
+# committed output block does not prove that every child of a parent is durable.
+_UNSUPPORTED_STREAM_MAPPERS = frozenset(
     {
         "generate_qa_from_text_mapper",
         "image_diffusion_mapper",
         "nlpaug_en_mapper",
         "nlpcda_zh_mapper",
-        "expand_duplicate_mapper",
     }
 )
 _PARTITION_CONTENT_HASH_ALGORITHM = "sha256-sequence-v1"
@@ -155,11 +146,8 @@ def _contiguous_row_id_ranges(row_ids: List[int]) -> List[list]:
     so we compute the actual runs present in this block rather than assume one range.
     """
     ranges: List[list] = []
-    # De-duplicate first: with a row-EXPANDING (1:many) op a parent id is copied
-    # onto every sub-row, so this block's ids can repeat. The frontier is a SET
-    # of committed input ids (presence, not multiplicity), so collapsing dups
-    # here keeps the emitted ranges clean and disjoint; reconcile merges across
-    # shards regardless.
+    # The tee has already rejected duplicates. A set keeps this helper robust
+    # when called outside that path; it does not enable row expansion.
     for rid in sorted({int(x) for x in row_ids}):
         if ranges and rid == ranges[-1][1]:
             ranges[-1][1] = rid + 1
@@ -196,7 +184,6 @@ class _StreamTeeSink:
         job_id: str,
         row_id_column: str = _ROW_ID_COLUMN,
         fsync: bool = True,
-        allow_expansion: bool = False,
     ):
         self.ckpt_dir = ckpt_dir
         self.data_dir = data_dir
@@ -207,12 +194,6 @@ class _StreamTeeSink:
         self.job_id = job_id
         self.row_id_column = row_id_column
         self.fsync = fsync
-        # When True this segment contains a row-EXPANDING (1:many) op, so the
-        # per-block row-id uniqueness guard below is relaxed (a parent id legally
-        # repeats across its sub-rows). When False (1:1 / row-dropping pipeline)
-        # the guard stays armed as a defensive net against a buggy op silently
-        # duplicating ids.
-        self.allow_expansion = allow_expansion
         os.makedirs(self.data_dir, exist_ok=True)
         os.makedirs(self.manifest_dir, exist_ok=True)
 
@@ -237,29 +218,18 @@ class _StreamTeeSink:
 
         row_ids = [int(x) for x in batch.column(self.row_id_column).to_pylist()]
         sorted_ids = sorted(row_ids)
-        # Cardinality guard. A 1:1 / row-dropping op keeps every input row's
-        # unique stamped id, so ids stay unique -- a duplicate then means a buggy
-        # op, and we fail closed. A row-EXPANDING (1:many) op legally copies a
-        # parent id onto each sub-row; the frontier is a SET of committed INPUT
-        # ids (presence, not output count), and the block-preserving tee
-        # (batch_size=None) keeps a parent's whole expansion inside ONE committed
-        # block, so committing that input id is exactly-once. When allow_expansion
-        # is set we therefore permit duplicates instead of rejecting them.
-        if not self.allow_expansion and len(set(sorted_ids)) != len(sorted_ids):
+        # Duplicates violate the row-preserving streaming contract.
+        if len(set(sorted_ids)) != len(sorted_ids):
             raise RuntimeError(
-                f"Streaming recovery requires 1:1 / row-dropping ops, but segment {self.segment_index} "
-                f"(op '{self.op_name}') produced duplicate row ids unexpectedly -- a row-expanding (1:many) "
-                "operator was not declared. Add it to _ROW_EXPANDING_MAPPERS / set "
-                "partition.stream_allow_row_expansion=true, or use partition.recovery_mode=partition."
+                f"Streaming recovery requires row-preserving operators, but segment {self.segment_index} "
+                f"(op '{self.op_name}') produced duplicate row ids. Use partition.recovery_mode=partition."
             )
 
         # Content-key filename: stable across Ray lineage recompute of this
         # side-effecting tee. If Ray recomputes a lost block with the same rows,
         # it overwrites its own file instead of writing a fresh uuid-named
-        # duplicate that would double-count on a future resume. Uses the DEDUPED
-        # id set so a 1:many block keys on its input-id footprint (the frontier
-        # unit), identical whether or not Ray coalesces sub-rows.
-        content_key = hashlib.sha1((",".join(map(str, sorted(set(sorted_ids))))).encode()).hexdigest()[:16]
+        # duplicate that would double-count on a future resume.
+        content_key = hashlib.sha1((",".join(map(str, sorted_ids))).encode()).hexdigest()[:16]
         stem = f"block_{content_key}_{self.segment_index:04d}"
         block_path = os.path.join(self.data_dir, f"{stem}.parquet")
         # Atomic, durable block write (all columns, including the row-id
@@ -590,13 +560,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             _DEFAULT_GPU_PROBE_SAMPLE_SEED,
         )
         execution_group_size = ConfigAccessor.get(partition_cfg, "execution_group_size", "auto")
-        recovery_mode = ConfigAccessor.get(partition_cfg, "recovery_mode", "streaming")
+        recovery_mode = ConfigAccessor.get(partition_cfg, "recovery_mode", "partition")
         stream_segments = ConfigAccessor.get(partition_cfg, "stream_segments", 1)
         stream_fsync = ConfigAccessor.get(partition_cfg, "stream_fsync", True)
-        # "auto" (default) => enable 1:many streaming recovery iff a known
-        # row-expanding op is present; True/False force it on/off (needed for
-        # custom expanders not on _ROW_EXPANDING_MAPPERS).
-        stream_allow_row_expansion = ConfigAccessor.get(partition_cfg, "stream_allow_row_expansion", "auto")
         max_initialization_overhead_ratio = ConfigAccessor.get(
             partition_cfg,
             "max_initialization_overhead_ratio",
@@ -771,23 +737,17 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             )
             self.max_initialization_overhead_ratio = _DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO
         # Recovery mode selects how the GPU + all-(Mapper/Filter) segment is
-        # processed. "streaming" (default) uses the tee-sink row-level frontier
-        # that decouples actor reuse from crash blast radius; "partition" forces
-        # the plain per-partition path (no execution groups), which is the honest
-        # A/B baseline. The execution_group barrier path is retired from selection.
-        normalized_recovery = str(recovery_mode).strip().lower() if recovery_mode is not None else "streaming"
+        # processed. The row-id tee-sink is opt-in while its supported operator
+        # envelope is limited to row-preserving Mapper pipelines.
+        normalized_recovery = str(recovery_mode).strip().lower() if recovery_mode is not None else "partition"
         if normalized_recovery not in {"streaming", "partition"}:
-            logger.warning(f"Invalid partition.recovery_mode={recovery_mode!r}; using 'streaming'")
-            normalized_recovery = "streaming"
+            logger.warning(f"Invalid partition.recovery_mode={recovery_mode!r}; using 'partition'")
+            normalized_recovery = "partition"
         self.recovery_mode = normalized_recovery
         # Number of contiguous op-segments; a tee-sink is inserted after each.
         # More segments => finer resume (re-run only ops after the deepest
         # committed segment) at the cost of more committed blocks. Clamped to
         # >= 1 here; further clamped to <= len(ops) when the segments are built.
-        # Blocks are always block-preserving (batch_size=None, no rebatch) so a
-        # 1:many op's expansion is not split across committed blocks by us; the
-        # former stream_block_size knob was redundant with override_num_blocks
-        # / the read block_size and is removed.
         try:
             self.stream_segments = max(1, int(stream_segments)) if stream_segments else 1
         except (TypeError, ValueError):
@@ -797,13 +757,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # segment k is durable before its rows reach segment k+1 (nested frontier
         # holds under power-loss, not just process-kill).
         self.stream_fsync = bool(stream_fsync) if stream_fsync is not None else True
-        # Normalize the 1:many toggle: keep the literal "auto" string (resolved
-        # against the known-expander list at _should_use_streaming_recovery time)
-        # or coerce to an explicit bool override.
-        if isinstance(stream_allow_row_expansion, str) and stream_allow_row_expansion.lower() == "auto":
-            self.stream_allow_row_expansion = "auto"
-        else:
-            self.stream_allow_row_expansion = bool(stream_allow_row_expansion)
         self.partition_size_cfg = partition_size
         self.max_size_mb = max_size_mb
 
@@ -1400,41 +1353,29 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             return cached
 
         def _decide() -> bool:
-            if getattr(self, "recovery_mode", "streaming") != "streaming":
+            if getattr(self, "recovery_mode", "partition") != "streaming":
                 return False
-            if self.ckpt_manager is None or self.ckpt_manager.checkpoint_strategy == CheckpointStrategy.DISABLED:
+            ckpt_manager = getattr(self, "ckpt_manager", None)
+            if (
+                ckpt_manager is None
+                or not ckpt_manager.checkpoint_enabled
+                or ckpt_manager.checkpoint_strategy == CheckpointStrategy.DISABLED
+            ):
                 logger.info("Streaming recovery disabled: checkpointing is off.")
                 return False
-            # A single lazy segment only keeps a meaningful row-id frontier for
-            # row-preserving / row-dropping map-style ops (Phase 1 envelope,
-            # identical to execution grouping).
-            if any(not isinstance(op, (Mapper, Filter)) for op in ops):
-                logger.info("Streaming recovery disabled: segment contains a dataset-level operator.")
+            # A tee after a Filter cannot tell an already-dropped input from an
+            # unprocessed one. A tee after an expander cannot tell whether all
+            # children of a parent have been committed. Both need an explicit
+            # input-unit completion protocol, which this path does not have.
+            if not ops or any(not isinstance(op, Mapper) for op in ops):
+                logger.info("Streaming recovery disabled: segment is not a Mapper-only pipeline.")
                 return False
-            # Cardinality handling: a row-EXPANDING (1:many) mapper copies a
-            # parent id onto each sub-row. The row-id frontier represents this
-            # fine -- it commits a SET of INPUT ids, decoupled from output count
-            # (same decoupling that already makes row-dropping filters safe), and
-            # the block-preserving tee keeps a parent's whole expansion in one
-            # committed block. So instead of failing closed we ENABLE expansion
-            # mode and relax the tee's uniqueness guard for this run. Detection is
-            # best-effort via the known-expander list; a config override forces it
-            # for custom expanders. (out>in still requires the atomic-per-block
-            # invariant, which batch_size=None gives.)
-            force = getattr(self, "stream_allow_row_expansion", "auto")
-            expanders = [getattr(op, "_name", "") for op in ops if getattr(op, "_name", "") in _ROW_EXPANDING_MAPPERS]
-            if isinstance(force, str) and force.lower() == "auto":
-                self._stream_allow_expansion = bool(expanders)
-            else:
-                self._stream_allow_expansion = bool(force)
-            if self._stream_allow_expansion:
-                logger.info(
-                    "Streaming recovery: row-expanding (1:many) mode ENABLED "
-                    f"(detected {expanders or 'via config override'}); tee uniqueness guard relaxed."
-                )
+            if any(getattr(op, "_name", "") in _UNSUPPORTED_STREAM_MAPPERS for op in ops):
+                logger.info("Streaming recovery disabled: a known Mapper changes row cardinality.")
+                return False
             # Block + manifest commits rely on POSIX-atomic os.replace; a remote
             # checkpoint dir gives no such guarantee, so fall back.
-            if is_remote_path(self.ckpt_manager.ckpt_dir):
+            if is_remote_path(ckpt_manager.ckpt_dir):
                 logger.info("Streaming recovery disabled: checkpoint dir is a remote path.")
                 return False
             try:
@@ -1487,8 +1428,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         """
         n = len(ops)
         s = max(1, min(int(getattr(self, "stream_segments", 1)), n)) if n else 1
-        force = getattr(self, "stream_allow_row_expansion", "auto")
-        force_auto = isinstance(force, str) and force.lower() == "auto"
         segments: List[dict] = []
         start = 0
         for i in range(s):
@@ -1496,22 +1435,11 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             seg_ops = ops[start : start + size]
             boundary_idx = start + size - 1
             op_name = getattr(ops[boundary_idx], "_name", f"op_{boundary_idx}") if seg_ops else "identity"
-            # Per-segment cardinality guard (P2): relax the tee's row-id
-            # uniqueness check ONLY for the segment(s) that actually contain a
-            # row-expanding op. A single global flag would disarm the guard for
-            # every 1:1 segment too, hiding a buggy op that duplicates ids
-            # outside the declared expander. Under "auto" we detect per segment;
-            # an explicit True/False config forces all segments uniformly.
-            if force_auto:
-                seg_allow = any(getattr(op, "_name", "") in _ROW_EXPANDING_MAPPERS for op in seg_ops)
-            else:
-                seg_allow = bool(force)
             segments.append(
                 {
                     "ops": seg_ops,
                     "boundary_idx": boundary_idx,
                     "op_name": op_name,
-                    "allow_expansion": seg_allow,
                 }
             )
             start += size
@@ -1524,7 +1452,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         data = source_data
         for k in range(start_seg, len(segments)):
             seg = segments[k]
-            data = RayDataset(data, cfg=self.cfg).process(seg["ops"]).data
+            data = RayDataset(data, cfg=self.cfg).process(seg["ops"], defer_schema_probe=True).data
             tee_kwargs = dict(
                 ckpt_dir=self.ckpt_manager.ckpt_dir,
                 data_dir=self.ckpt_manager.stream_data_dir(k),
@@ -1535,10 +1463,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 job_id=self.job_id,
                 row_id_column=_ROW_ID_COLUMN,
                 fsync=getattr(self, "stream_fsync", True),
-                allow_expansion=bool(seg.get("allow_expansion", getattr(self, "_stream_allow_expansion", False))),
             )
-            # batch_size None => one tee block per upstream block (block-preserving,
-            # no rebatch) so a 1:many expansion is never split across our blocks.
+            # The tee receives whole upstream blocks. Cardinality-changing
+            # operators are excluded from this recovery path.
             data = data.map_batches(
                 _StreamTeeSink,
                 fn_constructor_kwargs=tee_kwargs,
@@ -1567,8 +1494,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         - ``op_names`` / ``segment_layout`` / ``stream_segments``: the op chain
           and how it was cut into tee boundaries. Resuming with an edited
           pipeline would map committed frontiers onto the wrong ops.
-        - ``job_id`` / ``allow_expansion`` / ``schema_version``: run identity and
-          manifest-format guards.
+        - ``job_id`` / ``schema_version``: run identity and manifest-format guards.
         """
         content_hash, row_count = self._compute_partition_content_hash(stamped.data)
         return {
@@ -1578,7 +1504,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             "stream_segments": len(segments),
             "op_names": [getattr(op, "_name", f"op_{i}") for i, op in enumerate(ops)],
             "segment_layout": [{"boundary_idx": s["boundary_idx"], "op_name": s["op_name"]} for s in segments],
-            "allow_expansion": bool(getattr(self, "_stream_allow_expansion", False)),
             "input_content_hash": content_hash,
             "input_row_count": row_count,
         }
@@ -1649,7 +1574,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
     def _process_streaming_with_tee_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
         """Multi-segment, block-level streaming recovery.
 
-        The Mapper/Filter chain is split into ``stream_segments`` contiguous
+        The Mapper-only chain is split into ``stream_segments`` contiguous
         segments; a hot pass-through tee actor pool durably commits (block
         parquet + atomic manifest shard) after each segment WITHOUT a
         materialize barrier -- still one lazy stream. Rows carry a stable global

@@ -820,13 +820,11 @@ def build_base_parser() -> ArgumentParser:
     parser.add_argument(
         "--partition.recovery_mode",
         type=Literal["streaming", "partition"],
-        default="streaming",
+        default="partition",
         help=(
-            "How the GPU + all-(Mapper/Filter) segment is processed. 'streaming' (default) uses a "
-            "pass-through tee-sink with a row-level manifest frontier: crash blast radius equals the "
-            "uncommitted-row lag and model loads equal the actor-pool size, decoupling the two. "
-            "'partition' forces the plain per-partition path (no execution groups). The legacy "
-            "execution-group barrier path is retired from selection."
+            "'partition' (default) uses per-partition checkpoints. 'streaming' is an experimental "
+            "row-id tee-sink path for row-preserving Mapper pipelines only; Filters, row-expanding "
+            "Mappers, and dataset-level operators use the partition path."
         ),
     )
     parser.add_argument(
@@ -834,7 +832,7 @@ def build_base_parser() -> ArgumentParser:
         type=Optional[int],
         default=1,
         help=(
-            "Number of contiguous op-segments the (Mapper/Filter) chain is split into under "
+            "Number of contiguous op-segments the Mapper-only chain is split into under "
             "recovery_mode=streaming. A pass-through tee-sink is inserted after each segment, so a "
             "resume re-runs only the ops AFTER the deepest segment that already committed a row "
             "(finer recovery than the single-segment default). Still ONE lazy stream, no per-segment "
@@ -850,20 +848,6 @@ def build_base_parser() -> ArgumentParser:
             "their directories) BEFORE the tee returns the batch downstream. This makes segment k's "
             "commit durable before its rows can reach segment k+1, so the nested frontier holds even "
             "under power-loss/NFS (not just process-kill). Default True; set False for a no-fsync A/B."
-        ),
-    )
-    parser.add_argument(
-        "--partition.stream_allow_row_expansion",
-        type=Union[str, bool],
-        default="auto",
-        help=(
-            "Under recovery_mode=streaming, whether a segment may contain a row-EXPANDING (1:many) "
-            "op. The row-id frontier commits a SET of INPUT ids (decoupled from output count) and the "
-            "block-preserving tee keeps a parent's whole expansion in one block, so 1:many is "
-            "recoverable -- but the tee's per-block id-uniqueness guard must be relaxed for that "
-            "segment. 'auto' (default) detects known expanders per segment and relaxes only those; "
-            "True forces relaxation for all segments (needed for a CUSTOM expander not in the known "
-            "list); False keeps the guard armed everywhere (a 1:many op then fails closed)."
         ),
     )
     parser.add_argument(
