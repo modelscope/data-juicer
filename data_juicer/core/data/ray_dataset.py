@@ -9,12 +9,13 @@ import ray
 from jsonargparse import Namespace
 from loguru import logger
 from ray.data import ActorPoolStrategy, TaskPoolStrategy
+from ray.data.block import BlockAccessor
 
 from data_juicer.core.data import DJDataset
 from data_juicer.core.data.schema import Schema
 from data_juicer.core.tracer import should_trace_op
 from data_juicer.ops import Deduplicator, Filter, Mapper, Pipeline
-from data_juicer.ops.base_op import DEFAULT_BATCH_SIZE, TAGGING_OPS
+from data_juicer.ops.base_op import DEFAULT_BATCH_SIZE, NON_STATS_FILTERS, TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.webdataset_utils import _custom_default_decoder
@@ -95,8 +96,44 @@ def preprocess_dataset(dataset: ray.data.Dataset, dataset_path, cfg) -> ray.data
     return dataset
 
 
-def filter_batch(batch, filter_func):
-    mask = pyarrow.array(filter_func(batch.to_pydict()))
+def operator_batch_columns(op):
+    columns = []
+    if op._name in TAGGING_OPS.modules:
+        columns.append(Fields.meta)
+    # The inherited batched statistics loop requires this column even for non-stats filters.
+    if isinstance(op, Filter) and (op._name not in NON_STATS_FILTERS.modules or op.is_batched_op()):
+        columns.append(Fields.stats)
+    return columns
+
+
+def prepare_batch_columns(table: pyarrow.Table, columns):
+    for column in columns:
+        if column not in table.column_names:
+            table = table.append_column(column, [[{} for _ in range(len(table))]])
+    return table
+
+
+class RayOperatorActor:
+    def __init__(self, operator_type, args, kwargs, tracer=None):
+        self.operator = operator_type(*args, **kwargs)
+        op = self.operator
+        if isinstance(op, Mapper) and tracer and should_trace_op(tracer, op._name):
+            from data_juicer.ops.base_op import wrap_mapper_with_tracer
+
+            op.process = wrap_mapper_with_tracer(op.process, op._name, op.text_key, tracer, True)
+
+    def __call__(self, table: pyarrow.Table):
+        return self.operator(table)
+
+
+def filter_batch(batch, filter_func, is_batched=True):
+    if batch.num_rows == 0:
+        return batch
+    if is_batched:
+        keep = filter_func(batch.to_pydict())
+    else:
+        keep = [bool(filter_func(row)) for row in BlockAccessor.for_block(batch).iter_rows(public_row_format=True)]
+    mask = pyarrow.array(keep, type=pyarrow.bool_())
     return batch.filter(mask)
 
 
@@ -264,17 +301,12 @@ class RayDataset(DJDataset):
                 f"Ray mode. Supported modes: {op._supported_exec_modes}"
             )
 
-        if op._name in TAGGING_OPS.modules and (defer_schema_probe or Fields.meta not in cached_columns):
-
-            def process_batch_arrow(table: pyarrow.Table):
-                if Fields.meta in table.column_names:
-                    return table
-                new_column_data = [{} for _ in range(len(table))]
-                new_table = table.append_column(Fields.meta, [new_column_data])
-                return new_table
-
+        prepared_columns = operator_batch_columns(op)
+        if Fields.meta in prepared_columns and (defer_schema_probe or Fields.meta not in cached_columns):
             self.data = self.data.map_batches(
-                process_batch_arrow, batch_format="pyarrow", batch_size=DEFAULT_BATCH_SIZE
+                partial(prepare_batch_columns, columns=(Fields.meta,)),
+                batch_format="pyarrow",
+                batch_size=DEFAULT_BATCH_SIZE,
             )
             cached_columns.add(Fields.meta)
 
@@ -339,17 +371,11 @@ class RayDataset(DJDataset):
                         op.process = original_process
             elif isinstance(op, Filter):
                 # Use cached_columns instead of self.data.columns() to avoid breaking pipeline
-                if defer_schema_probe or Fields.stats not in cached_columns:
-
-                    def process_batch_arrow(table: pyarrow.Table):
-                        if Fields.stats in table.column_names:
-                            return table
-                        new_column_data = [{} for _ in range(len(table))]
-                        new_talbe = table.append_column(Fields.stats, [new_column_data])
-                        return new_talbe
-
+                if Fields.stats in prepared_columns and (defer_schema_probe or Fields.stats not in cached_columns):
                     self.data = self.data.map_batches(
-                        process_batch_arrow, batch_format="pyarrow", batch_size=DEFAULT_BATCH_SIZE
+                        partial(prepare_batch_columns, columns=(Fields.stats,)),
+                        batch_format="pyarrow",
+                        batch_size=DEFAULT_BATCH_SIZE,
                     )
                     cached_columns.add(Fields.stats)
                 prepare_for_ray_map_batches = getattr(op, "_prepare_for_ray_map_batches", None)
@@ -362,11 +388,11 @@ class RayDataset(DJDataset):
                 if op.use_ray_actor() and not use_instance_for_ray_tasks:
                     compute = _build_actor_pool_strategy(op.num_proc)
                     self.data = self.data.map_batches(
-                        op.__class__,
+                        RayOperatorActor,
                         fn_args=None,
                         fn_kwargs=None,
-                        fn_constructor_args=op._init_args,
-                        fn_constructor_kwargs=op._init_kwargs,
+                        fn_constructor_args=(op.__class__, op._init_args, op._init_kwargs),
+                        fn_constructor_kwargs=None,
                         batch_size=batch_size,
                         num_cpus=op.num_cpus,
                         num_gpus=op.num_gpus,
@@ -399,22 +425,16 @@ class RayDataset(DJDataset):
                         op.process = wrap_filter_with_tracer(original_process, op._name, tracer, op.is_batched_op())
 
                     try:
-                        if op.is_batched_op():
-                            # The core computation have been done in compute_stats,
-                            # and the filter process only performs simple filtering.
-                            # cpu and parallelism are not set here
-                            self.data = self.data.map_batches(
-                                partial(filter_batch, filter_func=op.process),
-                                batch_format="pyarrow",
-                                zero_copy_batch=True,
-                                batch_size=DEFAULT_BATCH_SIZE,
-                                runtime_env=op.runtime_env,
-                            )
-                        else:
-                            self.data = self.data.filter(
-                                op.process,
-                                runtime_env=op.runtime_env,
-                            )
+                        # The core computation have been done in compute_stats,
+                        # and the filter process only performs simple filtering.
+                        # cpu and parallelism are not set here
+                        self.data = self.data.map_batches(
+                            partial(filter_batch, filter_func=op.process, is_batched=op.is_batched_op()),
+                            batch_format="pyarrow",
+                            zero_copy_batch=True,
+                            batch_size=DEFAULT_BATCH_SIZE,
+                            runtime_env=op.runtime_env,
+                        )
                     finally:
                         # Restore original process method
                         if tracer and should_trace_op(tracer, op._name) and original_process:

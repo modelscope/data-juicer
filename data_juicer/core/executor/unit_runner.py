@@ -5,9 +5,7 @@ workers may execute units concurrently, but only the coordinator owns the
 LocalUnitStore and conditionally accepts their immutable output files.
 """
 
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Callable, Iterable, Sequence, Tuple, Union
+from typing import Callable, Iterable, Sequence, Tuple
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -18,55 +16,44 @@ TableSource = Callable[[int, int], Iterable[pa.Table]]
 TableOperator = Callable[[pa.Table], Iterable[pa.Table]]
 
 
-@dataclass(frozen=True)
-class UnitStage:
-    operator: TableOperator
-    empty_schema: Callable[[pa.Schema], pa.Schema]
-
-
 def execute_unit_attempt(
     store: LocalUnitStore,
     attempt: Attempt,
     unit: Unit,
     source: TableSource,
-    stage_spec: Union[TableOperator, UnitStage],
+    stage_spec: TableOperator,
     upstream: Commit = None,
 ) -> PreparedOutput:
     """Produce immutable files for one attempt without deciding its winner."""
-    operator = stage_spec.operator if isinstance(stage_spec, UnitStage) else stage_spec
-    empty_schema = stage_spec.empty_schema if isinstance(stage_spec, UnitStage) else None
     if upstream is None:
         if attempt.stage != 0:
             raise ProtocolError("Upstream stage has not committed")
         input_tables = source(unit.start, unit.stop)
         expected_input_rows = unit.stop - unit.start
-        upstream_schema = None
     else:
         if attempt.input_commit_id != upstream.attempt.attempt_id:
             raise ProtocolError("Attempt does not reference the upstream commit")
         input_tables = (pq.read_table(store.root / item.path) for item in upstream.files)
         expected_input_rows = upstream.rows
-        upstream_schema = upstream.schema
 
-    def output_tables():
+    def checked_tables():
         input_rows = 0
-        input_schema = upstream_schema
-        emitted = False
         for table in input_tables:
             if not isinstance(table, pa.Table):
                 raise TypeError("Unit source must yield PyArrow tables")
             input_rows += table.num_rows
-            if input_schema is None:
-                input_schema = table.schema
-            for output in operator(table):
-                emitted = True
-                yield output
+            if table.num_rows:
+                yield table
         if input_rows != expected_input_rows:
             raise ProtocolError("Unit input row count differs from the recovery plan")
-        if not emitted:
-            if empty_schema is None or input_schema is None:
-                raise ProtocolError("Empty output requires a stage schema contract")
-            yield pa.Table.from_batches([], schema=empty_schema(input_schema))
+
+    def output_tables():
+        process_unit = getattr(stage_spec, "process_unit", None)
+        if process_unit is not None:
+            yield from process_unit(checked_tables())
+        else:
+            for table in checked_tables():
+                yield from stage_spec(table)
 
     return store.write_output(attempt, output_tables())
 
@@ -75,7 +62,7 @@ def run_local_units(
     store: LocalUnitStore,
     units: Sequence[Unit],
     source: TableSource,
-    stages: Sequence[Union[TableOperator, UnitStage]],
+    stages: Sequence[TableOperator],
 ) -> Tuple[pa.Table, ...]:
     """Run/recover independent unit stages and return committed final blocks.
 
@@ -106,18 +93,11 @@ def run_local_units(
 
 
 def collect_final_units(store: LocalUnitStore, units: Sequence[Unit], stage: int) -> Tuple[pa.Table, ...]:
-    """Read winners in input-unit order, retaining an all-empty schema."""
+    """Read committed final files in input-unit order."""
     final = []
-    final_schema = None
     for unit in units:
         commit = store.get_commit(unit.unit_id, stage)
         if commit is None:
             raise ProtocolError("Final unit stage has not committed")
-        if final_schema is None:
-            final_schema = commit.schema
-        elif not final_schema.equals(commit.schema, check_metadata=True):
-            raise ProtocolError("Final unit schemas differ")
-        final.extend(pq.read_table(Path(store.root / item.path)) for item in commit.files)
-    if not final and final_schema is not None:
-        final.append(pa.Table.from_batches([], schema=final_schema))
+        final.extend(pq.read_table(store.root / item.path) for item in commit.files)
     return tuple(final)

@@ -1141,10 +1141,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # only after the generic schema/environment validation has succeeded.
         self._configure_pre_partition_resources(dataset, ops)
 
-        # Streaming tee-sink recovery keeps the input as one lazy stream and
-        # never manually partitions, so the whole partition-count negotiation
-        # below (including the resume partitioning_info.json requirement) is
-        # bypassed; its frontier lives in the stream manifest instead.
         streaming_selected = self._should_use_streaming_recovery(dataset, ops)
 
         # A resumed job must reuse the saved partition count before DAG
@@ -1164,7 +1160,8 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # automatic operator parallelism have both populated the real
         # per-worker requests used by the cluster-aware bounds.
         if streaming_selected:
-            logger.info("Streaming tee-sink recovery selected; skipping manual partitioning.")
+            self.num_partitions = 1
+            logger.info("Streaming unit recovery selected; skipping manual partitioning.")
         elif not resume_requested and self.partition_mode == "auto":
             self._configure_auto_partitioning(dataset, ops)
         elif self.partition_size_cfg is not None:
@@ -1249,9 +1246,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         Uses deterministic splitting to ensure reproducible partitions for
         checkpoint resumption.
         """
-        # Streaming tee-sink row-level recovery replaces manual partitioning
-        # entirely (no split, no per-partition materialize barrier). Dispatch
-        # before splitting so it never pays for partitions it will not use.
         if self._should_use_streaming_recovery(dataset, ops):
             return self._process_with_unit_recovery(dataset, ops)
 
@@ -1350,15 +1344,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         return False
 
     def _should_use_streaming_recovery(self, dataset: RayDataset, ops: List) -> bool:
-        """Return whether this segment should use streaming tee-sink row-level
-        recovery instead of manual per-partition checkpointing.
-
-        Cached on first call (both ``_run_impl`` and
-        ``_process_with_simple_partitioning`` consult it). Streaming replaces
-        #1054's per-partition ``.materialize()`` barrier with one lazy stream +
-        one hot pass-through sink actor pool, decoupling model loads (= pool
-        size) from crash blast radius (= uncommitted rows).
-        """
+        """Use U recovery only for supported local Mapper/Filter segments."""
         cached = getattr(self, "_streaming_selected_cache", None)
         if cached is not None:
             return cached
@@ -1382,8 +1368,10 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             if any(isinstance(op, Filter) and op.stats_export_path is not None for op in ops):
                 logger.info("Streaming unit recovery disabled: Filter stats export needs its own sink.")
                 return False
-            # Block + manifest commits rely on POSIX-atomic os.replace; a remote
-            # checkpoint dir gives no such guarantee, so fall back.
+            if any(getattr(op, "_prepare_for_ray_map_batches", None) is not None for op in ops):
+                logger.info("Streaming unit recovery disabled: shared operator state needs a replay contract.")
+                return False
+            # Attempt files require a shared local POSIX filesystem.
             if is_remote_path(ckpt_manager.ckpt_dir):
                 logger.info("Streaming recovery disabled: checkpoint dir is a remote path.")
                 return False
@@ -1425,8 +1413,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
 
     def _process_with_unit_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
         """Execute Mapper/Filter stages against stable input recovery units."""
-        import pyarrow as pa
-
         from data_juicer.core.executor.operator_unit_adapter import operator_unit_stage
         from data_juicer.core.executor.ray_unit_runner import RayStage, run_ray_units
         from data_juicer.core.executor.unit_protocol import LocalUnitStore, ProtocolError
@@ -1489,7 +1475,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 uses_cuda = False
             stages.append(
                 RayStage(
-                    operator=operator_unit_stage(op, empty_schema=lambda schema: schema),
+                    operator=operator_unit_stage(op),
                     actors=actors,
                     num_cpus=float(getattr(op, "num_cpus", None) or 1),
                     num_gpus=float(getattr(op, "num_gpus", None) or (1 if uses_cuda else 0)),
@@ -1503,17 +1489,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         run_ray_units(store, units, source, stages, materialize_output=False)
 
         final_commits = [store.get_commit(unit.unit_id, len(stages) - 1) for unit in units]
-        schemas = [commit.schema for commit in final_commits]
-        if schemas and any(not schemas[0].equals(schema, check_metadata=True) for schema in schemas[1:]):
-            raise ProtocolError("Final recovery units have incompatible schemas")
         paths = [str(store.root / item.path) for commit in final_commits for item in commit.files]
-        if paths:
-            result = ray.data.read_parquet(paths)
-        else:
-            schema = (
-                schemas[0] if schemas else pa.ipc.read_schema(pa.BufferReader(bytes.fromhex(manifest["schema_hex"])))
-            )
-            result = ray.data.from_arrow(pa.Table.from_batches([], schema=schema))
+        result = ray.data.read_parquet(paths) if paths else ray.data.from_items([])
+        result.context.execution_options.preserve_order = True
         return RayDataset(result, cfg=self.cfg)
 
     def _stamp_row_ids(self, dataset: RayDataset) -> RayDataset:

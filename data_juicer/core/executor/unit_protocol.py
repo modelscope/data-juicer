@@ -20,7 +20,7 @@ from typing import Iterable, Optional, Tuple
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 
 class ProtocolError(RuntimeError):
@@ -54,7 +54,6 @@ class OutputFile:
 @dataclass(frozen=True)
 class PreparedOutput:
     files: Tuple[OutputFile, ...]
-    schema: pa.Schema
 
 
 @dataclass(frozen=True)
@@ -62,7 +61,6 @@ class Commit:
     attempt: Attempt
     files: Tuple[OutputFile, ...]
     rows: int
-    schema: pa.Schema
 
 
 def _fsync_dir(path: Path) -> None:
@@ -95,6 +93,21 @@ class LocalUnitStore:
         self.db_path = self.root / "units.sqlite3"
         self.run_id = run_id
         with self._connect() as db:
+            columns = {row["name"] for row in db.execute("PRAGMA table_info(attempts)")}
+            if columns and columns != {
+                "attempt_id",
+                "run_id",
+                "unit_id",
+                "stage",
+                "generation",
+                "input_commit_id",
+                "files_json",
+                "rows",
+            }:
+                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 3")
+            if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='runs'").fetchone():
+                if db.execute("SELECT 1 FROM runs WHERE schema_version != ?", (SCHEMA_VERSION,)).fetchone():
+                    raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 3")
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS runs (
                     run_id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL,
@@ -118,12 +131,9 @@ class LocalUnitStore:
                     attempt_id TEXT PRIMARY KEY, run_id TEXT NOT NULL,
                     unit_id TEXT NOT NULL, stage INTEGER NOT NULL,
                     generation INTEGER NOT NULL, input_commit_id TEXT,
-                    files_json TEXT, rows INTEGER, schema_hex TEXT
+                    files_json TEXT, rows INTEGER
                 );
                 """)
-            columns = {row["name"] for row in db.execute("PRAGMA table_info(attempts)")}
-            if "schema_hex" not in columns:
-                raise ProtocolError("Checkpoint database uses an incompatible protocol version")
 
     @contextmanager
     def _connect(self):
@@ -163,6 +173,8 @@ class LocalUnitStore:
                     stop = min(start + unit_size, input_rows)
                     unit_id = f"{ordinal:012d}"
                     db.execute("INSERT INTO units VALUES (?, ?, ?, ?, ?)", (self.run_id, unit_id, ordinal, start, stop))
+            elif prior["schema_version"] != SCHEMA_VERSION:
+                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 3")
             elif (
                 tuple(
                     prior[key]
@@ -228,21 +240,14 @@ class LocalUnitStore:
             )
             return Attempt(attempt_id, unit_id, stage, generation, input_commit_id)
 
-    def write_output(
-        self, attempt: Attempt, batches: Iterable[pa.Table], *, empty_schema: Optional[pa.Schema] = None
-    ) -> PreparedOutput:
-        """Write complete blocks and record the schema even for zero rows."""
+    def write_output(self, attempt: Attempt, batches: Iterable[pa.Table]) -> PreparedOutput:
+        """Write complete nonempty blocks as immutable attempt-owned files."""
         directory = self.root / "attempts" / attempt.attempt_id
         directory.mkdir(parents=True, exist_ok=True)
         files = []
-        schema = empty_schema
         for index, batch in enumerate(batches):
             if not isinstance(batch, pa.Table):
                 raise TypeError("Attempt output must contain PyArrow tables")
-            if schema is None:
-                schema = batch.schema
-            elif not schema.equals(batch.schema, check_metadata=True):
-                raise ProtocolError("Attempt output schema differs between blocks")
             if batch.num_rows == 0:
                 continue
             name = f"part-{index:08d}.parquet"
@@ -259,30 +264,24 @@ class LocalUnitStore:
             files.append(OutputFile(str(final.relative_to(self.root)), batch.num_rows, digest))
         _fsync_dir(directory)
         _fsync_dir(directory.parent)
-        if schema is None:
-            raise ProtocolError("Empty output requires an explicit schema")
-        return PreparedOutput(tuple(files), schema)
+        return PreparedOutput(tuple(files))
 
     def commit(self, attempt: Attempt, output: PreparedOutput) -> Commit:
         """Atomically accept a complete attempt, or reject a stale one."""
-        if not isinstance(output.schema, pa.Schema):
-            raise ProtocolError("Attempt output requires a PyArrow schema")
         files = output.files
         rows = 0
         seen = set()
         expected_dir = (self.root / "attempts" / attempt.attempt_id).resolve()
         for item in files:
             path = (self.root / item.path).resolve()
-            if path.parent != expected_dir or item.path in seen or item.rows < 1:
+            if path.parent != expected_dir or path in seen or item.rows < 1:
                 raise ProtocolError("Invalid attempt output file")
-            seen.add(item.path)
+            seen.add(path)
             if not path.is_file() or _sha256_file(path) != item.sha256:
                 raise ProtocolError("Missing or modified attempt output file")
             metadata = pq.read_metadata(path)
             if metadata.num_rows != item.rows:
                 raise ProtocolError("Attempt output row count mismatch")
-            if not pq.read_schema(path).equals(output.schema, check_metadata=True):
-                raise ProtocolError("Attempt output schema mismatch")
             rows += item.rows
         with self._transaction() as db:
             recorded = db.execute(
@@ -306,19 +305,14 @@ class LocalUnitStore:
                 if upstream is None or upstream[0] != attempt.input_commit_id:
                     raise ProtocolError("Upstream commit changed")
             db.execute(
-                "UPDATE attempts SET files_json=?, rows=?, schema_hex=? WHERE attempt_id=?",
-                (
-                    json.dumps([item.__dict__ for item in files]),
-                    rows,
-                    output.schema.serialize().to_pybytes().hex(),
-                    attempt.attempt_id,
-                ),
+                "UPDATE attempts SET files_json=?, rows=? WHERE attempt_id=?",
+                (json.dumps([item.__dict__ for item in files]), rows, attempt.attempt_id),
             )
             db.execute(
                 "UPDATE stage_state SET committed_attempt_id=? " "WHERE run_id=? AND unit_id=? AND stage=?",
                 (attempt.attempt_id, self.run_id, attempt.unit_id, attempt.stage),
             )
-        return Commit(attempt, files, rows, output.schema)
+        return Commit(attempt, files, rows)
 
     def get_commit(self, unit_id: str, stage: int) -> Optional[Commit]:
         """Read a committed result and fail if its durable output is damaged."""
@@ -334,23 +328,23 @@ class LocalUnitStore:
                 row["attempt_id"], row["unit_id"], row["stage"], row["generation"], row["input_commit_id"]
             )
             files = tuple(OutputFile(**item) for item in json.loads(row["files_json"]))
-            if not row["schema_hex"]:
-                raise ProtocolError("Committed output schema is missing")
-            schema = pa.ipc.read_schema(pa.BufferReader(bytes.fromhex(row["schema_hex"])))
             if sum(item.rows for item in files) != row["rows"]:
                 raise ProtocolError("Committed output row count mismatch")
             expected_dir = (self.root / "attempts" / attempt.attempt_id).resolve()
+            seen = set()
             for item in files:
                 path = (self.root / item.path).resolve()
                 if (
                     path.parent != expected_dir
+                    or path in seen
+                    or item.rows < 1
                     or not path.is_file()
                     or _sha256_file(path) != item.sha256
                     or pq.read_metadata(path).num_rows != item.rows
-                    or not pq.read_schema(path).equals(schema, check_metadata=True)
                 ):
                     raise ProtocolError("Committed output file is missing or modified")
-            return Commit(attempt, files, row["rows"], schema)
+                seen.add(path)
+            return Commit(attempt, files, row["rows"])
 
     def pending(self, stage: int) -> Tuple[Unit, ...]:
         """Units ready for this stage but not yet durably completed."""

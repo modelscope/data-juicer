@@ -12,7 +12,6 @@ class RayDatasetFuncsTest(DataJuicerTestCaseBase):
         """Set up test data"""
         super().setUp()
 
-        import ray
         from data_juicer.core.data.ray_dataset import (
             get_abs_path,
             convert_to_absolute_paths,
@@ -552,6 +551,92 @@ class RayComputeStrategyTest(DataJuicerTestCaseBase):
                 self.assertIsInstance(compute, ActorPoolStrategy)
                 self.assertEqual(compute.min_size, 1)
                 self.assertEqual(compute.max_size, 3)
+
+
+class RayBatchExecutionTest(unittest.TestCase):
+    def test_native_actor_uses_original_operator_call(self):
+        import pyarrow as pa
+
+        from data_juicer.core.data.ray_dataset import RayDataset, RayOperatorActor
+        from data_juicer.ops.base_op import Mapper
+
+        class CustomCallMapper(Mapper):
+            def __call__(self, table):
+                return table.append_column("custom", pa.array([True] * table.num_rows))
+
+            def process_single(self, sample):
+                raise AssertionError("Original __call__ must be preserved")
+
+        op = CustomCallMapper(num_proc=1, ray_execution_mode="actor")
+        dataset = RayDataset.__new__(RayDataset)
+        dataset.data = MagicMock()
+        dataset.data.map_batches.return_value = dataset.data
+        dataset._run_single_op(op, {"text"})
+        call = dataset.data.map_batches.call_args
+        self.assertIs(call.args[0], RayOperatorActor)
+        actor = call.args[0](*call.kwargs["fn_constructor_args"], **call.kwargs["fn_constructor_kwargs"])
+        self.assertEqual(actor(pa.table({"text": ["one"]})).to_pylist(), [{"text": "one", "custom": True}])
+        self.assertEqual(actor(pa.table({"text": ["two"]})).to_pylist(), [{"text": "two", "custom": True}])
+
+    def test_preparation_handles_tagging_filters_and_preserves_existing_columns(self):
+        import pyarrow as pa
+        from unittest.mock import patch
+
+        from data_juicer.core.data.ray_dataset import operator_batch_columns, prepare_batch_columns
+        from data_juicer.ops.base_op import TAGGING_OPS
+        from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+        from data_juicer.utils.constant import Fields
+
+        op = TextLengthFilter()
+        with patch.dict(TAGGING_OPS.modules, {op._name: type(op)}):
+            columns = operator_batch_columns(op)
+        self.assertEqual(columns, [Fields.meta, Fields.stats])
+        table = pa.table({"text": ["one"], Fields.meta: [{"tag": "keep"}]})
+        prepared = prepare_batch_columns(table, columns)
+        self.assertEqual(prepared[Fields.meta].to_pylist(), [{"tag": "keep"}])
+        self.assertEqual(prepared[Fields.stats].to_pylist(), [{}])
+        self.assertIs(prepare_batch_columns(prepared, columns), prepared)
+
+    def test_non_stats_filter_does_not_create_empty_struct(self):
+        from data_juicer.core.data.ray_dataset import operator_batch_columns
+        from data_juicer.ops.filter.suffix_filter import SuffixFilter
+
+        self.assertEqual(operator_batch_columns(SuffixFilter()), [])
+
+    def test_nonbatched_filter_preserves_native_tensor_shape(self):
+        import numpy as np
+        import pyarrow as pa
+
+        from data_juicer.core.data.ray_dataset import filter_batch
+
+        values = np.arange(12).reshape(3, 2, 2)
+        table = pa.table({"tensor": pa.FixedShapeTensorArray.from_numpy_ndarray(values)})
+        selected = filter_batch(
+            table, lambda row: row["tensor"].shape == (2, 2) and row["tensor"][0, 0] == 4, is_batched=False
+        )
+        self.assertTrue(selected.equals(table.slice(1, 1)))
+
+    def test_forced_batch_non_stats_filter_keeps_required_stats_preparation(self):
+        from data_juicer.core.data.ray_dataset import operator_batch_columns
+        from data_juicer.ops.filter.suffix_filter import SuffixFilter
+        from data_juicer.utils.constant import Fields
+
+        self.assertEqual(operator_batch_columns(SuffixFilter(batch_mode=True)), [Fields.stats])
+
+    def test_batched_and_single_filter_use_same_arrow_selection(self):
+        import pyarrow as pa
+
+        from data_juicer.core.data.ray_dataset import filter_batch
+
+        table = pa.table({"value": [0, 1, 2]})
+        batched = filter_batch(table, lambda samples: [value % 2 == 0 for value in samples["value"]])
+        single = filter_batch(table, lambda row: row["value"] % 2 == 0, is_batched=False)
+        self.assertTrue(batched.equals(single))
+        self.assertEqual(single["value"].to_pylist(), [0, 2])
+        with self.assertRaises(pa.ArrowInvalid):
+            filter_batch(table, lambda samples: [True])
+        empty = table.slice(0, 0)
+        self.assertIs(filter_batch(empty, lambda samples: self.fail("Empty filters must not run")), empty)
 
 
 if __name__ == "__main__":

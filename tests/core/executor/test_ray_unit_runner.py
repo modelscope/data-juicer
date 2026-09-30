@@ -2,6 +2,7 @@
 
 import hashlib
 import os
+import time
 from dataclasses import dataclass
 
 import pyarrow as pa
@@ -9,18 +10,15 @@ import pyarrow.parquet as pq
 import pytest
 import ray
 
+from data_juicer.core.executor import ray_unit_runner
 from data_juicer.core.executor.operator_unit_adapter import operator_unit_stage
 from data_juicer.core.executor.ray_unit_runner import RayStage, run_ray_units
 from data_juicer.core.executor.unit_protocol import LocalUnitStore
-from data_juicer.core.executor.unit_runner import UnitStage, run_local_units
+from data_juicer.core.executor.unit_runner import run_local_units
 from data_juicer.ops.base_op import Filter, Mapper
 from data_juicer.ops.filter.alphanumeric_filter import AlphanumericFilter
 from data_juicer.ops.mapper.whitespace_normalization_mapper import WhitespaceNormalizationMapper
 from data_juicer.utils.constant import Fields
-
-
-def same_schema(schema):
-    return schema
 
 
 @dataclass
@@ -64,17 +62,17 @@ def _planned(tmp_path, rows, stages, unit_size=1):
     return store, units, ParquetRangeSource(str(source_path))
 
 
-def test_actual_mapper_filter_keep_schema_for_empty_unit(tmp_path):
+def test_actual_mapper_filter_complete_empty_unit_without_schema(tmp_path):
     pq.write_table(pa.table({"text": [" A\tB ", "!!!", " C "]}), tmp_path / "source.parquet")
     store, units, source = _planned(tmp_path, 3, 2)
     stages = [
-        operator_unit_stage(WhitespaceNormalizationMapper(), empty_schema=same_schema),
+        operator_unit_stage(WhitespaceNormalizationMapper()),
         operator_unit_stage(AlphanumericFilter(min_ratio=0.5)),
     ]
     result = run_local_units(store, units, source, stages)
     assert [text for block in result for text in block["text"].to_pylist()] == ["A B", "C"]
     assert store.get_commit(units[1].unit_id, 1).rows == 0
-    assert Fields.stats in store.get_commit(units[1].unit_id, 1).schema.names
+    assert store.get_commit(units[1].unit_id, 1).files == ()
     assert [text for block in run_local_units(store, units, source, stages) for text in block["text"].to_pylist()] == [
         "A B",
         "C",
@@ -85,8 +83,8 @@ def with_worker_pid(table):
     yield table.append_column("worker_pid", pa.array([os.getpid()] * table.num_rows))
 
 
-def pid_schema(schema):
-    return schema.append(pa.field("worker_pid", pa.int64()))
+def identity(table):
+    yield table
 
 
 @dataclass
@@ -101,9 +99,73 @@ class FailSecondUnitOnce:
         return (table,)
 
 
+@dataclass
+class WaitForDownstream:
+    directory: str
+    empty_first: bool
+
+    def __call__(self, table):
+        value = table["value"][0].as_py()
+        if value == 0 and self.empty_first:
+            return ()
+        if value == 1:
+            store = LocalUnitStore(self.directory, "job-1")
+            deadline = time.monotonic() + 30
+            while store.get_commit("000000000000", 1) is None:
+                if time.monotonic() > deadline:
+                    raise RuntimeError("first U never reached downstream before the next U")
+                time.sleep(0.05)
+        return (table,)
+
+
+@dataclass
+class SlowFirstUnit:
+    directory: str
+
+    def __call__(self, table):
+        if table["value"][0].as_py() == 0:
+            store = LocalUnitStore(self.directory, "job-1")
+            deadline = time.monotonic() + 30
+            while store.get_commit("000000000001", 1) is None:
+                if time.monotonic() > deadline:
+                    raise RuntimeError("A completed later U was blocked by input order")
+                time.sleep(0.05)
+        return (table,)
+
+
+@dataclass
+class RecordCalls:
+    path: str
+    crash_before_commit: bool = False
+
+    def __call__(self, table):
+        value = table["value"][0].as_py()
+        with open(self.path, "a") as stream:
+            stream.write(f"{value}\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        marker = self.path + ".crashed"
+        if self.crash_before_commit and value == 1 and not os.path.exists(marker):
+            with open(marker, "x"):
+                pass
+            os._exit(86)
+        return (table,)
+
+
+class ExitAfterCommitOnce(ray_unit_runner._UnitTicketActor):
+    def __call__(self, batch):
+        for result in super().__call__(batch):
+            marker = self.store.root / "exited-after-commit"
+            if result["ordinal"][0].as_py() == 1 and not marker.exists():
+                with marker.open("x"):
+                    pass
+                os._exit(86)
+            yield result
+
+
 @pytest.fixture
 def local_ray():
-    ray.init(num_cpus=2, include_dashboard=False, ignore_reinit_error=True)
+    ray.init(num_cpus=2, include_dashboard=False, ignore_reinit_error=True, log_to_driver=False)
     try:
         yield
     finally:
@@ -113,7 +175,7 @@ def local_ray():
 def test_ray_actor_reused_across_units_and_commits_in_input_order(tmp_path, local_ray):
     pq.write_table(pa.table({"value": [0, 1, 2, 3]}), tmp_path / "source.parquet")
     store, units, source = _planned(tmp_path, 4, 1)
-    stage = RayStage(UnitStage(with_worker_pid, pid_schema), actors=1)
+    stage = RayStage(with_worker_pid, actors=1)
     result = run_ray_units(store, units, source, [stage])
     assert [value for block in result for value in block["value"].to_pylist()] == [0, 1, 2, 3]
     assert len({pid for block in result for pid in block["worker_pid"].to_pylist()}) == 1
@@ -127,7 +189,7 @@ def test_ray_runner_with_real_mapper_and_filter(tmp_path, local_ray):
     pq.write_table(pa.table({"text": [" A\tB ", "!!!", " C "]}), tmp_path / "source.parquet")
     store, units, source = _planned(tmp_path, 3, 2)
     stages = [
-        RayStage(operator_unit_stage(WhitespaceNormalizationMapper(), empty_schema=same_schema), actors=1),
+        RayStage(operator_unit_stage(WhitespaceNormalizationMapper()), actors=1),
         RayStage(operator_unit_stage(AlphanumericFilter(min_ratio=0.5)), actors=1),
     ]
     result = run_ray_units(store, units, source, stages)
@@ -138,10 +200,7 @@ def test_ray_runner_with_real_mapper_and_filter(tmp_path, local_ray):
 def test_ray_mapper_expansion_and_filter_zero_output(tmp_path, local_ray):
     pq.write_table(pa.table({"value": [0, 1, 2]}), tmp_path / "source.parquet")
     store, units, source = _planned(tmp_path, 3, 2)
-    stages = [
-        RayStage(operator_unit_stage(DuplicateMapper(), empty_schema=same_schema), actors=1),
-        RayStage(operator_unit_stage(KeepEvenFilter()), actors=1),
-    ]
+    stages = [RayStage(operator_unit_stage(DuplicateMapper())), RayStage(operator_unit_stage(KeepEvenFilter()))]
     result = run_ray_units(store, units, source, stages)
     assert [value for block in result for value in block["value"].to_pylist()] == [0, 0, 2, 2]
     assert [store.get_commit(unit.unit_id, 0).rows for unit in units] == [2, 2, 2]
@@ -151,7 +210,7 @@ def test_ray_mapper_expansion_and_filter_zero_output(tmp_path, local_ray):
 def test_ray_failure_replays_only_uncommitted_unit(tmp_path, local_ray):
     pq.write_table(pa.table({"value": [0, 1]}), tmp_path / "source.parquet")
     store, units, source = _planned(tmp_path, 2, 1)
-    stage = RayStage(UnitStage(FailSecondUnitOnce(str(tmp_path / "failed-once")), same_schema), actors=1)
+    stage = RayStage(FailSecondUnitOnce(str(tmp_path / "failed-once")))
     with pytest.raises(ray.exceptions.RayTaskError, match="worker failed inside unit"):
         run_ray_units(store, units, source, [stage])
     first = store.get_commit(units[0].unit_id, 0)
@@ -161,3 +220,45 @@ def test_ray_failure_replays_only_uncommitted_unit(tmp_path, local_ray):
     result = run_ray_units(reopened, same_units, same_source, [stage])
     assert reopened.get_commit(units[0].unit_id, 0) == first
     assert [value for block in result for value in block["value"].to_pylist()] == [0, 1]
+
+
+@pytest.mark.parametrize("empty_first", [False, True])
+def test_first_ticket_reaches_downstream_before_upstream_finishes(tmp_path, local_ray, monkeypatch, empty_first):
+    pq.write_table(pa.table({"value": [0, 1, 2, 3]}), tmp_path / "source.parquet")
+    store, units, source = _planned(tmp_path, 4, 2)
+    original = ray.data.from_items
+    monkeypatch.setattr(ray.data, "from_items", lambda items: original(items, override_num_blocks=1))
+    context = ray.data.DataContext.get_current()
+    original_sizes = (context.target_min_block_size, context.target_max_block_size)
+    stages = [RayStage(WaitForDownstream(str(store.root), empty_first)), RayStage(identity)]
+    result = run_ray_units(store, units, source, stages)
+    assert [v for block in result for v in block["value"].to_pylist()] == ([1, 2, 3] if empty_first else [0, 1, 2, 3])
+    assert (context.target_min_block_size, context.target_max_block_size) == original_sizes
+    assert store.get_commit(units[0].unit_id, 1).rows == (0 if empty_first else 1)
+
+
+def test_completed_later_unit_is_not_blocked_by_slow_first_unit(tmp_path, local_ray, monkeypatch):
+    pq.write_table(pa.table({"value": [0, 1]}), tmp_path / "source.parquet")
+    store, units, source = _planned(tmp_path, 2, 2)
+    original = ray.data.from_items
+    monkeypatch.setattr(ray.data, "from_items", lambda items: original(items, override_num_blocks=2))
+    stages = [RayStage(SlowFirstUnit(str(store.root)), actors=2, num_cpus=0.5), RayStage(identity, num_cpus=0.5)]
+    result = run_ray_units(store, units, source, stages)
+    assert [value for table in result for value in table["value"].to_pylist()] == [0, 1]
+
+
+@pytest.mark.parametrize("after_commit", [False, True])
+def test_actor_restart_replays_only_uncommitted_work(tmp_path, local_ray, monkeypatch, after_commit):
+    pq.write_table(pa.table({"value": [0, 1, 2, 3]}), tmp_path / "source.parquet")
+    store, units, source = _planned(tmp_path, 4, 1)
+    calls = tmp_path / "calls"
+    original = ray.data.from_items
+    monkeypatch.setattr(ray.data, "from_items", lambda items: original(items, override_num_blocks=1))
+    if after_commit:
+        monkeypatch.setattr(ray_unit_runner, "_UnitTicketActor", ExitAfterCommitOnce)
+    stage = RayStage(RecordCalls(str(calls), crash_before_commit=not after_commit))
+    result = run_ray_units(store, units, source, [stage])
+    assert [v for block in result for v in block["value"].to_pylist()] == [0, 1, 2, 3]
+    observed = [int(value) for value in calls.read_text().splitlines()]
+    assert observed.count(1) == (1 if after_commit else 2)
+    assert all(observed.count(value) == 1 for value in (0, 2, 3))
