@@ -822,9 +822,17 @@ def build_base_parser() -> ArgumentParser:
         type=Literal["streaming", "partition"],
         default="partition",
         help=(
-            "'partition' (default) uses per-partition checkpoints. 'streaming' is an experimental "
-            "row-id tee-sink path for row-preserving Mapper pipelines only; Filters, row-expanding "
-            "Mappers, and dataset-level operators use the partition path."
+            "'partition' (default) uses per-partition checkpoints. 'streaming' uses durable input "
+            "recovery units for Mapper/Filter chains, with bounded replay after a crash."
+        ),
+    )
+    parser.add_argument(
+        "--partition.unit_size",
+        type=Union[PositiveInt, Literal["auto"]],
+        default="auto",
+        help=(
+            "Input rows per streaming recovery unit. 'auto' chooses a bounded size from operator "
+            "throughput probes; an explicit integer pins the retry granularity."
         ),
     )
     parser.add_argument(
@@ -832,11 +840,8 @@ def build_base_parser() -> ArgumentParser:
         type=Optional[int],
         default=1,
         help=(
-            "Number of contiguous op-segments the Mapper-only chain is split into under "
-            "recovery_mode=streaming. A pass-through tee-sink is inserted after each segment, so a "
-            "resume re-runs only the ops AFTER the deepest segment that already committed a row "
-            "(finer recovery than the single-segment default). Still ONE lazy stream, no per-segment "
-            "materialize barrier. 1 (default) = single segment (whole chain). Clamped to <= number of ops."
+            "Legacy tee-sink option retained for config compatibility. Recovery units commit "
+            "after every Mapper/Filter stage; this value is ignored in streaming mode."
         ),
     )
     parser.add_argument(
@@ -844,10 +849,8 @@ def build_base_parser() -> ArgumentParser:
         type=bool,
         default=True,
         help=(
-            "Under recovery_mode=streaming, fsync each committed block parquet and manifest shard (and "
-            "their directories) BEFORE the tee returns the batch downstream. This makes segment k's "
-            "commit durable before its rows can reach segment k+1, so the nested frontier holds even "
-            "under power-loss/NFS (not just process-kill). Default True; set False for a no-fsync A/B."
+            "Legacy tee-sink option retained for config compatibility. Recovery units always fsync "
+            "their output files and SQLite commit; this value is ignored in streaming mode."
         ),
     )
     parser.add_argument(

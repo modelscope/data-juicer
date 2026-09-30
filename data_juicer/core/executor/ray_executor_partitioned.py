@@ -561,6 +561,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         )
         execution_group_size = ConfigAccessor.get(partition_cfg, "execution_group_size", "auto")
         recovery_mode = ConfigAccessor.get(partition_cfg, "recovery_mode", "partition")
+        unit_size = ConfigAccessor.get(partition_cfg, "unit_size", "auto")
         stream_segments = ConfigAccessor.get(partition_cfg, "stream_segments", 1)
         stream_fsync = ConfigAccessor.get(partition_cfg, "stream_fsync", True)
         max_initialization_overhead_ratio = ConfigAccessor.get(
@@ -744,6 +745,16 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             logger.warning(f"Invalid partition.recovery_mode={recovery_mode!r}; using 'partition'")
             normalized_recovery = "partition"
         self.recovery_mode = normalized_recovery
+        if isinstance(unit_size, str) and unit_size.strip().lower() == "auto":
+            self.unit_size_cfg = "auto"
+        else:
+            try:
+                if isinstance(unit_size, bool) or int(unit_size) < 1:
+                    raise ValueError
+                self.unit_size_cfg = int(unit_size)
+            except (TypeError, ValueError):
+                logger.warning(f"Invalid partition.unit_size={unit_size!r}; using auto")
+                self.unit_size_cfg = "auto"
         # Number of contiguous op-segments; a tee-sink is inserted after each.
         # More segments => finer resume (re-run only ops after the deepest
         # committed segment) at the cost of more committed blocks. Clamped to
@@ -1242,7 +1253,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # entirely (no split, no per-partition materialize barrier). Dispatch
         # before splitting so it never pays for partitions it will not use.
         if self._should_use_streaming_recovery(dataset, ops):
-            return self._process_streaming_with_tee_recovery(dataset, ops)
+            return self._process_with_unit_recovery(dataset, ops)
 
         logger.info("Processing with real partitioning using Ray Data's split and union...")
 
@@ -1363,15 +1374,13 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             ):
                 logger.info("Streaming recovery disabled: checkpointing is off.")
                 return False
-            # A tee after a Filter cannot tell an already-dropped input from an
-            # unprocessed one. A tee after an expander cannot tell whether all
-            # children of a parent have been committed. Both need an explicit
-            # input-unit completion protocol, which this path does not have.
-            if not ops or any(not isinstance(op, Mapper) for op in ops):
-                logger.info("Streaming recovery disabled: segment is not a Mapper-only pipeline.")
+            from data_juicer.ops import Filter
+
+            if not ops or any(not isinstance(op, (Mapper, Filter)) for op in ops):
+                logger.info("Streaming unit recovery disabled: segment is not Mapper/Filter-only.")
                 return False
-            if any(getattr(op, "_name", "") in _UNSUPPORTED_STREAM_MAPPERS for op in ops):
-                logger.info("Streaming recovery disabled: a known Mapper changes row cardinality.")
+            if any(isinstance(op, Filter) and op.stats_export_path is not None for op in ops):
+                logger.info("Streaming unit recovery disabled: Filter stats export needs its own sink.")
                 return False
             # Block + manifest commits rely on POSIX-atomic os.replace; a remote
             # checkpoint dir gives no such guarantee, so fall back.
@@ -1403,6 +1412,109 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         except (TypeError, ValueError):
             base = 4
         return max(1, min(4, base))
+
+    def _resolve_recovery_unit_size(self, ops: List) -> int:
+        configured = getattr(self, "unit_size_cfg", "auto")
+        if configured == "auto" and getattr(self, "partition_size_cfg", None) is not None:
+            configured = self.partition_size_cfg
+        if configured != "auto":
+            return int(configured)
+        rates = [float(op._gpu_rows_per_second) for op in ops if float(getattr(op, "_gpu_rows_per_second", 0) or 0) > 0]
+        target = math.ceil(min(rates) * 30) if rates else 512
+        return max(64, min(2048, target))
+
+    def _process_with_unit_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
+        """Execute Mapper/Filter stages against stable input recovery units."""
+        import pyarrow as pa
+
+        from data_juicer.core.executor.operator_unit_adapter import operator_unit_stage
+        from data_juicer.core.executor.ray_unit_runner import RayStage, run_ray_units
+        from data_juicer.core.executor.unit_protocol import LocalUnitStore, ProtocolError
+        from data_juicer.core.executor.unit_snapshot import open_or_create_snapshot
+
+        root = os.path.join(self.ckpt_manager.ckpt_dir, "unit_recovery")
+        snapshot_dir = os.path.join(root, "source")
+        state_dir = os.path.join(root, "state")
+        resuming = bool(getattr(self, "_is_resuming", False))
+        unit_size = self._resolve_recovery_unit_size(ops)
+        if (
+            resuming
+            and getattr(self, "unit_size_cfg", "auto") == "auto"
+            and getattr(self, "partition_size_cfg", None) is None
+        ):
+            manifest_path = os.path.join(snapshot_dir, "manifest.json")
+            if os.path.isfile(manifest_path):
+                with open(manifest_path) as stream:
+                    unit_size = int(json.load(stream)["unit_size"])
+        if (
+            resuming
+            and not os.path.exists(snapshot_dir)
+            and os.path.exists(os.path.join(self.ckpt_manager.ckpt_dir, "stream_run.json"))
+        ):
+            raise ProtocolError("Cannot resume a tee-sink job with the recovery-unit protocol; use a new job ID")
+        manifest, source = open_or_create_snapshot(dataset.data, snapshot_dir, unit_size, resuming=resuming)
+
+        config_payload = [
+            {
+                "operator": f"{type(op).__module__}.{type(op).__qualname__}",
+                "args": op._init_args,
+                "kwargs": op._init_kwargs,
+            }
+            for op in ops
+        ]
+        config_hash = hashlib.sha256(
+            json.dumps(config_payload, sort_keys=True, default=str, ensure_ascii=False).encode("utf-8")
+        ).hexdigest()
+        store = LocalUnitStore(state_dir, str(self.job_id or "unit-run"))
+        units = store.plan(
+            input_fingerprint=manifest["fingerprint"],
+            config_fingerprint=config_hash,
+            input_rows=manifest["rows"],
+            unit_size=unit_size,
+            stage_count=len(ops),
+        )
+
+        stages = []
+        for op in ops:
+            parallelism = getattr(op, "num_proc", 1)
+            if isinstance(parallelism, (tuple, list)):
+                parallelism = max(parallelism)
+            try:
+                actors = max(1, int(parallelism))
+            except (TypeError, ValueError):
+                actors = 1
+            try:
+                uses_cuda = bool(op.use_cuda())
+            except (AttributeError, RuntimeError):
+                uses_cuda = False
+            stages.append(
+                RayStage(
+                    operator=operator_unit_stage(op, empty_schema=lambda schema: schema),
+                    actors=actors,
+                    num_cpus=float(getattr(op, "num_cpus", None) or 1),
+                    num_gpus=float(getattr(op, "num_gpus", None) or (1 if uses_cuda else 0)),
+                    runtime_env=getattr(op, "runtime_env", None),
+                )
+            )
+        logger.info(
+            f"Streaming unit recovery: {manifest['rows']} input rows, {len(units)} units "
+            f"of up to {unit_size}, {len(stages)} operator stages, resuming={resuming}"
+        )
+        run_ray_units(store, units, source, stages, materialize_output=False)
+
+        final_commits = [store.get_commit(unit.unit_id, len(stages) - 1) for unit in units]
+        schemas = [commit.schema for commit in final_commits]
+        if schemas and any(not schemas[0].equals(schema, check_metadata=True) for schema in schemas[1:]):
+            raise ProtocolError("Final recovery units have incompatible schemas")
+        paths = [str(store.root / item.path) for commit in final_commits for item in commit.files]
+        if paths:
+            result = ray.data.read_parquet(paths)
+        else:
+            schema = (
+                schemas[0] if schemas else pa.ipc.read_schema(pa.BufferReader(bytes.fromhex(manifest["schema_hex"])))
+            )
+            result = ray.data.from_arrow(pa.Table.from_batches([], schema=schema))
+        return RayDataset(result, cfg=self.cfg)
 
     def _stamp_row_ids(self, dataset: RayDataset) -> RayDataset:
         """Inject a dense, unique, read-order-stable global row id.

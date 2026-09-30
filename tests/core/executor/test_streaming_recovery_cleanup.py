@@ -42,7 +42,7 @@ def _source(executor):
     return RayDataset(data, cfg=executor.cfg)
 
 
-def test_streaming_selection_honors_checkpoint_switch_and_cardinality(tmp_path):
+def test_streaming_selection_honors_checkpoint_switch_and_accepts_cardinality(tmp_path):
     executor = _executor(tmp_path)
     mapper = WhitespaceNormalizationMapper(num_proc=1)
     dataset = SimpleNamespace(data=SimpleNamespace())
@@ -52,11 +52,11 @@ def test_streaming_selection_honors_checkpoint_switch_and_cardinality(tmp_path):
     executor._streaming_selected_cache = None
     executor.ckpt_manager.checkpoint_enabled = True
     executor.ckpt_manager.checkpoint_strategy = CheckpointStrategy.EVERY_OP
-    assert not executor._should_use_streaming_recovery(dataset, [TextLengthFilter(min_len=1, num_proc=1)])
+    assert executor._should_use_streaming_recovery(dataset, [TextLengthFilter(min_len=1, num_proc=1)])
 
     executor._streaming_selected_cache = None
     mapper._name = "nlpaug_en_mapper"
-    assert not executor._should_use_streaming_recovery(dataset, [mapper])
+    assert executor._should_use_streaming_recovery(dataset, [mapper])
 
 
 def test_streaming_tee_rejects_duplicate_ids(tmp_path):
