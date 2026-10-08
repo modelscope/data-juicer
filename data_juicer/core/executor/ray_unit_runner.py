@@ -1,22 +1,14 @@
-"""Ray Data ticket pipeline backed by a shared local POSIX checkpoint store."""
+"""Recovery boundaries for the shared Ray Dataset execution plan."""
 
 from dataclasses import dataclass
-from typing import Optional, Sequence, Tuple
 
 import pyarrow as pa
+import pyarrow.parquet as pq
 import ray
 
-from data_juicer.core.executor.unit_protocol import LocalUnitStore, ProtocolError, Unit
-from data_juicer.core.executor.unit_runner import TableOperator, TableSource, collect_final_units, execute_unit_attempt
-
-
-@dataclass(frozen=True)
-class RayStage:
-    operator: TableOperator
-    actors: int = 1
-    num_cpus: float = 1
-    num_gpus: float = 0
-    runtime_env: Optional[dict] = None
+from data_juicer.core.data.ray_batch_plan import BatchPlanWorker
+from data_juicer.core.executor.unit_protocol import LocalUnitStore, PreparedOutput, ProtocolError
+from data_juicer.core.executor.unit_runner import execute_unit_attempt
 
 
 def _ticket(unit, stage=-1, commit_id=""):
@@ -55,86 +47,116 @@ class _UnitCoordinator:
         return self.store.commit(attempt, output)
 
 
+@dataclass(frozen=True)
+class UnitWorkerContext:
+    directory: str
+    run_id: str
+    source: object
+    stage: int
+    coordinator: object
+
+
 class _UnitTicketActor:
-    def __init__(self, directory, run_id, source, operator, stage, coordinator):
-        self.store = LocalUnitStore(directory, run_id)
-        self.source = source
-        self.operator = operator
-        self.stage = stage
-        self.coordinator = coordinator
+    def __init__(self, context, plan):
+        self.store = LocalUnitStore(context.directory, context.run_id)
+        self.source = context.source
+        self.stage = context.stage
+        self.coordinator = context.coordinator
+        self.operator = BatchPlanWorker(plan)
 
     def __call__(self, batch):
         for item in batch.to_pylist():
             unit, attempt, upstream, committed = ray.get(self.coordinator.claim.remote(item, self.stage))
             if committed is None:
-                output = execute_unit_attempt(self.store, attempt, unit, self.source, self.operator, upstream)
+                stats_files = ()
+
+                def write_stats(tables):
+                    nonlocal stats_files
+                    stats_files = self.store.write_output(attempt, tables, stats=True).stats_files
+                    return (pq.read_table(self.store.root / entry.path) for entry in stats_files)
+
+                output = execute_unit_attempt(
+                    self.store, attempt, unit, self.source, self.operator, upstream, write_stats=write_stats
+                )
+                output = PreparedOutput(output.files, stats_files)
                 committed = ray.get(self.coordinator.finish.remote(attempt, output))
             yield pa.Table.from_pylist([_ticket(unit, self.stage, committed.attempt.attempt_id)])
 
 
-def run_ray_units(
-    store: LocalUnitStore,
-    units: Sequence[Unit],
-    source: TableSource,
-    stages: Sequence[RayStage],
-    *,
-    materialize_output: bool = True,
-) -> Optional[Tuple[pa.Table, ...]]:
-    """Emit each downstream ticket only after its complete U output is committed."""
-    if not ray.is_initialized():
-        raise RuntimeError("Ray must be initialized before running recovery units")
-    if not stages:
-        raise ValueError("At least one stage is required")
-    if any(spec.actors < 1 for spec in stages):
-        raise ValueError("Each Ray stage needs at least one actor")
-    if not units:
-        return () if materialize_output else None
+def run_unit_task(batch, context, plan):
+    yield from _UnitTicketActor(context, plan)(batch)
 
-    first_stage = 0
-    items = [_ticket(unit) for unit in units]
-    for stage in range(len(stages)):
-        commits = [store.get_commit(unit.unit_id, stage) for unit in units]
-        if any(commit is None for commit in commits):
-            break
-        items = [_ticket(unit, stage, commit.attempt.attempt_id) for unit, commit in zip(units, commits)]
-        first_stage = stage + 1
-    if first_stage == len(stages):
-        return collect_final_units(store, units, len(stages) - 1) if materialize_output else None
 
-    dataset = ray.data.from_items(items)
-    # A yielded ticket must not wait for Ray's business-data-sized output buffer.
-    dataset.context.target_max_block_size = 1
-    dataset.context.target_min_block_size = 1
-    dataset.context.actor_task_retry_on_errors = False
-    dataset.context.execution_options.preserve_order = False
-    coordinator = _UnitCoordinator.remote(str(store.root), store.run_id, units)
-    try:
-        for stage in range(first_stage, len(stages)):
-            spec = stages[stage]
-            dataset = dataset.map_batches(
-                _UnitTicketActor,
-                batch_size=1,
-                batch_format="pyarrow",
-                compute=ray.data.ActorPoolStrategy(size=min(spec.actors, len(units)), max_tasks_in_flight_per_actor=1),
-                fn_constructor_args=(str(store.root), store.run_id, source, spec.operator, stage, coordinator),
-                num_cpus=spec.num_cpus,
-                num_gpus=spec.num_gpus,
-                runtime_env=spec.runtime_env,
-                max_restarts=2,
-                max_task_retries=2,
-            )
-        remaining = {unit.unit_id: unit for unit in units}
-        for batch in dataset.iter_batches(batch_size=None, batch_format="pyarrow", prefetch_batches=0):
-            for item in batch.to_pylist():
-                unit = remaining.pop(item["unit_id"], None)
-                if unit is None:
-                    raise ProtocolError("Unexpected or duplicate final recovery ticket")
-                committed = store.get_commit(unit.unit_id, len(stages) - 1)
-                if committed is None or item != _ticket(unit, len(stages) - 1, committed.attempt.attempt_id):
-                    raise ProtocolError("Final ticket does not reference a committed result")
-        if remaining:
-            raise ProtocolError("Missing final recovery tickets")
-    finally:
-        ray.kill(coordinator, no_restart=True)
+class UnitRecoveryStage:
+    def __init__(self, recovery, stage):
+        self.recovery = recovery
+        self.stage = stage
 
-    return collect_final_units(store, units, len(stages) - 1) if materialize_output else None
+    @property
+    def complete(self):
+        return not self.recovery.units or self.stage < self.recovery.first_stage
+
+    @property
+    def worker_context(self):
+        recovery = self.recovery
+        return UnitWorkerContext(
+            str(recovery.store.root), recovery.store.run_id, recovery.source, self.stage, recovery.coordinator
+        )
+
+    def register_stats(self, export):
+        self.recovery.stats_exports[self.stage] = export
+
+
+class UnitRecovery:
+    def __init__(self, store, units, source, stage_count):
+        self.store = store
+        self.units = units
+        self.source = source
+        self.stage_count = stage_count
+        self.first_stage = 0
+        self.coordinator = None
+        self.stats_exports = {}
+
+    def open(self):
+        items = [_ticket(unit) for unit in self.units]
+        for stage in range(self.stage_count):
+            commits = [self.store.get_commit(unit.unit_id, stage) for unit in self.units]
+            if any(commit is None for commit in commits):
+                break
+            items = [_ticket(unit, stage, commit.attempt.attempt_id) for unit, commit in zip(self.units, commits)]
+            self.first_stage = stage + 1
+        if self.units and self.first_stage < self.stage_count:
+            self.coordinator = _UnitCoordinator.remote(str(self.store.root), self.store.run_id, self.units)
+        return items
+
+    def stage(self, index):
+        return UnitRecoveryStage(self, index)
+
+    def finish(self, dataset):
+        if self.units and self.first_stage < self.stage_count:
+            remaining = {unit.unit_id: unit for unit in self.units}
+            for batch in dataset.iter_batches(batch_size=None, batch_format="pyarrow", prefetch_batches=0):
+                for item in batch.to_pylist():
+                    unit = remaining.pop(item["unit_id"], None)
+                    if unit is None:
+                        raise ProtocolError("Unexpected or duplicate final recovery ticket")
+                    committed = self.store.get_commit(unit.unit_id, self.stage_count - 1)
+                    if committed is None or item != _ticket(unit, self.stage_count - 1, committed.attempt.attempt_id):
+                        raise ProtocolError("Final ticket does not reference a committed result")
+            if remaining:
+                raise ProtocolError("Missing final recovery tickets")
+        return self.output_paths(self.stage_count - 1)
+
+    def output_paths(self, stage, *, stats=False):
+        paths = []
+        for unit in self.units:
+            commit = self.store.get_commit(unit.unit_id, stage)
+            if commit is None:
+                raise ProtocolError("Recovery unit has no committed output")
+            paths.extend(str(self.store.root / item.path) for item in (commit.stats_files if stats else commit.files))
+        return paths
+
+    def close(self):
+        if self.coordinator is not None:
+            ray.kill(self.coordinator, no_restart=True)
+            self.coordinator = None

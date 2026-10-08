@@ -14,28 +14,49 @@ from data_juicer.core.executor.unit_runner import collect_final_units, execute_u
 def test_old_checkpoint_database_is_rejected_before_running(tmp_path):
     with sqlite3.connect(tmp_path / "units.sqlite3") as db:
         db.execute("CREATE TABLE attempts (attempt_id TEXT PRIMARY KEY, files_json TEXT, rows INTEGER)")
-    with pytest.raises(ProtocolError, match="incompatible protocol version"):
+    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
         LocalUnitStore(str(tmp_path), "job-1")
 
 
-@pytest.mark.parametrize("version, schema_column", [(1, False), (2, True), (2, False), (3, True)])
+@pytest.mark.parametrize(
+    "version, schema_column", [(1, False), (2, True), (2, False), (3, True), (3, False), (4, True)]
+)
 def test_incompatible_checkpoint_is_rejected_without_migration(tmp_path, version, schema_column):
     store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
     attempt = store.begin(unit.unit_id, 0)
     store.commit(attempt, store.write_output(attempt, []))
     with sqlite3.connect(store.db_path) as db:
-        assert SCHEMA_VERSION == db.execute("SELECT schema_version FROM runs").fetchone()[0] == 3
-        assert "schema_hex" not in {row[1] for row in db.execute("PRAGMA table_info(attempts)")}
+        assert SCHEMA_VERSION == db.execute("SELECT schema_version FROM runs").fetchone()[0] == 4
+        columns = {row[1] for row in db.execute("PRAGMA table_info(attempts)")}
+        assert "schema_hex" not in columns
+        assert "stats_files_json" in columns
         db.execute("UPDATE runs SET schema_version=?", (version,))
         if schema_column:
             db.execute("ALTER TABLE attempts ADD COLUMN schema_hex TEXT")
-    with pytest.raises(ProtocolError, match="incompatible protocol version"):
+    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
         LocalUnitStore(str(tmp_path), "job-1")
-    with pytest.raises(ProtocolError, match="incompatible protocol version"):
+    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
         LocalUnitStore(str(tmp_path), "another-job")
     with sqlite3.connect(store.db_path) as db:
         assert db.execute("SELECT schema_version FROM runs").fetchone()[0] == version
         assert ("schema_hex" in {row[1] for row in db.execute("PRAGMA table_info(attempts)")}) == schema_column
+
+
+@pytest.mark.parametrize("version", [3, 4])
+def test_v3_attempts_schema_is_rejected_without_migration(tmp_path, version):
+    store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
+    attempt = store.begin(unit.unit_id, 0)
+    store.commit(attempt, store.write_output(attempt, []))
+    with sqlite3.connect(store.db_path) as db:
+        db.execute("ALTER TABLE attempts DROP COLUMN stats_files_json")
+        db.execute("UPDATE runs SET schema_version=?", (version,))
+        before = tuple(db.iterdump())
+    # A v3 layout is incompatible even if its version marker claims v4.
+    for run_id in ("job-1", "another-job"):
+        with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
+            LocalUnitStore(str(tmp_path), run_id)
+    with sqlite3.connect(store.db_path) as db:
+        assert tuple(db.iterdump()) == before
 
 
 def _store(tmp_path, *, rows=5, size=2, stages=2):
@@ -76,11 +97,12 @@ def test_plan_is_stable_and_changed_provenance_fails_closed(tmp_path):
         )
 
 
+@pytest.mark.parametrize("stats", [False, True])
 @pytest.mark.parametrize("empty_tables", [[], [pa.table({})], [pa.table({"value": []}), pa.table({"other": []})]])
-def test_zero_output_and_many_outputs_are_complete_commits(tmp_path, empty_tables):
+def test_zero_output_and_many_outputs_are_complete_commits(tmp_path, empty_tables, stats):
     store, (unit,) = _store(tmp_path, rows=2, size=2)
     first = store.begin(unit.unit_id, 0)
-    first_output = store.write_output(first, empty_tables)
+    first_output = store.write_output(first, empty_tables, stats=stats)
     assert first_output == PreparedOutput(())
     assert list((store.root / "attempts" / first.attempt_id).iterdir()) == []
     zero_commit = store.commit(first, first_output)
@@ -104,7 +126,75 @@ def test_zero_output_and_many_outputs_are_complete_commits(tmp_path, empty_table
     restored = reopened.get_commit(unit.unit_id, 1)
     assert restored is not None and restored.rows == 5
     assert len(restored.files) == 2
+    assert restored.stats_files == ()
     assert reopened.pending(1) == ()
+
+
+@pytest.mark.parametrize("empty_output", [False, True])
+def test_business_and_stats_outputs_share_one_commit(tmp_path, empty_output):
+    store, (unit,) = _store(tmp_path, rows=3, size=3)
+    attempt = store.begin(unit.unit_id, 0)
+    stats = store.write_output(
+        attempt,
+        [pa.table({"score": [0.1, 0.9]}), pa.table({"score": []}), pa.table({"other_stat": [True]})],
+        stats=True,
+    )
+    tables = [] if empty_output else [pa.table({"value": [1]}), pa.table({"value": [2]})]
+    business = store.write_output(attempt, tables)
+    assert stats.files == ()
+    assert business.stats_files == ()
+    assert [item.path for item in stats.stats_files] == [
+        f"attempts/{attempt.attempt_id}/stats-00000000.parquet",
+        f"attempts/{attempt.attempt_id}/stats-00000002.parquet",
+    ]
+    assert [item.path for item in business.files] == [
+        f"attempts/{attempt.attempt_id}/part-{index:08d}.parquet" for index in range(len(tables))
+    ]
+    output = PreparedOutput(business.files, stats.stats_files)
+    assert store.get_commit(unit.unit_id, 0) is None
+    assert store.pending(0) == (unit,)
+    assert store.pending(1) == ()
+    committed = store.commit(attempt, output)
+    assert committed.files == business.files
+    assert committed.stats_files == stats.stats_files
+    assert committed.rows == (0 if empty_output else 2)
+    assert sum(item.rows for item in committed.stats_files) == 3
+    with sqlite3.connect(store.db_path) as db:
+        row = db.execute("SELECT files_json, stats_files_json, rows FROM attempts").fetchone()
+        assert json.loads(row[0]) == [item.__dict__ for item in business.files]
+        assert json.loads(row[1]) == [item.__dict__ for item in stats.stats_files]
+        assert row[2] == committed.rows
+    reopened, units = _store(tmp_path, rows=3, size=3)
+    assert reopened.get_commit(unit.unit_id, 0) == committed
+    assert reopened.pending(0) == ()
+    assert reopened.pending(1) == (unit,)
+    assert reopened.begin(unit.unit_id, 1).input_commit_id == attempt.attempt_id
+    blocks = collect_final_units(reopened, units, 0)
+    assert len(blocks) == len(tables)
+    assert all(block.equals(table) for block, table in zip(blocks, tables))
+
+
+def test_business_and_stats_manifests_roll_back_together(tmp_path):
+    store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
+    attempt = store.begin(unit.unit_id, 0)
+    business = store.write_output(attempt, [pa.table({"value": [1]})])
+    stats = store.write_output(attempt, [pa.table({"score": [0.9]})], stats=True)
+    output = PreparedOutput(business.files, stats.stats_files)
+    with sqlite3.connect(store.db_path) as db:
+        db.execute(
+            "CREATE TRIGGER fail_commit BEFORE UPDATE OF committed_attempt_id ON stage_state "
+            "BEGIN SELECT RAISE(ABORT, 'injected commit failure'); END"
+        )
+    with pytest.raises(sqlite3.IntegrityError, match="injected commit failure"):
+        store.commit(attempt, output)
+    assert store.get_commit(unit.unit_id, 0) is None
+    assert store.pending(0) == (unit,)
+    with sqlite3.connect(store.db_path) as db:
+        assert db.execute("SELECT files_json, stats_files_json, rows FROM attempts").fetchone() == (None, None, None)
+        db.execute("DROP TRIGGER fail_commit")
+    committed = store.commit(attempt, output)
+    assert store.get_commit(unit.unit_id, 0) == committed
+    assert committed.files and committed.stats_files
 
 
 def test_one_unit_can_commit_files_with_different_schemas(tmp_path):
@@ -122,18 +212,19 @@ def test_one_unit_can_commit_files_with_different_schemas(tmp_path):
     assert all(block.equals(table) for block, table in zip(blocks, tables))
 
 
+@pytest.mark.parametrize("stats", [False, True])
 @pytest.mark.parametrize("empty", [False, True])
-def test_uncommitted_output_is_reprocessed_and_late_attempt_is_fenced(tmp_path, empty):
+def test_uncommitted_output_is_reprocessed_and_late_attempt_is_fenced(tmp_path, empty, stats):
     store, (unit,) = _store(tmp_path, rows=2, size=2, stages=1)
     old = store.begin(unit.unit_id, 0)
-    old_files = store.write_output(old, [] if empty else [pa.table({"value": ["old"]})])
+    old_files = store.write_output(old, [] if empty else [pa.table({"value": ["old"]})], stats=stats)
     # Simulate a crash after durable output, before the metadata commit.
     restarted, _ = _store(tmp_path, rows=2, size=2, stages=1)
     assert restarted.get_commit(unit.unit_id, 0) is None
     assert restarted.pending(0) == (unit,)
     current = restarted.begin(unit.unit_id, 0)
     assert current.generation == old.generation + 1
-    current_files = restarted.write_output(current, [] if empty else [pa.table({"value": ["new"]})])
+    current_files = restarted.write_output(current, [] if empty else [pa.table({"value": ["new"]})], stats=stats)
     with pytest.raises(ProtocolError, match="stale"):
         restarted.commit(old, old_files)
     accepted = restarted.commit(current, current_files)
@@ -159,12 +250,13 @@ def test_downstream_requires_upstream_and_can_commit_empty_result(tmp_path):
     assert store.pending(1) == ()
 
 
-def test_empty_output_is_fenced_when_upstream_commit_changes(tmp_path):
+@pytest.mark.parametrize("stats", [False, True])
+def test_empty_output_is_fenced_when_upstream_commit_changes(tmp_path, stats):
     store, (unit,) = _store(tmp_path, rows=1, size=1)
     first = store.begin(unit.unit_id, 0)
     store.commit(first, store.write_output(first, []))
     second = store.begin(unit.unit_id, 1)
-    output = store.write_output(second, [])
+    output = store.write_output(second, [pa.table({"score": [0.1]})] if stats else [], stats=stats)
     with sqlite3.connect(store.db_path) as db:
         db.execute("UPDATE stage_state SET committed_attempt_id='replaced' WHERE stage=0")
     with pytest.raises(ProtocolError, match="Upstream commit changed"):
@@ -172,58 +264,75 @@ def test_empty_output_is_fenced_when_upstream_commit_changes(tmp_path):
     assert store.get_commit(unit.unit_id, 1) is None
 
 
+@pytest.mark.parametrize("stats", [False, True])
 @pytest.mark.parametrize("damage", ["missing", "modified"])
-def test_missing_or_modified_output_cannot_be_committed(tmp_path, damage):
+def test_missing_or_modified_output_cannot_be_committed(tmp_path, damage, stats):
     store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
     attempt = store.begin(unit.unit_id, 0)
-    files = store.write_output(attempt, [pa.table({"value": [1]})])
-    path = tmp_path / files.files[0].path
+    output = store.write_output(attempt, [pa.table({"value": [1]})], stats=stats)
+    path = tmp_path / (output.stats_files if stats else output.files)[0].path
+    if stats:
+        business = store.write_output(attempt, [pa.table({"value": [1]})])
+        output = replace(output, files=business.files)
     if damage == "missing":
         path.unlink()
     else:
         path.write_bytes(b"damaged")
     with pytest.raises(ProtocolError, match="Missing or modified"):
-        store.commit(attempt, files)
+        store.commit(attempt, output)
     assert store.get_commit(unit.unit_id, 0) is None
+    assert store.pending(0) == (unit,)
+    with sqlite3.connect(store.db_path) as db:
+        assert db.execute("SELECT files_json, stats_files_json, rows FROM attempts").fetchone() == (None, None, None)
 
 
-def test_attempt_output_files_cannot_be_overwritten(tmp_path):
+@pytest.mark.parametrize("stats", [False, True])
+def test_attempt_output_files_cannot_be_overwritten(tmp_path, stats):
     store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
     attempt = store.begin(unit.unit_id, 0)
-    output = store.write_output(attempt, [pa.table({"value": [1]})])
+    output = store.write_output(attempt, [pa.table({"value": [1]})], stats=stats)
     with pytest.raises(FileExistsError):
-        store.write_output(attempt, [pa.table({"value": [2]})])
-    assert store.commit(attempt, output).rows == 1
+        store.write_output(attempt, [pa.table({"value": [2]})], stats=stats)
+    committed = store.commit(attempt, output)
+    assert committed.rows == (0 if stats else 1)
+    assert store.get_commit(unit.unit_id, 0) == committed
 
 
+@pytest.mark.parametrize("stats", [False, True])
 @pytest.mark.parametrize("invalid", ["rows", "duplicate", "zero"])
-def test_invalid_file_manifest_cannot_be_committed(tmp_path, invalid):
+def test_invalid_file_manifest_cannot_be_committed(tmp_path, invalid, stats):
     store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
     attempt = store.begin(unit.unit_id, 0)
-    output = store.write_output(attempt, [pa.table({"value": [1]})])
-    item = output.files[0]
+    output = store.write_output(attempt, [pa.table({"value": [1]})], stats=stats)
+    item = (output.stats_files if stats else output.files)[0]
     files = (item, item) if invalid == "duplicate" else (replace(item, rows=0 if invalid == "zero" else 2),)
+    invalid_output = PreparedOutput((), files) if stats else PreparedOutput(files)
     with pytest.raises(ProtocolError, match="Invalid attempt output file|row count mismatch"):
-        store.commit(attempt, PreparedOutput(files))
+        store.commit(attempt, invalid_output)
     assert store.get_commit(unit.unit_id, 0) is None
 
 
-def test_forged_attempt_cannot_commit_another_units_output(tmp_path):
+@pytest.mark.parametrize("stats", [False, True])
+def test_forged_attempt_cannot_commit_another_units_output(tmp_path, stats):
     store, units = _store(tmp_path, rows=3, size=2, stages=1)
     first = store.begin(units[0].unit_id, 0)
     second = store.begin(units[1].unit_id, 0)
-    files = store.write_output(first, [pa.table({"value": [1]})])
+    files = store.write_output(first, [pa.table({"value": [1]})], stats=stats)
     with pytest.raises(ProtocolError, match="Invalid attempt output file"):
         store.commit(second, files)
 
 
+@pytest.mark.parametrize("stats", [False, True])
 @pytest.mark.parametrize("damage", ["missing", "modified"])
-def test_committed_file_damage_fails_closed_on_recovery(tmp_path, damage):
+def test_committed_file_damage_fails_closed_on_recovery(tmp_path, damage, stats):
     store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
     attempt = store.begin(unit.unit_id, 0)
-    files = store.write_output(attempt, [pa.table({"value": [1]})])
-    store.commit(attempt, files)
-    path = tmp_path / files.files[0].path
+    output = store.write_output(attempt, [pa.table({"value": [1]})], stats=stats)
+    path = tmp_path / (output.stats_files if stats else output.files)[0].path
+    if stats:
+        business = store.write_output(attempt, [pa.table({"value": [1]})])
+        output = replace(output, files=business.files)
+    store.commit(attempt, output)
     if damage == "missing":
         path.unlink()
     else:
@@ -233,13 +342,14 @@ def test_committed_file_damage_fails_closed_on_recovery(tmp_path, damage):
         reopened.get_commit(unit.unit_id, 0)
 
 
+@pytest.mark.parametrize("stats", [False, True])
 @pytest.mark.parametrize("damage", ["total_rows", "file_rows", "duplicate", "foreign_file", "zero"])
-def test_committed_manifest_damage_fails_closed_on_recovery(tmp_path, damage):
+def test_committed_manifest_damage_fails_closed_on_recovery(tmp_path, damage, stats):
     store, units = _store(tmp_path, rows=2, size=1, stages=1)
     first, second = (store.begin(unit.unit_id, 0) for unit in units)
-    output = store.write_output(first, [pa.table({"value": [1]})])
+    output = store.write_output(first, [pa.table({"value": [1]})], stats=stats)
     store.commit(first, output)
-    files = [output.files[0].__dict__.copy()]
+    files = [(output.stats_files if stats else output.files)[0].__dict__.copy()]
     rows = 1
     if damage == "total_rows":
         rows = 2
@@ -249,18 +359,42 @@ def test_committed_manifest_damage_fails_closed_on_recovery(tmp_path, damage):
         files *= 2
         rows = 2
     elif damage == "foreign_file":
-        foreign = store.write_output(second, [pa.table({"value": [1]})])
-        files = [foreign.files[0].__dict__]
+        foreign = store.write_output(second, [pa.table({"value": [1]})], stats=stats)
+        files = [(foreign.stats_files if stats else foreign.files)[0].__dict__]
     else:
         files[0]["rows"] = rows = 0
+    if stats and damage != "total_rows":
+        rows = 0  # Stats must be validated independently of the business row total.
+    column = "stats_files_json" if stats else "files_json"
     with sqlite3.connect(store.db_path) as db:
         db.execute(
-            "UPDATE attempts SET files_json=?, rows=? WHERE attempt_id=?",
+            f"UPDATE attempts SET {column}=?, rows=? WHERE attempt_id=?",
             (json.dumps(files), rows, first.attempt_id),
         )
     reopened, _ = _store(tmp_path, rows=2, size=1, stages=1)
     with pytest.raises(ProtocolError, match="Committed output"):
         reopened.get_commit(units[0].unit_id, 0)
+
+
+@pytest.mark.parametrize("on_recovery", [False, True])
+def test_duplicate_paths_across_business_and_stats_are_rejected(tmp_path, on_recovery):
+    store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
+    attempt = store.begin(unit.unit_id, 0)
+    output = store.write_output(attempt, [pa.table({"value": [1]})])
+    # A different spelling of the same path must not bypass cross-list checks.
+    duplicate = replace(output.files[0], path=output.files[0].path.replace("/part-", "/./part-"))
+    if on_recovery:
+        store.commit(attempt, output)
+        with sqlite3.connect(store.db_path) as db:
+            db.execute("UPDATE attempts SET stats_files_json=?", (json.dumps([duplicate.__dict__]),))
+        reopened, _ = _store(tmp_path, rows=1, size=1, stages=1)
+        with pytest.raises(ProtocolError, match="Committed output file"):
+            reopened.get_commit(unit.unit_id, 0)
+    else:
+        with pytest.raises(ProtocolError, match="Invalid attempt output file"):
+            store.commit(attempt, replace(output, stats_files=(duplicate,)))
+        assert store.get_commit(unit.unit_id, 0) is None
+        assert store.pending(0) == (unit,)
 
 
 @pytest.mark.parametrize("read_rows", [0, 1, 3])

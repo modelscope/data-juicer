@@ -20,7 +20,7 @@ from typing import Iterable, Optional, Tuple
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 
 class ProtocolError(RuntimeError):
@@ -54,6 +54,7 @@ class OutputFile:
 @dataclass(frozen=True)
 class PreparedOutput:
     files: Tuple[OutputFile, ...]
+    stats_files: Tuple[OutputFile, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,7 @@ class Commit:
     attempt: Attempt
     files: Tuple[OutputFile, ...]
     rows: int
+    stats_files: Tuple[OutputFile, ...] = ()
 
 
 def _fsync_dir(path: Path) -> None:
@@ -102,12 +104,13 @@ class LocalUnitStore:
                 "generation",
                 "input_commit_id",
                 "files_json",
+                "stats_files_json",
                 "rows",
             }:
-                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 3")
+                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 4")
             if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='runs'").fetchone():
                 if db.execute("SELECT 1 FROM runs WHERE schema_version != ?", (SCHEMA_VERSION,)).fetchone():
-                    raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 3")
+                    raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 4")
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS runs (
                     run_id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL,
@@ -131,7 +134,7 @@ class LocalUnitStore:
                     attempt_id TEXT PRIMARY KEY, run_id TEXT NOT NULL,
                     unit_id TEXT NOT NULL, stage INTEGER NOT NULL,
                     generation INTEGER NOT NULL, input_commit_id TEXT,
-                    files_json TEXT, rows INTEGER
+                    files_json TEXT, stats_files_json TEXT, rows INTEGER
                 );
                 """)
 
@@ -174,7 +177,7 @@ class LocalUnitStore:
                     unit_id = f"{ordinal:012d}"
                     db.execute("INSERT INTO units VALUES (?, ?, ?, ?, ?)", (self.run_id, unit_id, ordinal, start, stop))
             elif prior["schema_version"] != SCHEMA_VERSION:
-                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 3")
+                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 4")
             elif (
                 tuple(
                     prior[key]
@@ -240,8 +243,8 @@ class LocalUnitStore:
             )
             return Attempt(attempt_id, unit_id, stage, generation, input_commit_id)
 
-    def write_output(self, attempt: Attempt, batches: Iterable[pa.Table]) -> PreparedOutput:
-        """Write complete nonempty blocks as immutable attempt-owned files."""
+    def write_output(self, attempt: Attempt, batches: Iterable[pa.Table], *, stats: bool = False) -> PreparedOutput:
+        """Write nonempty business or stats blocks as immutable attempt-owned files."""
         directory = self.root / "attempts" / attempt.attempt_id
         directory.mkdir(parents=True, exist_ok=True)
         files = []
@@ -250,7 +253,7 @@ class LocalUnitStore:
                 raise TypeError("Attempt output must contain PyArrow tables")
             if batch.num_rows == 0:
                 continue
-            name = f"part-{index:08d}.parquet"
+            name = f"{'stats' if stats else 'part'}-{index:08d}.parquet"
             final = directory / name
             tmp = directory / f".{name}.{uuid.uuid4().hex}.tmp"
             try:
@@ -264,15 +267,14 @@ class LocalUnitStore:
             files.append(OutputFile(str(final.relative_to(self.root)), batch.num_rows, digest))
         _fsync_dir(directory)
         _fsync_dir(directory.parent)
-        return PreparedOutput(tuple(files))
+        return PreparedOutput((), tuple(files)) if stats else PreparedOutput(tuple(files))
 
     def commit(self, attempt: Attempt, output: PreparedOutput) -> Commit:
-        """Atomically accept a complete attempt, or reject a stale one."""
-        files = output.files
-        rows = 0
+        """Atomically accept business and stats output, or reject a stale attempt."""
+        files, stats_files = output.files, output.stats_files
         seen = set()
         expected_dir = (self.root / "attempts" / attempt.attempt_id).resolve()
-        for item in files:
+        for item in files + stats_files:
             path = (self.root / item.path).resolve()
             if path.parent != expected_dir or path in seen or item.rows < 1:
                 raise ProtocolError("Invalid attempt output file")
@@ -282,7 +284,7 @@ class LocalUnitStore:
             metadata = pq.read_metadata(path)
             if metadata.num_rows != item.rows:
                 raise ProtocolError("Attempt output row count mismatch")
-            rows += item.rows
+        rows = sum(item.rows for item in files)
         with self._transaction() as db:
             recorded = db.execute(
                 "SELECT * FROM attempts WHERE attempt_id=? AND run_id=?", (attempt.attempt_id, self.run_id)
@@ -305,17 +307,22 @@ class LocalUnitStore:
                 if upstream is None or upstream[0] != attempt.input_commit_id:
                     raise ProtocolError("Upstream commit changed")
             db.execute(
-                "UPDATE attempts SET files_json=?, rows=? WHERE attempt_id=?",
-                (json.dumps([item.__dict__ for item in files]), rows, attempt.attempt_id),
+                "UPDATE attempts SET files_json=?, stats_files_json=?, rows=? WHERE attempt_id=?",
+                (
+                    json.dumps([item.__dict__ for item in files]),
+                    json.dumps([item.__dict__ for item in stats_files]),
+                    rows,
+                    attempt.attempt_id,
+                ),
             )
             db.execute(
                 "UPDATE stage_state SET committed_attempt_id=? " "WHERE run_id=? AND unit_id=? AND stage=?",
                 (attempt.attempt_id, self.run_id, attempt.unit_id, attempt.stage),
             )
-        return Commit(attempt, files, rows)
+        return Commit(attempt, files, rows, stats_files)
 
     def get_commit(self, unit_id: str, stage: int) -> Optional[Commit]:
-        """Read a committed result and fail if its durable output is damaged."""
+        """Read a committed result and fail if business or stats output is damaged."""
         with self._connect() as db:
             row = db.execute(
                 "SELECT a.* FROM stage_state s JOIN attempts a ON a.attempt_id=s.committed_attempt_id "
@@ -328,11 +335,12 @@ class LocalUnitStore:
                 row["attempt_id"], row["unit_id"], row["stage"], row["generation"], row["input_commit_id"]
             )
             files = tuple(OutputFile(**item) for item in json.loads(row["files_json"]))
+            stats_files = tuple(OutputFile(**item) for item in json.loads(row["stats_files_json"]))
             if sum(item.rows for item in files) != row["rows"]:
                 raise ProtocolError("Committed output row count mismatch")
             expected_dir = (self.root / "attempts" / attempt.attempt_id).resolve()
             seen = set()
-            for item in files:
+            for item in files + stats_files:
                 path = (self.root / item.path).resolve()
                 if (
                     path.parent != expected_dir
@@ -344,7 +352,7 @@ class LocalUnitStore:
                 ):
                     raise ProtocolError("Committed output file is missing or modified")
                 seen.add(path)
-            return Commit(attempt, files, row["rows"])
+            return Commit(attempt, files, row["rows"], stats_files)
 
     def pending(self, stage: int) -> Tuple[Unit, ...]:
         """Units ready for this stage but not yet durably completed."""

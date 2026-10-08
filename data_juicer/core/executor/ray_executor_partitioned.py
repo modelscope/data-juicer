@@ -1365,9 +1365,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             if not ops or any(not isinstance(op, (Mapper, Filter)) for op in ops):
                 logger.info("Streaming unit recovery disabled: segment is not Mapper/Filter-only.")
                 return False
-            if any(isinstance(op, Filter) and op.stats_export_path is not None for op in ops):
-                logger.info("Streaming unit recovery disabled: Filter stats export needs its own sink.")
-                return False
             if any(getattr(op, "_prepare_for_ray_map_batches", None) is not None for op in ops):
                 logger.info("Streaming unit recovery disabled: shared operator state needs a replay contract.")
                 return False
@@ -1413,8 +1410,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
 
     def _process_with_unit_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
         """Execute Mapper/Filter stages against stable input recovery units."""
-        from data_juicer.core.executor.operator_unit_adapter import operator_unit_stage
-        from data_juicer.core.executor.ray_unit_runner import RayStage, run_ray_units
+        from data_juicer.core.executor.ray_unit_runner import UnitRecovery
         from data_juicer.core.executor.unit_protocol import LocalUnitStore, ProtocolError
         from data_juicer.core.executor.unit_snapshot import open_or_create_snapshot
 
@@ -1460,39 +1456,12 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             stage_count=len(ops),
         )
 
-        stages = []
-        for op in ops:
-            parallelism = getattr(op, "num_proc", 1)
-            if isinstance(parallelism, (tuple, list)):
-                parallelism = max(parallelism)
-            try:
-                actors = max(1, int(parallelism))
-            except (TypeError, ValueError):
-                actors = 1
-            try:
-                uses_cuda = bool(op.use_cuda())
-            except (AttributeError, RuntimeError):
-                uses_cuda = False
-            stages.append(
-                RayStage(
-                    operator=operator_unit_stage(op),
-                    actors=actors,
-                    num_cpus=float(getattr(op, "num_cpus", None) or 1),
-                    num_gpus=float(getattr(op, "num_gpus", None) or (1 if uses_cuda else 0)),
-                    runtime_env=getattr(op, "runtime_env", None),
-                )
-            )
         logger.info(
             f"Streaming unit recovery: {manifest['rows']} input rows, {len(units)} units "
-            f"of up to {unit_size}, {len(stages)} operator stages, resuming={resuming}"
+            f"of up to {unit_size}, {len(ops)} operator stages, resuming={resuming}"
         )
-        run_ray_units(store, units, source, stages, materialize_output=False)
-
-        final_commits = [store.get_commit(unit.unit_id, len(stages) - 1) for unit in units]
-        paths = [str(store.root / item.path) for commit in final_commits for item in commit.files]
-        result = ray.data.read_parquet(paths) if paths else ray.data.from_items([])
-        result.context.execution_options.preserve_order = True
-        return RayDataset(result, cfg=self.cfg)
+        recovery = UnitRecovery(store, units, source, len(ops))
+        return self._wrap_with_precomputed_parallelism(dataset.data).process(ops, unit_recovery=recovery)
 
     def _stamp_row_ids(self, dataset: RayDataset) -> RayDataset:
         """Inject a dense, unique, read-order-stable global row id.

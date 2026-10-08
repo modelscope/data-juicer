@@ -145,8 +145,6 @@ def test_streaming_dispatch_uses_units_for_mapper_filter_and_resumes(tmp_path, l
 
 
 def test_streaming_shared_state_hook_uses_partition_path(tmp_path):
-    from data_juicer.core.executor.operator_unit_adapter import operator_unit_stage
-
     class SharedFilter(TextLengthFilter):
         def _prepare_for_ray_map_batches(self):
             raise AssertionError("Selection must not initialize shared state")
@@ -154,8 +152,8 @@ def test_streaming_shared_state_hook_uses_partition_path(tmp_path):
     executor = _executor(tmp_path)
     op = SharedFilter(num_proc=1)
     assert not executor._should_use_streaming_recovery(None, [op])
-    with pytest.raises(ProtocolError, match="shared Ray state"):
-        operator_unit_stage(op)
+    with pytest.raises(ProtocolError, match="Shared Ray state"):
+        RayDataset(None, auto_op_parallelism=False).process([op], unit_recovery=Namespace(stage_count=1))
 
 
 def test_streaming_resume_rejects_changed_input(tmp_path, local_ray):
@@ -280,22 +278,33 @@ def test_single_mapper_keeps_arrow_exception_wrapper(tmp_path, local_ray):
     assert [row["id"] for row in result.data.take_all()] == [0, 2, 3]
 
 
-def test_filter_predicate_batching_matches_native_within_unit(tmp_path, local_ray):
+@pytest.mark.parametrize("batch_size", [2, "auto", None])
+def test_filter_predicate_batching_matches_native_within_unit(tmp_path, local_ray, batch_size):
     executor = _executor(tmp_path)
     executor.unit_size_cfg = 4
-    op = MaximumBatchFilter(batch_size=2, num_proc=1, ray_execution_mode="actor")
+    op = MaximumBatchFilter(batch_size=batch_size, num_proc=1, ray_execution_mode="actor")
     expected = _source(executor).process([op]).data.take_all()
     actual = executor._process_with_simple_partitioning(_source(executor), [op]).data.take_all()
     assert actual == expected
     assert [row["id"] for row in actual] == [3]
 
 
-def test_stats_and_predicate_batch_sizes_are_independent():
+def test_stats_and_predicate_batch_sizes_are_independent(monkeypatch):
     import pyarrow as pa
 
-    from data_juicer.core.executor.operator_unit_adapter import operator_unit_stage
+    from data_juicer.core.data.ray_batch_plan import BatchPlanWorker, RayBatchPlan
 
-    stage = operator_unit_stage(MaximumBatchFilter(batch_size=3))
+    plans = []
+
+    def capture(plan, dataset, recovery=None):
+        plans.append(plan)
+        return dataset
+
+    monkeypatch.setattr(RayBatchPlan, "apply", capture)
+    RayDataset(None, auto_op_parallelism=False)._run_single_op(
+        MaximumBatchFilter(batch_size=3, num_proc=1, ray_execution_mode="actor"), defer_schema_probe=True
+    )
+    stage = BatchPlanWorker(plans[0])
     tables = [pa.table({"id": list(range(start, min(start + 2, 1004)))}) for start in range(0, 1004, 2)]
     result = [row for table in stage.process_unit(tables) for row in table.to_pylist()]
     assert [row["id"] for row in result] == [999, 1003]
@@ -348,3 +357,354 @@ def test_streaming_and_native_ray_actors_produce_same_records(tmp_path, local_ra
     if case == "suffix":
         assert [row["id"] for row in recovered] == [1, 3]
         assert all(Fields.stats not in row for row in recovered)
+
+
+class LoggedStatsTextLengthFilter(TextLengthFilter):
+    def __init__(self, log_path, *, failure_marker=None, state_dir=None, **kwargs):
+        from pathlib import Path
+
+        super().__init__(**kwargs)
+        self.log_path = Path(log_path)
+        self.failure_marker = Path(failure_marker) if failure_marker is not None else None
+        self.state_dir = Path(state_dir) if state_dir is not None else None
+
+    def _record(self, phase, samples):
+        with self.log_path.open("a") as stream:
+            stream.write(json.dumps({"phase": phase, "ids": list(samples["id"])}) + "\n")
+
+    def compute_stats_batched(self, samples):
+        samples = super().compute_stats_batched(samples)
+        self._record("compute", samples)
+        return samples
+
+    def process_batched(self, samples):
+        self._record("predicate", samples)
+        if self.failure_marker is not None and 2 in samples["id"] and not self.failure_marker.exists():
+            import pyarrow.parquet as pq
+
+            # Fail inside the real predicate, only after this attempt's stats are on disk.
+            with sqlite3.connect(self.state_dir / "units.sqlite3") as db:
+                attempt_id = db.execute(
+                    "SELECT attempt_id FROM attempts WHERE unit_id=? AND stage=0 ORDER BY generation DESC LIMIT 1",
+                    ("000000000001",),
+                ).fetchone()[0]
+                assert (
+                    db.execute(
+                        "SELECT committed_attempt_id FROM stage_state WHERE unit_id=? AND stage=0",
+                        ("000000000000",),
+                    ).fetchone()[0]
+                    is not None
+                )
+            stats_paths = sorted((self.state_dir / "attempts" / attempt_id).glob("stats-*.parquet"))
+            persisted = [row for path in stats_paths for row in pq.read_table(path).to_pylist()]
+            assert sorted(row["id"] for row in persisted) == [2, 3]
+            assert all(row[Fields.stats]["text_len"] == len(row["text"]) for row in persisted)
+            with self.failure_marker.open("x") as stream:
+                stream.write(attempt_id)
+            raise RuntimeError("injected predicate failure after stats persistence")
+        return super().process_batched(samples)
+
+
+def _read_stats_test_json(path):
+    paths = sorted(path.glob("*.json")) if path.is_dir() else [path]
+    assert paths
+    return [json.loads(line) for shard in paths for line in shard.read_text().splitlines() if line.strip()]
+
+
+def _committed_stats_attempts(state_dir):
+    with sqlite3.connect(state_dir / "units.sqlite3") as db:
+        db.row_factory = sqlite3.Row
+        return [
+            dict(row)
+            for row in db.execute(
+                "SELECT a.* FROM attempts a JOIN stage_state s ON s.committed_attempt_id=a.attempt_id "
+                "ORDER BY a.unit_id, a.stage"
+            )
+        ]
+
+
+@pytest.mark.parametrize("ray_execution_mode", ["actor", "task"])
+@pytest.mark.parametrize("drop_all", [False, True])
+def test_streaming_stats_export_matches_native_before_filtering(tmp_path, local_ray, ray_execution_mode, drop_all):
+    import pyarrow.parquet as pq
+
+    executor = _executor(tmp_path)
+    native_path = tmp_path / "native-stats"
+    recovered_path = tmp_path / "recovered-stats"
+    kwargs = {
+        "min_len": 100 if drop_all else 4,
+        "batch_size": 2,
+        "num_proc": 1,
+        "ray_execution_mode": ray_execution_mode,
+        "skip_op_error": False,
+    }
+    native = _source(executor).process([TextLengthFilter(stats_export_path=str(native_path), **kwargs)]).data.take_all()
+    ops = [TextLengthFilter(stats_export_path=str(recovered_path), **kwargs)]
+    assert executor._should_use_streaming_recovery(_source(executor), ops)
+    recovered = executor._process_with_simple_partitioning(_source(executor), ops).data.take_all()
+    expected_ids = [] if drop_all else [0]
+    assert sorted(row["id"] for row in recovered) == expected_ids
+    assert sorted(recovered, key=lambda row: row["id"]) == sorted(native, key=lambda row: row["id"])
+
+    native_stats = sorted(_read_stats_test_json(native_path), key=lambda row: row["id"])
+    recovered_stats = sorted(_read_stats_test_json(recovered_path), key=lambda row: row["id"])
+    assert recovered_stats == native_stats
+    assert [row["id"] for row in recovered_stats] == [0, 1, 2, 3]
+    assert [row[Fields.stats]["text_len"] for row in recovered_stats] == [5, 3, 3, 3]
+
+    state_dir = tmp_path / "checkpoints" / "unit_recovery" / "state"
+    commits = _committed_stats_attempts(state_dir)
+    assert len(commits) == 2
+    committed_stats = []
+    committed_business = []
+    for ordinal, commit in enumerate(commits):
+        assert commit["unit_id"] == f"{ordinal:012d}"
+        files = json.loads(commit["files_json"])
+        stats_files = json.loads(commit["stats_files_json"])
+        assert stats_files
+        assert {entry["path"] for entry in files}.isdisjoint(entry["path"] for entry in stats_files)
+        for entry in files + stats_files:
+            path = state_dir / entry["path"]
+            assert path.parent == state_dir / "attempts" / commit["attempt_id"]
+            assert pq.read_metadata(path).num_rows == entry["rows"]
+        stats_rows = [row for entry in stats_files for row in pq.read_table(state_dir / entry["path"]).to_pylist()]
+        business_rows = [row for entry in files for row in pq.read_table(state_dir / entry["path"]).to_pylist()]
+        assert sorted(row["id"] for row in stats_rows) == [ordinal * 2, ordinal * 2 + 1]
+        assert sum(entry["rows"] for entry in stats_files) == 2
+        assert commit["rows"] == sum(entry["rows"] for entry in files) == len(business_rows)
+        assert sorted(row["id"] for row in business_rows) == [
+            value for value in expected_ids if ordinal * 2 <= value < ordinal * 2 + 2
+        ]
+        if not business_rows:
+            assert files == []
+        committed_stats.extend(stats_rows)
+        committed_business.extend(business_rows)
+    assert sorted(committed_stats, key=lambda row: row["id"]) == recovered_stats
+    assert sorted(committed_business, key=lambda row: row["id"]) == sorted(recovered, key=lambda row: row["id"])
+
+
+def test_streaming_predicate_failure_replays_only_pending_stats_unit(tmp_path, local_ray, monkeypatch):
+    import pyarrow.parquet as pq
+
+    # One ticket block and one actor keep the failure after the first unit's commit.
+    from_items = ray.data.from_items
+    monkeypatch.setattr(
+        ray.data, "from_items", lambda items, **kwargs: from_items(items, **{**kwargs, "override_num_blocks": 1})
+    )
+    state_dir = tmp_path / "checkpoints" / "unit_recovery" / "state"
+    log_path = tmp_path / "filter-calls.jsonl"
+    marker = tmp_path / "predicate-failed-once"
+    stats_path = tmp_path / "stats"
+    kwargs = {
+        "log_path": str(log_path),
+        "failure_marker": str(marker),
+        "state_dir": str(state_dir),
+        "stats_export_path": str(stats_path),
+        "min_len": 4,
+        "batch_size": 2,
+        "num_proc": 1,
+        "ray_execution_mode": "actor",
+        "skip_op_error": False,
+    }
+    executor = _executor(tmp_path)
+    with pytest.raises(ray.exceptions.RayTaskError, match="injected predicate failure after stats persistence"):
+        executor._process_with_simple_partitioning(_source(executor), [LoggedStatsTextLengthFilter(**kwargs)])
+
+    expected_calls = [{"phase": phase, "ids": ids} for ids in ([0, 1], [2, 3]) for phase in ("compute", "predicate")]
+    assert _read_stats_test_json(log_path) == expected_calls
+    first_commits = _committed_stats_attempts(state_dir)
+    assert len(first_commits) == 1
+    assert first_commits[0]["unit_id"] == "000000000000"
+    failed_attempt = marker.read_text()
+    with sqlite3.connect(state_dir / "units.sqlite3") as db:
+        assert db.execute("SELECT COUNT(*) FROM attempts").fetchone()[0] == 2
+        assert db.execute(
+            "SELECT committed_attempt_id FROM stage_state WHERE unit_id=? AND stage=0", ("000000000001",)
+        ).fetchone() == (None,)
+        assert db.execute(
+            "SELECT files_json, stats_files_json, rows FROM attempts WHERE attempt_id=?", (failed_attempt,)
+        ).fetchone() == (None, None, None)
+    orphan_stats = sorted((state_dir / "attempts" / failed_attempt).glob("stats-*.parquet"))
+    assert sorted(row["id"] for path in orphan_stats for row in pq.read_table(path).to_pylist()) == [2, 3]
+    assert not stats_path.exists()
+
+    restarted = _executor(tmp_path, resume=True)
+    restored = restarted._process_with_simple_partitioning(_source(restarted), [LoggedStatsTextLengthFilter(**kwargs)])
+    assert [row["id"] for row in restored.data.take_all()] == [0]
+    assert _read_stats_test_json(log_path) == expected_calls + expected_calls[-2:]
+    commits = _committed_stats_attempts(state_dir)
+    assert len(commits) == 2
+    assert commits[0] == first_commits[0]
+    assert commits[1]["attempt_id"] != failed_attempt
+    assert commits[1]["generation"] == 2
+    assert marker.read_text() == failed_attempt
+    with sqlite3.connect(state_dir / "units.sqlite3") as db:
+        assert db.execute("SELECT unit_id, COUNT(*) FROM attempts GROUP BY unit_id ORDER BY unit_id").fetchall() == [
+            ("000000000000", 1),
+            ("000000000001", 2),
+        ]
+    exported = sorted(_read_stats_test_json(stats_path), key=lambda row: row["id"])
+    assert [row["id"] for row in exported] == [0, 1, 2, 3]
+    assert [row[Fields.stats]["text_len"] for row in exported] == [5, 3, 3, 3]
+    committed_stats_paths = [
+        state_dir / entry["path"] for commit in commits for entry in json.loads(commit["stats_files_json"])
+    ]
+    assert set(committed_stats_paths).isdisjoint(orphan_stats)
+    assert all(path.is_file() for path in orphan_stats)
+    assert (
+        sorted(
+            [row for path in committed_stats_paths for row in pq.read_table(path).to_pylist()],
+            key=lambda row: row["id"],
+        )
+        == exported
+    )
+
+
+def test_streaming_stats_publish_failure_resumes_without_recomputing_or_duplicate_json(
+    tmp_path, local_ray, monkeypatch
+):
+    from data_juicer.core.data.ray_batch_plan import StatsExport
+
+    log_path = tmp_path / "filter-calls.jsonl"
+    stats_path = tmp_path / "stats"
+    kwargs = {
+        "log_path": str(log_path),
+        "stats_export_path": str(stats_path),
+        "min_len": 4,
+        "batch_size": 2,
+        "num_proc": 1,
+        "ray_execution_mode": "actor",
+        "skip_op_error": False,
+    }
+    stats_path.mkdir()
+    unrelated = stats_path / "unrelated.bin"
+    unrelated.write_bytes(b"preserve existing destination content")
+    publish = StatsExport.publish
+    publish_calls = []
+
+    def publish_then_fail_once(export, paths):
+        publish_calls.append(tuple(paths))
+        publish(export, paths)
+        if len(publish_calls) == 1:
+            raise RuntimeError("injected failure after stats publication")
+
+    monkeypatch.setattr(StatsExport, "publish", publish_then_fail_once)
+    executor = _executor(tmp_path)
+    with pytest.raises(RuntimeError, match="injected failure after stats publication"):
+        executor._process_with_simple_partitioning(_source(executor), [LoggedStatsTextLengthFilter(**kwargs)])
+
+    state_dir = tmp_path / "checkpoints" / "unit_recovery" / "state"
+    commits_before = _committed_stats_attempts(state_dir)
+    assert len(commits_before) == 2
+    with sqlite3.connect(state_dir / "units.sqlite3") as db:
+        attempts_before = db.execute("SELECT COUNT(*) FROM attempts").fetchone()[0]
+    assert attempts_before == 2
+    for phase in ("compute", "predicate"):
+        assert sorted(
+            value for call in _read_stats_test_json(log_path) if call["phase"] == phase for value in call["ids"]
+        ) == [0, 1, 2, 3]
+    calls_before = log_path.read_bytes()
+    exported_before = sorted(_read_stats_test_json(stats_path), key=lambda row: row["id"])
+    assert [row["id"] for row in exported_before] == [0, 1, 2, 3]
+    assert [row[Fields.stats]["text_len"] for row in exported_before] == [5, 3, 3, 3]
+    assert publish_calls == [
+        tuple(
+            str(state_dir / entry["path"])
+            for commit in commits_before
+            for entry in json.loads(commit["stats_files_json"])
+        )
+    ]
+
+    restarted = _executor(tmp_path, resume=True)
+    restored = restarted._process_with_simple_partitioning(_source(restarted), [LoggedStatsTextLengthFilter(**kwargs)])
+    assert [row["id"] for row in restored.data.take_all()] == [0]
+    assert _committed_stats_attempts(state_dir) == commits_before
+    with sqlite3.connect(state_dir / "units.sqlite3") as db:
+        assert db.execute("SELECT COUNT(*) FROM attempts").fetchone()[0] == attempts_before
+    assert log_path.read_bytes() == calls_before
+    assert len(publish_calls) == 2
+    assert publish_calls[1] == publish_calls[0]
+    exported_after = sorted(_read_stats_test_json(stats_path), key=lambda row: row["id"])
+    assert exported_after == exported_before
+    assert [row["id"] for row in exported_after] == [0, 1, 2, 3]
+    assert unrelated.read_bytes() == b"preserve existing destination content"
+
+
+def test_empty_upstream_stats_export_commits_without_schema(tmp_path, local_ray):
+    stats_path = tmp_path / "stats"
+    executor = _executor(tmp_path)
+    ops = [
+        TextLengthFilter(min_len=100, num_proc=1, ray_execution_mode="actor"),
+        TextLengthFilter(stats_export_path=str(stats_path), num_proc=1, ray_execution_mode="actor"),
+    ]
+    assert executor._process_with_simple_partitioning(_source(executor), ops).data.take_all() == []
+    state_dir = tmp_path / "checkpoints" / "unit_recovery" / "state"
+    commits = _committed_stats_attempts(state_dir)
+    assert len(commits) == 4
+    assert all(commit["rows"] == 0 and commit["stats_files_json"] == "[]" for commit in commits)
+    assert not list(stats_path.glob("*.json"))
+    restarted = _executor(tmp_path, resume=True)
+    assert restarted._process_with_simple_partitioning(_source(restarted), ops).data.take_all() == []
+    assert _committed_stats_attempts(state_dir) == commits
+
+
+def test_partial_stats_publication_rebuilds_only_owned_files(tmp_path, local_ray, monkeypatch):
+    stats_path = tmp_path / "stats"
+    stats_path.mkdir()
+    unrelated = stats_path / "other-export.json"
+    unrelated.write_text('{"id":99}\n')
+    log_path = tmp_path / "calls.jsonl"
+    kwargs = dict(
+        log_path=str(log_path),
+        stats_export_path=stats_path.as_uri(),
+        min_len=4,
+        batch_size=2,
+        num_proc=1,
+        ray_execution_mode="actor",
+        skip_op_error=False,
+    )
+    write_json = ray.data.Dataset.write_json
+    writes = []
+
+    def partial_write_once(data, path, **options):
+        writes.append(path)
+        if len(writes) == 1:
+            partial = data.limit(1)
+            partial._set_uuid(data._uuid)
+            write_json(partial, path, **options)
+            (stats_path / f"{data._uuid}stale.json").write_text('{"id":-1}\n')
+            raise RuntimeError("injected partial statistics publication")
+        return write_json(data, path, **options)
+
+    monkeypatch.setattr(ray.data.Dataset, "write_json", partial_write_once)
+    executor = _executor(tmp_path)
+    with pytest.raises(RuntimeError, match="partial statistics publication"):
+        executor._process_with_simple_partitioning(_source(executor), [LoggedStatsTextLengthFilter(**kwargs)])
+    assert len(_read_stats_test_json(stats_path)) == 3
+    calls_before = log_path.read_bytes()
+    state_dir = tmp_path / "checkpoints" / "unit_recovery" / "state"
+    commits = _committed_stats_attempts(state_dir)
+    restarted = _executor(tmp_path, resume=True)
+    result = restarted._process_with_simple_partitioning(_source(restarted), [LoggedStatsTextLengthFilter(**kwargs)])
+    assert [row["id"] for row in result.data.take_all()] == [0]
+    assert sorted(row["id"] for row in _read_stats_test_json(stats_path)) == [0, 1, 2, 3, 99]
+    assert unrelated.read_text() == '{"id":99}\n'
+    assert log_path.read_bytes() == calls_before
+    assert _committed_stats_attempts(state_dir) == commits
+
+
+def test_multiple_stats_stages_share_directory_without_erasing_each_other(tmp_path, local_ray):
+    from collections import Counter
+
+    stats_path = tmp_path / "stats"
+    kwargs = dict(stats_export_path=str(stats_path), num_proc=1, ray_execution_mode="actor")
+    ops = [TextLengthFilter(min_len=4, **kwargs), AlphanumericFilter(min_ratio=0.1, **kwargs)]
+    executor = _executor(tmp_path)
+    assert [
+        row["id"] for row in executor._process_with_simple_partitioning(_source(executor), ops).data.take_all()
+    ] == [0]
+    expected = Counter({0: 2, 1: 1, 2: 1, 3: 1})
+    assert Counter(row["id"] for row in _read_stats_test_json(stats_path)) == expected
+    restarted = _executor(tmp_path, resume=True)
+    restarted._process_with_simple_partitioning(_source(restarted), ops)
+    assert Counter(row["id"] for row in _read_stats_test_json(stats_path)) == expected

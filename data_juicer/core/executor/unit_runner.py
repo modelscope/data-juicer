@@ -23,6 +23,8 @@ def execute_unit_attempt(
     source: TableSource,
     stage_spec: TableOperator,
     upstream: Commit = None,
+    *,
+    write_stats=None,
 ) -> PreparedOutput:
     """Produce immutable files for one attempt without deciding its winner."""
     if upstream is None:
@@ -50,7 +52,8 @@ def execute_unit_attempt(
     def output_tables():
         process_unit = getattr(stage_spec, "process_unit", None)
         if process_unit is not None:
-            yield from process_unit(checked_tables())
+            kwargs = {"write_stats": write_stats} if write_stats is not None else {}
+            yield from process_unit(checked_tables(), **kwargs)
         else:
             for table in checked_tables():
                 yield from stage_spec(table)

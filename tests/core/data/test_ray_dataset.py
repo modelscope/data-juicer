@@ -638,6 +638,115 @@ class RayBatchExecutionTest(unittest.TestCase):
         empty = table.slice(0, 0)
         self.assertIs(filter_batch(empty, lambda samples: self.fail("Empty filters must not run")), empty)
 
+    def test_unit_compute_uses_shared_fixed_elastic_and_task_strategies(self):
+        from types import SimpleNamespace
+
+        from ray.data import ActorPoolStrategy, TaskPoolStrategy
+
+        from data_juicer.core.data.ray_dataset import RayDataset
+        from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+        from data_juicer.ops.mapper.whitespace_normalization_mapper import WhitespaceNormalizationMapper
+
+        for op_class in (TextLengthFilter, WhitespaceNormalizationMapper):
+            for mode, concurrency in (("actor", 3), ("actor", (1, 3)), ("task", 3)):
+                with self.subTest(op=op_class, mode=mode, concurrency=concurrency):
+                    dataset = RayDataset(MagicMock(), auto_op_parallelism=False)
+                    dataset.data.map_batches.return_value = dataset.data
+                    recovery = SimpleNamespace(
+                        complete=False, worker_context=None, recovery=SimpleNamespace(units=(0, 1))
+                    )
+                    op = op_class(num_proc=concurrency, ray_execution_mode=mode)
+                    dataset._run_single_op(op, defer_schema_probe=True, recovery=recovery)
+                    options = dataset.data.map_batches.call_args.kwargs
+                    compute = options["compute"]
+                    if mode == "task":
+                        self.assertIsInstance(compute, TaskPoolStrategy)
+                        self.assertEqual(compute.size, 3)
+                    else:
+                        self.assertIsInstance(compute, ActorPoolStrategy)
+                        self.assertEqual(compute.min_size, 1 if isinstance(concurrency, tuple) else 2)
+                        self.assertEqual(compute.max_size, 2)
+                        self.assertEqual(compute.max_tasks_in_flight_per_actor, 1)
+                    self.assertEqual(options["num_cpus"], op.num_cpus)
+                    self.assertEqual(options["num_gpus"], op.num_gpus)
+                    self.assertEqual(options["runtime_env"], op.runtime_env)
+
+    def test_unit_batches_preserve_requested_mutability(self):
+        import numpy as np
+        import pyarrow as pa
+
+        from data_juicer.core.data.ray_batch_plan import BatchPlanWorker, RayBatchPlan
+
+        def mutate(batch):
+            batch["value"] += 1
+            return batch
+
+        table = pa.table({"value": np.arange(3)})
+        plan = RayBatchPlan().map_batches(mutate, batch_size=2, batch_format="numpy", zero_copy_batch=False)
+        result = [row for block in BatchPlanWorker(plan).process_unit([table]) for row in block.to_pylist()]
+        self.assertEqual(result, [{"value": 1}, {"value": 2}, {"value": 3}])
+        self.assertEqual(table["value"].to_pylist(), [0, 1, 2])
+
+    def test_unit_worker_rejects_global_barrier(self):
+        from data_juicer.core.data.ray_batch_plan import BatchPlanWorker, RayBatchPlan
+
+        with self.assertRaisesRegex(RuntimeError, "global materialization barrier"):
+            list(BatchPlanWorker(RayBatchPlan().materialize()).process_unit([]))
+
+    def test_native_and_unit_plans_reject_invalid_business_batches(self):
+        from types import SimpleNamespace
+
+        from data_juicer.core.data.ray_batch_plan import RayBatchPlan
+        from data_juicer.core.data.ray_dataset import RayDataset
+        from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+
+        for size in (0, -1):
+            for recovery in (None, SimpleNamespace(recovery=SimpleNamespace(units=(0,)))):
+                with self.subTest(size=size, recovery=recovery):
+                    dataset = RayDataset(MagicMock(), auto_op_parallelism=False)
+                    op = TextLengthFilter(batch_size=size, num_proc=1, ray_execution_mode="actor")
+                    with self.assertRaisesRegex(ValueError, "negative or 0"):
+                        dataset._run_single_op(op, defer_schema_probe=True, recovery=recovery)
+                    dataset.data.map_batches.assert_not_called()
+        for size in (None, "auto"):
+            with self.assertRaisesRegex(ValueError, "explicit batch_size"):
+                RayBatchPlan().map_batches(lambda batch: batch, num_gpus=1, batch_size=size)
+
+    def test_native_shared_state_keeps_task_override_and_global_barrier(self):
+        from ray.data import TaskPoolStrategy
+
+        from data_juicer.core.data.ray_dataset import RayDataset
+        from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+
+        events = []
+
+        class SharedFilter(TextLengthFilter):
+            def _prepare_for_ray_map_batches(self):
+                events.append("prepare_shared_state")
+                return True
+
+        ray_data = MagicMock()
+
+        def map_batches(function, **options):
+            if "compute" in options:
+                self.assertIsInstance(options["compute"], TaskPoolStrategy)
+                events.append("compute")
+            else:
+                events.append("filter")
+            return ray_data
+
+        def materialize():
+            events.append("materialize")
+            return ray_data
+
+        ray_data.map_batches.side_effect = map_batches
+        ray_data.materialize.side_effect = materialize
+        ray_data.write_json.side_effect = lambda *args, **kwargs: events.append("stats_export")
+        op = SharedFilter(num_proc=1, ray_execution_mode="actor", stats_export_path="stats")
+        dataset = RayDataset(ray_data, auto_op_parallelism=False)
+        dataset._run_single_op(op, {"text", "__dj__stats__"})
+        self.assertEqual(events, ["prepare_shared_state", "compute", "materialize", "stats_export", "filter"])
+
 
 if __name__ == "__main__":
     unittest.main()
