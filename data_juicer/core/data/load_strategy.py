@@ -353,6 +353,15 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
 
 
 def validate_limit(limit):
+    """
+    Validate that a dataset row limit is a non-negative integer.
+
+    Args:
+        limit: Maximum number of rows to keep
+
+    Raises:
+        ValueError: If limit is not a non-negative integer
+    """
     if isinstance(limit, bool) or not isinstance(limit, int) or limit < 0:
         raise ValueError(f"limit must be a non-negative integer, got {limit!r}")
 
@@ -372,6 +381,9 @@ class DefaultHuggingfaceDataLoadStrategy(DefaultDataLoadStrategy):
 
     @staticmethod
     def _apply_limit(ds, limit):
+        """
+        Keep at most ``limit`` rows of a loaded dataset (per split for dataset dicts).
+        """
         if isinstance(ds, datasets.DatasetDict):
             return datasets.DatasetDict({k: v.select(range(min(limit, len(v)))) for k, v in ds.items()})
         if isinstance(ds, datasets.IterableDatasetDict):
