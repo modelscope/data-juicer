@@ -352,7 +352,7 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
         return formatter.load_dataset(load_data_np, self.cfg)
 
 
-def validate_limit(limit):
+def validate_limit(limit: int) -> None:
     """
     Validate that a dataset row limit is a non-negative integer.
 
