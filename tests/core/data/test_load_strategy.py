@@ -419,6 +419,34 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
                 ds = strategy.load_data(num_proc=1)
             self.assertEqual(ds["text"], expected)
 
+    @patch("data_juicer.core.data.load_strategy.datasets.load_dataset")
+    def test_huggingface_strategy_limit_caps_dataset_dict(self, mock_load_dataset):
+        """``limit`` is applied per split when no ``split`` is configured."""
+        from datasets import Dataset, DatasetDict
+
+        DataLoadStrategyRegistry._strategies = {}
+
+        cfg = Namespace(text_keys=["text"])
+        mock_load_dataset.return_value = DatasetDict(
+            {"train": Dataset.from_dict({"text": ["a", "b", "c"]}), "test": Dataset.from_dict({"text": ["d"]})}
+        )
+        strategy = DefaultHuggingfaceDataLoadStrategy({"type": "huggingface", "path": "dummy/dataset", "limit": 2}, cfg)
+        with patch("data_juicer.core.data.load_strategy.unify_format", side_effect=lambda ds, **kw: ds):
+            ds = strategy.load_data(num_proc=1)
+        self.assertEqual(ds["train"]["text"], ["a", "b"])
+        self.assertEqual(ds["test"]["text"], ["d"])
+
+    def test_huggingface_strategy_limit_validation(self):
+        from data_juicer.core.data.config_validator import ConfigValidationError
+
+        DataLoadStrategyRegistry._strategies = {}
+
+        cfg = Namespace(text_keys=["text"])
+        for limit in (-1, "10", True):
+            with self.assertRaises(ConfigValidationError):
+                DefaultHuggingfaceDataLoadStrategy({"type": "huggingface", "path": "dummy/dataset", "limit": limit}, cfg)
+        DefaultHuggingfaceDataLoadStrategy({"type": "huggingface", "path": "dummy/dataset", "limit": 0}, cfg)
+
 
 class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
     def setUp(self):
