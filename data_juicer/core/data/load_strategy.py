@@ -373,10 +373,12 @@ class DefaultHuggingfaceDataLoadStrategy(DefaultDataLoadStrategy):
             data_files=self.ds_config.get("data_files", None),
             data_dir=self.ds_config.get("data_dir", None),
             name=self.ds_config.get("name", None),
-            limit=self.ds_config.get("limit", None),
             num_proc=num_proc,
             **kwargs,
         )
+        limit = self.ds_config.get("limit", None)
+        if limit is not None:
+            ds = ds.select(range(min(limit, len(ds))))
         return unify_format(ds, text_keys=self.cfg.text_keys, num_proc=num_proc, global_cfg=self.cfg)
 
 
