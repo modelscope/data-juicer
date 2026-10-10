@@ -352,16 +352,18 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
         return formatter.load_dataset(load_data_np, self.cfg)
 
 
-def validate_limit(limit: int) -> None:
+def validate_limit(limit: Optional[int]) -> None:
     """
     Validate that a dataset row limit is a non-negative integer.
 
     Args:
-        limit: Maximum number of rows to keep
+        limit: Maximum number of rows to keep, or None for no limit
 
     Raises:
         ValueError: If limit is not a non-negative integer
     """
+    if limit is None:
+        return
     if isinstance(limit, bool) or not isinstance(limit, int) or limit < 0:
         raise ValueError(f"limit must be a non-negative integer, got {limit!r}")
 
