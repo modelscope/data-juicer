@@ -39,6 +39,19 @@ class RemoveHeaderMapperTest(DataJuicerTestCaseBase):
         }]
         self._run_remove_header(samples)
 
+    def test_each_heading_alone(self):
+        headings = [
+            'chapter', 'part', 'section', 'subsection', 'subsubsection',
+            'paragraph', 'subparagraph'
+        ]
+        for heading in headings:
+            with self.subTest(heading=heading):
+                samples = [{
+                    'text': f'Preamble\\{heading}{{Intro}}Body',
+                    'target': f'\\{heading}{{Intro}}Body',
+                }]
+                self._run_remove_header(samples)
+
     def test_keep_no_head(self):
         self.op = RemoveHeaderMapper(drop_no_head=False)
         samples = [{

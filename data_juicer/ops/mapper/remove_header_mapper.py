@@ -35,7 +35,7 @@ class RemoveHeaderMapper(Mapper):
         self.pattern += r"\\\bsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
         self.pattern += r"\\\bsubsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
         self.pattern += r"\\\bsubsubsection\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
-        self.pattern += r"\\\bparagraph\b\*?(?:\[(.*?)\])?\{(.*?)\}"
+        self.pattern += r"\\\bparagraph\b\*?(?:\[(.*?)\])?\{(.*?)\}|"
         self.pattern += r"\\\bsubparagraph\b\*?(?:\[(.*?)\])?\{(.*?)\}"
         self.pattern += r")"
 
