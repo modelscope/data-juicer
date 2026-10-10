@@ -446,7 +446,9 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
         cfg = Namespace(text_keys=["text"])
         for limit in (-1, "10", True):
             with self.assertRaises(ConfigValidationError):
-                DefaultHuggingfaceDataLoadStrategy({"type": "huggingface", "path": "dummy/dataset", "limit": limit}, cfg)
+                DefaultHuggingfaceDataLoadStrategy(
+                    {"type": "huggingface", "path": "dummy/dataset", "limit": limit}, cfg
+                )
         for limit in (0, None):
             DefaultHuggingfaceDataLoadStrategy({"type": "huggingface", "path": "dummy/dataset", "limit": limit}, cfg)
 
