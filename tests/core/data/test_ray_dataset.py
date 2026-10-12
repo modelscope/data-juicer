@@ -557,7 +557,7 @@ class RayBatchExecutionTest(unittest.TestCase):
     def test_native_actor_uses_original_operator_call(self):
         import pyarrow as pa
 
-        from data_juicer.core.data.ray_dataset import RayDataset, RayOperatorActor
+        from data_juicer.core.data.ray_dataset import RayDataset
         from data_juicer.ops.base_op import Mapper
 
         class CustomCallMapper(Mapper):
@@ -573,7 +573,7 @@ class RayBatchExecutionTest(unittest.TestCase):
         dataset.data.map_batches.return_value = dataset.data
         dataset._run_single_op(op, {"text"})
         call = dataset.data.map_batches.call_args
-        self.assertIs(call.args[0], RayOperatorActor)
+        self.assertIs(call.args[0], CustomCallMapper)
         actor = call.args[0](*call.kwargs["fn_constructor_args"], **call.kwargs["fn_constructor_kwargs"])
         self.assertEqual(actor(pa.table({"text": ["one"]})).to_pylist(), [{"text": "one", "custom": True}])
         self.assertEqual(actor(pa.table({"text": ["two"]})).to_pylist(), [{"text": "two", "custom": True}])

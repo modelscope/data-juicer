@@ -836,24 +836,6 @@ def build_base_parser() -> ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--partition.stream_segments",
-        type=Optional[int],
-        default=1,
-        help=(
-            "Legacy tee-sink option retained for config compatibility. Recovery units commit "
-            "after every Mapper/Filter stage; this value is ignored in streaming mode."
-        ),
-    )
-    parser.add_argument(
-        "--partition.stream_fsync",
-        type=bool,
-        default=True,
-        help=(
-            "Legacy tee-sink option retained for config compatibility. Recovery units always fsync "
-            "their output files and SQLite commit; this value is ignored in streaming mode."
-        ),
-    )
-    parser.add_argument(
         "--partition.max_initialization_overhead_ratio",
         type=float,
         default=0.1,

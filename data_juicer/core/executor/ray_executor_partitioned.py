@@ -38,15 +38,9 @@ from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.executor.dag_execution_mixin import DAGExecutionMixin
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin, EventType
 from data_juicer.core.ray_exporter import RayExporter
-from data_juicer.ops import Mapper, load_ops
+from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-from data_juicer.utils.ckpt_utils import (
-    STREAM_MANIFEST_SCHEMA_VERSION,
-    CheckpointStrategy,
-    RayCheckpointManager,
-    atomic_write_json,
-    make_row_id_membership,
-)
+from data_juicer.utils.ckpt_utils import CheckpointStrategy, RayCheckpointManager
 from data_juicer.utils.config_utils import ConfigAccessor
 from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -62,20 +56,6 @@ _DEFAULT_GPU_PROBE_STEADY_BATCHES = 3
 _DEFAULT_GPU_PROBE_SAMPLE_SEED = 42
 _DEFAULT_MAX_INITIALIZATION_OVERHEAD_RATIO = 0.10
 _LOGICAL_PARTITION_COLUMN = "__data_juicer_logical_partition_id__"
-# Stable global read-order row id injected at ingestion for streaming tee-sink
-# recovery. Mappers/Filters carry it unchanged; it is the frontier key and is
-# dropped just before export. Reserved: rejected if present in the input schema.
-_ROW_ID_COLUMN = "__data_juicer_row_id__"
-# These known row-expanding mappers cannot use the row-id frontier: the first
-# committed output block does not prove that every child of a parent is durable.
-_UNSUPPORTED_STREAM_MAPPERS = frozenset(
-    {
-        "generate_qa_from_text_mapper",
-        "image_diffusion_mapper",
-        "nlpaug_en_mapper",
-        "nlpcda_zh_mapper",
-    }
-)
 _PARTITION_CONTENT_HASH_ALGORITHM = "sha256-sequence-v1"
 _PARTITION_CONTENT_HASH_MODULUS = 1 << 256
 _PARTITION_CONTENT_HASH_BASE = int.from_bytes(hashlib.sha256(b"data-juicer-partition-sequence-v1").digest(), "big") | 1
@@ -137,136 +117,6 @@ def _add_logical_partition_id(batch, partition_id: int):
 
 def _matches_logical_partition(row: Dict, partition_id: int) -> bool:
     return row[_LOGICAL_PARTITION_COLUMN] == partition_id
-
-
-def _contiguous_row_id_ranges(row_ids: List[int]) -> List[list]:
-    """Compress a set of row ids into sorted, disjoint half-open [lo, hi) ranges.
-
-    Row ids are contiguous in read order, but a Filter upstream may punch holes,
-    so we compute the actual runs present in this block rather than assume one range.
-    """
-    ranges: List[list] = []
-    # The tee has already rejected duplicates. A set keeps this helper robust
-    # when called outside that path; it does not enable row expansion.
-    for rid in sorted({int(x) for x in row_ids}):
-        if ranges and rid == ranges[-1][1]:
-            ranges[-1][1] = rid + 1
-        else:
-            ranges.append([rid, rid + 1])
-    return ranges
-
-
-class _StreamTeeSink:
-    """Pass-through Ray Data actor that durably tees each block, then returns it
-    unchanged so the pipeline keeps streaming (no materialize barrier).
-
-    Verified in experiments/seg_grid/ray_stream_probe.py (V1/V2): a hot actor
-    pool of this class writes one parquet block + one atomic manifest shard per
-    input block without triggering an implicit materialize.
-
-    Commit ordering is data-before-pointer and each step is atomic: the block
-    parquet is written to a unique ``*.tmp`` then ``os.replace``-d into its
-    content-keyed final name, and only then is the manifest shard written the
-    same write-tmp-then-replace way. A crash therefore leaves at most a stray
-    ``*.tmp`` (ignored by RayCheckpointManager.reconcile_stream_frontier) and
-    never a manifest pointing at a half-written or absent block; the reconciler
-    additionally drops any shard whose block file is missing.
-    """
-
-    def __init__(
-        self,
-        ckpt_dir: str,
-        data_dir: str,
-        manifest_dir: str,
-        segment_index: int,
-        op_boundary_idx: int,
-        op_name: str,
-        job_id: str,
-        row_id_column: str = _ROW_ID_COLUMN,
-        fsync: bool = True,
-    ):
-        self.ckpt_dir = ckpt_dir
-        self.data_dir = data_dir
-        self.manifest_dir = manifest_dir
-        self.segment_index = segment_index
-        self.op_boundary_idx = op_boundary_idx
-        self.op_name = op_name
-        self.job_id = job_id
-        self.row_id_column = row_id_column
-        self.fsync = fsync
-        os.makedirs(self.data_dir, exist_ok=True)
-        os.makedirs(self.manifest_dir, exist_ok=True)
-
-    @staticmethod
-    def _fsync_path(path):
-        fd = os.open(path, os.O_RDONLY)
-        try:
-            os.fsync(fd)
-        finally:
-            os.close(fd)
-
-    def __call__(self, batch):
-        import pyarrow.parquet as pq
-
-        if batch.num_rows == 0:
-            return batch
-        if self.row_id_column not in batch.column_names:
-            raise RuntimeError(
-                f"Stream tee-sink lost the row-id column '{self.row_id_column}'; "
-                "an operator must have dropped it, breaking recovery provenance."
-            )
-
-        row_ids = [int(x) for x in batch.column(self.row_id_column).to_pylist()]
-        sorted_ids = sorted(row_ids)
-        # Duplicates violate the row-preserving streaming contract.
-        if len(set(sorted_ids)) != len(sorted_ids):
-            raise RuntimeError(
-                f"Streaming recovery requires row-preserving operators, but segment {self.segment_index} "
-                f"(op '{self.op_name}') produced duplicate row ids. Use partition.recovery_mode=partition."
-            )
-
-        # Content-key filename: stable across Ray lineage recompute of this
-        # side-effecting tee. If Ray recomputes a lost block with the same rows,
-        # it overwrites its own file instead of writing a fresh uuid-named
-        # duplicate that would double-count on a future resume.
-        content_key = hashlib.sha1((",".join(map(str, sorted_ids))).encode()).hexdigest()[:16]
-        stem = f"block_{content_key}_{self.segment_index:04d}"
-        block_path = os.path.join(self.data_dir, f"{stem}.parquet")
-        # Atomic, durable block write (all columns, including the row-id
-        # provenance). Write to a per-writer-unique tmp then os.replace into the
-        # content-keyed final name: a reader (a resume reconcile) sees either no
-        # file or the whole file, never a partial parquet, even if Ray recomputes
-        # this side-effecting block or a speculative duplicate races on the same
-        # target. The manifest shard below is only written AFTER this returns, so
-        # a manifest never points at a half-written block.
-        tmp_block = f"{block_path}.{os.getpid()}.{os.urandom(4).hex()}.tmp"
-        pq.write_table(batch, tmp_block)
-        if self.fsync:
-            self._fsync_path(tmp_block)
-        os.replace(tmp_block, block_path)
-        if self.fsync:
-            # Block durable (file + its dir) before the manifest that points at
-            # it, and before the batch flows to the next segment.
-            self._fsync_path(block_path)
-            self._fsync_path(self.data_dir)
-
-        payload = {
-            "schema_version": STREAM_MANIFEST_SCHEMA_VERSION,
-            "job_id": self.job_id,
-            "segment_index": self.segment_index,
-            "op_boundary_idx": self.op_boundary_idx,
-            "op_name": self.op_name,
-            "block_uri": os.path.relpath(block_path, self.ckpt_dir),
-            "frontier_key": "row_id",
-            "committed_row_id_ranges": _contiguous_row_id_ranges(sorted_ids),
-            "row_count": batch.num_rows,
-            "written_at": time.time(),
-        }
-        # atomic_write_json(fsync=...) flushes the shard + manifest dir when on,
-        # so on return both block and manifest are durable for this segment.
-        atomic_write_json(os.path.join(self.manifest_dir, f"{stem}.json"), payload, fsync=self.fsync)
-        # Pass through unchanged: downstream keeps consuming while later blocks tee.
-        return batch
 
 
 class TempDirManager:
@@ -562,8 +412,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         execution_group_size = ConfigAccessor.get(partition_cfg, "execution_group_size", "auto")
         recovery_mode = ConfigAccessor.get(partition_cfg, "recovery_mode", "partition")
         unit_size = ConfigAccessor.get(partition_cfg, "unit_size", "auto")
-        stream_segments = ConfigAccessor.get(partition_cfg, "stream_segments", 1)
-        stream_fsync = ConfigAccessor.get(partition_cfg, "stream_fsync", True)
         max_initialization_overhead_ratio = ConfigAccessor.get(
             partition_cfg,
             "max_initialization_overhead_ratio",
@@ -755,19 +603,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             except (TypeError, ValueError):
                 logger.warning(f"Invalid partition.unit_size={unit_size!r}; using auto")
                 self.unit_size_cfg = "auto"
-        # Number of contiguous op-segments; a tee-sink is inserted after each.
-        # More segments => finer resume (re-run only ops after the deepest
-        # committed segment) at the cost of more committed blocks. Clamped to
-        # >= 1 here; further clamped to <= len(ops) when the segments are built.
-        try:
-            self.stream_segments = max(1, int(stream_segments)) if stream_segments else 1
-        except (TypeError, ValueError):
-            logger.warning(f"Invalid partition.stream_segments={stream_segments!r}; using 1")
-            self.stream_segments = 1
-        # fsync committed block + manifest (and dirs) before the tee returns, so
-        # segment k is durable before its rows reach segment k+1 (nested frontier
-        # holds under power-loss, not just process-kill).
-        self.stream_fsync = bool(stream_fsync) if stream_fsync is not None else True
         self.partition_size_cfg = partition_size
         self.max_size_mb = max_size_mb
 
@@ -1141,12 +976,12 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # only after the generic schema/environment validation has succeeded.
         self._configure_pre_partition_resources(dataset, ops)
 
-        streaming_selected = self._should_use_streaming_recovery(dataset, ops)
+        unit_recovery_selected = self._should_use_unit_recovery(dataset, ops)
 
         # A resumed job must reuse the saved partition count before DAG
         # initialization. Auto mode can otherwise choose a different count if
         # the Ray cluster resources changed between runs.
-        if resume_requested and not streaming_selected:
+        if resume_requested and not unit_recovery_selected:
             saved_info = self._load_partitioning_info()
             if saved_info is None:
                 raise RuntimeError(
@@ -1159,9 +994,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         # (DAG needs final partition count). At this point GPU preflight and
         # automatic operator parallelism have both populated the real
         # per-worker requests used by the cluster-aware bounds.
-        if streaming_selected:
+        if unit_recovery_selected:
             self.num_partitions = 1
-            logger.info("Streaming unit recovery selected; skipping manual partitioning.")
+            logger.info("Recovery-unit execution selected; skipping manual partitioning.")
         elif not resume_requested and self.partition_mode == "auto":
             self._configure_auto_partitioning(dataset, ops)
         elif self.partition_size_cfg is not None:
@@ -1246,7 +1081,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         Uses deterministic splitting to ensure reproducible partitions for
         checkpoint resumption.
         """
-        if self._should_use_streaming_recovery(dataset, ops):
+        if self._should_use_unit_recovery(dataset, ops):
             return self._process_with_unit_recovery(dataset, ops)
 
         logger.info("Processing with real partitioning using Ray Data's split and union...")
@@ -1324,28 +1159,31 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         return RayDataset(merged_dataset, cfg=self.cfg)
 
     def _should_use_execution_groups(self, dataset: RayDataset, ops: List) -> bool:
-        """The execution-group barrier path is retired from selection.
-
-        recovery_mode=streaming is handled by the tee-sink frontier (dispatched
-        before this is ever reached), and recovery_mode=partition is defined as
-        the plain per-partition path — "no execution groups" — so this must not
-        route a partition-mode run into the group barrier. Keeping the method
-        (rather than deleting the branch) preserves the reserved-column guard as
-        a single documented decision point should the path ever be revived.
-        """
-        # Guard against the reserved logical-partition column even though we no
-        # longer select the group path, so a revival keeps the invariant.
+        """Return whether logical partitions can safely share one GPU execution."""
+        if getattr(self, "_is_resuming", False):
+            logger.info("Using per-partition execution while resuming heterogeneous checkpoints.")
+            return False
+        has_gpu_actor = any(
+            getattr(op, "accelerator", None) == "cuda"
+            and (float(getattr(op, "num_gpus", 0) or 0) > 0 or op.use_ray_actor())
+            for op in ops
+        )
+        if not has_gpu_actor:
+            return False
+        if any(not isinstance(op, (Mapper, Filter)) for op in ops):
+            logger.info("GPU execution grouping is disabled because the segment contains a dataset-level operator.")
+            return False
         try:
             names = self._schema_names(dataset.data)
         except Exception:
             names = set()
         if _LOGICAL_PARTITION_COLUMN in names:
             raise RuntimeError(f"Input dataset contains reserved execution-group column {_LOGICAL_PARTITION_COLUMN!r}.")
-        return False
+        return True
 
-    def _should_use_streaming_recovery(self, dataset: RayDataset, ops: List) -> bool:
+    def _should_use_unit_recovery(self, dataset: RayDataset, ops: List) -> bool:
         """Use U recovery only for supported local Mapper/Filter segments."""
-        cached = getattr(self, "_streaming_selected_cache", None)
+        cached = getattr(self, "_unit_recovery_selected_cache", None)
         if cached is not None:
             return cached
 
@@ -1358,45 +1196,23 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 or not ckpt_manager.checkpoint_enabled
                 or ckpt_manager.checkpoint_strategy == CheckpointStrategy.DISABLED
             ):
-                logger.info("Streaming recovery disabled: checkpointing is off.")
+                logger.info("Recovery-unit execution disabled: checkpointing is off.")
                 return False
-            from data_juicer.ops import Filter
-
             if not ops or any(not isinstance(op, (Mapper, Filter)) for op in ops):
-                logger.info("Streaming unit recovery disabled: segment is not Mapper/Filter-only.")
+                logger.info("Recovery-unit execution disabled: segment is not Mapper/Filter-only.")
                 return False
             if any(getattr(op, "_prepare_for_ray_map_batches", None) is not None for op in ops):
-                logger.info("Streaming unit recovery disabled: shared operator state needs a replay contract.")
+                logger.info("Recovery-unit execution disabled: shared operator state needs a replay contract.")
                 return False
             # Attempt files require a shared local POSIX filesystem.
             if is_remote_path(ckpt_manager.ckpt_dir):
-                logger.info("Streaming recovery disabled: checkpoint dir is a remote path.")
+                logger.info("Recovery-unit execution disabled: checkpoint dir is a remote path.")
                 return False
-            try:
-                names = self._schema_names(dataset.data)
-            except Exception:
-                names = set()
-            if _ROW_ID_COLUMN in names:
-                raise RuntimeError(f"Input dataset contains reserved streaming row-id column {_ROW_ID_COLUMN!r}.")
             return True
 
         result = _decide()
-        self._streaming_selected_cache = result
+        self._unit_recovery_selected_cache = result
         return result
-
-    def _resolve_tee_sink_concurrency(self, ops: List) -> int:
-        """Fixed actor-pool size for the pass-through tee sink.
-
-        The sink is I/O-bound (one parquet block + one atomic manifest shard per
-        input block) and must stay a small HOT pool so it never turns into a
-        materialize barrier.
-        """
-        raw = getattr(self, "max_concurrent_partitions", 4)
-        try:
-            base = int(raw)
-        except (TypeError, ValueError):
-            base = 4
-        return max(1, min(4, base))
 
     def _resolve_recovery_unit_size(self, ops: List) -> int:
         configured = getattr(self, "unit_size_cfg", "auto")
@@ -1464,7 +1280,7 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         )
 
         logger.info(
-            f"Streaming unit recovery: {manifest['rows']} input rows, {len(units)} units "
+            f"Recovery-unit execution: {manifest['rows']} input rows, {len(units)} units "
             f"of up to {unit_size}, {len(ops)} operator stages, resuming={resuming}"
         )
         recovery = UnitRecovery(store, units, source, len(ops))
@@ -1472,272 +1288,6 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
         dataset.data = None
         del source
         return runner.process(ops, unit_recovery=recovery)
-
-    def _stamp_row_ids(self, dataset: RayDataset) -> RayDataset:
-        """Inject a dense, unique, read-order-stable global row id.
-
-        preserve_order is already enabled for deterministic execution, so a
-        materialized snapshot zipped with ``ray.data.range(N)`` produces
-        identical ids across runs (verified: zip block-alignment is dense +
-        unique + deterministic in experiments/seg_grid).
-        """
-        base = dataset.data.materialize()
-        n = base.count()
-        row_ids = ray.data.range(n).rename_columns({"id": _ROW_ID_COLUMN})
-        stamped = base.zip(row_ids)
-        return RayDataset(stamped, cfg=self.cfg)
-
-    def _split_ops_into_segments(self, ops: List) -> List[dict]:
-        """Split the op chain into ``stream_segments`` contiguous, non-empty,
-        as-evenly-sized-as-possible segments.
-
-        Each segment records the ops it runs, the GLOBAL index of its last op
-        (the tee boundary), and that op's name for the manifest. The count is
-        clamped to ``len(ops)`` so every segment has at least one op.
-        """
-        n = len(ops)
-        s = max(1, min(int(getattr(self, "stream_segments", 1)), n)) if n else 1
-        segments: List[dict] = []
-        start = 0
-        for i in range(s):
-            size = n // s + (1 if i < n % s else 0)
-            seg_ops = ops[start : start + size]
-            boundary_idx = start + size - 1
-            op_name = getattr(ops[boundary_idx], "_name", f"op_{boundary_idx}") if seg_ops else "identity"
-            segments.append(
-                {
-                    "ops": seg_ops,
-                    "boundary_idx": boundary_idx,
-                    "op_name": op_name,
-                }
-            )
-            start += size
-        return segments
-
-    def _thread_segments(self, source_data, segments: List[dict], start_seg: int, concurrency: int):
-        """Thread a lazy stream through segments ``start_seg..end``, applying
-        each segment's ops then a pass-through tee, with NO materialize barrier
-        between segments (one lazy plan)."""
-        data = source_data
-        for k in range(start_seg, len(segments)):
-            seg = segments[k]
-            data = RayDataset(data, cfg=self.cfg).process(seg["ops"], defer_schema_probe=True).data
-            tee_kwargs = dict(
-                ckpt_dir=self.ckpt_manager.ckpt_dir,
-                data_dir=self.ckpt_manager.stream_data_dir(k),
-                manifest_dir=self.ckpt_manager.stream_manifest_dir(k),
-                segment_index=k,
-                op_boundary_idx=seg["boundary_idx"],
-                op_name=seg["op_name"],
-                job_id=self.job_id,
-                row_id_column=_ROW_ID_COLUMN,
-                fsync=getattr(self, "stream_fsync", True),
-            )
-            # The tee receives whole upstream blocks. Cardinality-changing
-            # operators are excluded from this recovery path.
-            data = data.map_batches(
-                _StreamTeeSink,
-                fn_constructor_kwargs=tee_kwargs,
-                concurrency=concurrency,
-                batch_format="pyarrow",
-                batch_size=None,
-            )
-        return data
-
-    def _stream_run_path(self) -> str:
-        """Path to the run-level streaming provenance manifest."""
-        return os.path.join(self.ckpt_manager.ckpt_dir, "stream_run.json")
-
-    def _compute_stream_run_signature(self, stamped: RayDataset, segments: List[dict], ops: List) -> dict:
-        """Capture what the committed frontier is only valid against.
-
-        The row-id frontier commits INPUT row positions. It is only meaningful
-        for the SAME input, read in the SAME order, run through the SAME op
-        chain split the SAME way. This signature pins all of that so resume can
-        fail closed instead of splicing a stale frontier onto different work:
-
-        - ``input_content_hash`` / ``input_row_count``: an order-sensitive
-          content hash over the stamped input (row-id included -- it is a pure
-          function of read order, so the hash captures both content AND order).
-          A changed input file, a reorder, or a row count change all flip it.
-        - ``op_names`` / ``segment_layout`` / ``stream_segments``: the op chain
-          and how it was cut into tee boundaries. Resuming with an edited
-          pipeline would map committed frontiers onto the wrong ops.
-        - ``job_id`` / ``schema_version``: run identity and manifest-format guards.
-        """
-        content_hash, row_count = self._compute_partition_content_hash(stamped.data)
-        return {
-            "schema_version": STREAM_MANIFEST_SCHEMA_VERSION,
-            "job_id": self.job_id,
-            "row_id_column": _ROW_ID_COLUMN,
-            "stream_segments": len(segments),
-            "op_names": [getattr(op, "_name", f"op_{i}") for i, op in enumerate(ops)],
-            "segment_layout": [{"boundary_idx": s["boundary_idx"], "op_name": s["op_name"]} for s in segments],
-            "input_content_hash": content_hash,
-            "input_row_count": row_count,
-        }
-
-    def _write_or_validate_stream_run(self, signature: dict, resuming: bool) -> None:
-        """Fail closed on resume unless the provenance signature matches.
-
-        Fresh run: record ``signature`` durably. Resume: the committed frontier
-        we are about to splice in is only trustworthy if the manifest exists and
-        every critical field matches what we are running NOW. A missing manifest
-        (frontier of unknown provenance) or any mismatch (different input, op
-        chain, or segmentation) raises instead of silently emitting a corrupted
-        mix of old committed blocks and freshly reprocessed rows.
-        """
-        path = self._stream_run_path()
-        if not resuming:
-            atomic_write_json(path, signature, fsync=getattr(self, "stream_fsync", True))
-            logger.info(
-                f"Streaming provenance recorded: {signature['input_row_count']} input row(s), "
-                f"content_hash={signature['input_content_hash'][:16]}..., "
-                f"segments={signature['stream_segments']}."
-            )
-            return
-
-        if not os.path.exists(path):
-            raise RuntimeError(
-                f"Streaming resume refused: no provenance manifest at {path}. The committed frontier "
-                "cannot be trusted against the current input/op-chain. Start a fresh job_id, or use "
-                "partition.recovery_mode=partition."
-            )
-        try:
-            with open(path) as f:
-                prior = json.load(f)
-        except Exception as e:
-            raise RuntimeError(f"Streaming resume refused: unreadable provenance manifest {path}: {e}")
-
-        # Critical fields whose change invalidates the committed frontier.
-        critical = [
-            "schema_version",
-            "row_id_column",
-            "stream_segments",
-            "op_names",
-            "segment_layout",
-            "input_content_hash",
-            "input_row_count",
-        ]
-        mismatches = []
-        for key in critical:
-            if prior.get(key) != signature.get(key):
-                mismatches.append(f"{key}: checkpoint={prior.get(key)!r} != current={signature.get(key)!r}")
-        # job_id is expected to match by construction (ckpt dir is job-scoped);
-        # a mismatch means a cross-wired checkpoint dir -- also fatal.
-        if prior.get("job_id") != signature.get("job_id"):
-            mismatches.append(f"job_id: checkpoint={prior.get('job_id')!r} != current={signature.get('job_id')!r}")
-        if mismatches:
-            detail = "\n  - ".join(mismatches)
-            raise RuntimeError(
-                "Streaming resume refused: provenance mismatch -- the committed frontier does not "
-                "belong to the current run. Resuming would splice stale committed blocks onto "
-                f"different work and corrupt the output. Mismatches:\n  - {detail}\n"
-                "Start a fresh job_id, or use partition.recovery_mode=partition."
-            )
-        logger.info(
-            f"Streaming provenance validated on resume: {signature['input_row_count']} input row(s), "
-            f"content_hash={signature['input_content_hash'][:16]}..., segments={signature['stream_segments']}."
-        )
-
-    def _process_streaming_with_tee_recovery(self, dataset: RayDataset, ops: List) -> RayDataset:
-        """Multi-segment, block-level streaming recovery.
-
-        The Mapper-only chain is split into ``stream_segments`` contiguous
-        segments; a hot pass-through tee actor pool durably commits (block
-        parquet + atomic manifest shard) after each segment WITHOUT a
-        materialize barrier -- still one lazy stream. Rows carry a stable global
-        id, so on resume each segment's committed frontier F_k is reconciled
-        (nested F_0 >= F_1 >= ... >= F_{S-1} under kill + local FS; fsync extends
-        that to power-loss). A row is re-processed only from the segment AFTER
-        the DEEPEST tee that already committed it -- so the crash blast radius is
-        (uncommitted rows) x (ops after their deepest committed segment), strictly
-        finer than the single-segment whole-chain re-run.
-        """
-        stamped = self._stamp_row_ids(dataset)
-        segments = self._split_ops_into_segments(ops)
-        s = len(segments)
-        concurrency = self._resolve_tee_sink_concurrency(ops)
-        resuming = getattr(self, "_is_resuming", False)
-        logger.info(
-            f"Streaming tee-sink recovery: segments={s}, concurrency={concurrency}, "
-            f"fsync={getattr(self, 'stream_fsync', True)}, resuming={resuming}"
-        )
-
-        # Provenance gate (P0): a committed frontier is only valid against the
-        # SAME input, order, op chain, and segmentation. Fail closed on resume
-        # unless the recorded signature matches exactly; record it on a fresh
-        # run. Done BEFORE any reconcile so a stale/foreign frontier is never
-        # spliced into the output.
-        signature = self._compute_stream_run_signature(stamped, segments, ops)
-        self._write_or_validate_stream_run(signature, resuming)
-
-        # Reconcile every segment's committed frontier (resume only).
-        frontiers: List[List[Tuple[int, int]]] = [[] for _ in range(s)]
-        block_uris: List[List[str]] = [[] for _ in range(s)]
-        if resuming:
-            for k in range(s):
-                fr, bu, sc = self.ckpt_manager.reconcile_stream_frontier(k)
-                frontiers[k], block_uris[k] = fr, bu
-                logger.info(
-                    f"Streaming resume: segment {k} has {sc} committed shard(s), "
-                    f"{sum(hi - lo for lo, hi in fr)} committed row(s)."
-                )
-
-        # Each row enters the pipeline once, right AFTER the deepest tee that
-        # committed it. Partition the work into disjoint streams by that depth
-        # and union their endpoints:
-        #   - depth S-1 (fully done): restore final output, no reprocessing.
-        #   - depth k in [0, S-2]: restore segment k's output for rows in
-        #     F_k \ F_{k+1}, run segments k+1..S-1.
-        #   - fresh (not in F_0): run all segments from the raw stamped input.
-        # (block_uris[k] contains exactly F_k's rows, so filtering out F_{k+1}
-        #  yields F_k \ F_{k+1} without an explicit range difference.)
-        output_streams = []
-
-        if resuming and block_uris[s - 1]:
-            # Already through the whole chain -- restore verbatim, no ops/tee.
-            output_streams.append(ray.data.read_parquet(block_uris[s - 1]))
-
-        if resuming:
-            for k in range(s - 2, -1, -1):
-                if not block_uris[k]:
-                    continue
-                next_frontier = frontiers[k + 1]
-                restored_k = ray.data.read_parquet(block_uris[k])
-                if next_frontier:
-                    is_committed = make_row_id_membership(next_frontier)
-                    restored_k = restored_k.filter(lambda row, m=is_committed: not m(int(row[_ROW_ID_COLUMN])))
-                output_streams.append(self._thread_segments(restored_k, segments, k + 1, concurrency))
-
-        # Fresh rows: everything not yet committed by the first tee.
-        f0 = frontiers[0] if resuming else []
-        if f0:
-            is_committed_f0 = make_row_id_membership(f0)
-            fresh_src = stamped.data.filter(lambda row, m=is_committed_f0: not m(int(row[_ROW_ID_COLUMN])))
-        else:
-            fresh_src = stamped.data
-        output_streams.append(self._thread_segments(fresh_src, segments, 0, concurrency))
-
-        merged = output_streams[0]
-        for stream in output_streams[1:]:
-            merged = merged.union(stream)
-
-        # Row-id provenance is internal; strip it before final export.
-        merged = merged.drop_columns([_ROW_ID_COLUMN])
-
-        # Terminal materialize == exactly-once execution of this streaming plan.
-        # The tee sinks have side effects (block parquet + manifest shard); Ray
-        # runs a lazy plan once per terminal action, and the downstream exporter
-        # alone triggers TWO (a .columns() schema probe then the write), which
-        # would double-commit every block. Collecting here pins one streaming
-        # pass -- each tee commits its blocks once and manifests are written
-        # incrementally as blocks flow -- while the exporter's later
-        # .columns()/write read cached blocks without re-teeing. This is a single
-        # end-of-plan barrier, NOT #1054's per-op-group barriers: hot actor
-        # pools, row-level crash blast.
-        merged = merged.materialize()
-        return RayDataset(merged, cfg=self.cfg)
 
     def _resolve_execution_group_size(
         self,

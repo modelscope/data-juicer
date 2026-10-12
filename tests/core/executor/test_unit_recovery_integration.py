@@ -125,7 +125,7 @@ def _source(executor, *, changed=False):
 def test_streaming_dispatch_uses_units_for_mapper_filter_and_resumes(tmp_path, local_ray):
     executor = _executor(tmp_path)
     ops = [WhitespaceNormalizationMapper(num_proc=1), TextLengthFilter(min_len=1, max_len=2, num_proc=1)]
-    assert executor._should_use_streaming_recovery(_source(executor), ops)
+    assert executor._should_use_unit_recovery(_source(executor), ops)
     result = executor._process_with_simple_partitioning(_source(executor), ops)
     assert sorted(row["id"] for row in result.data.take_all()) == [2]
     source_directory = tmp_path / "checkpoints" / "unit_recovery" / "source"
@@ -153,7 +153,7 @@ def test_streaming_shared_state_hook_uses_partition_path(tmp_path):
 
     executor = _executor(tmp_path)
     op = SharedFilter(num_proc=1)
-    assert not executor._should_use_streaming_recovery(None, [op])
+    assert not executor._should_use_unit_recovery(None, [op])
     with pytest.raises(ProtocolError, match="Shared Ray state"):
         RayDataset(None, auto_op_parallelism=False).process([op], unit_recovery=Namespace(stage_count=1))
 
@@ -457,7 +457,7 @@ def test_streaming_stats_export_matches_native_before_filtering(tmp_path, local_
     }
     native = _source(executor).process([TextLengthFilter(stats_export_path=str(native_path), **kwargs)]).data.take_all()
     ops = [TextLengthFilter(stats_export_path=str(recovered_path), **kwargs)]
-    assert executor._should_use_streaming_recovery(_source(executor), ops)
+    assert executor._should_use_unit_recovery(_source(executor), ops)
     recovered = executor._process_with_simple_partitioning(_source(executor), ops).data.take_all()
     expected_ids = [] if drop_all else [0]
     assert sorted(row["id"] for row in recovered) == expected_ids
