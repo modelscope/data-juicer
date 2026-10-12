@@ -1,12 +1,16 @@
 """Crash and output-contract tests for the local recovery-unit protocol."""
 
 import json
+import multiprocessing
+import os
 import sqlite3
 from dataclasses import replace
 
 import pyarrow as pa
+import pyarrow.parquet as pq
 import pytest
 
+from data_juicer.core.executor import unit_protocol
 from data_juicer.core.executor.unit_protocol import SCHEMA_VERSION, LocalUnitStore, PreparedOutput, ProtocolError
 from data_juicer.core.executor.unit_runner import collect_final_units, execute_unit_attempt, run_local_units
 
@@ -14,28 +18,28 @@ from data_juicer.core.executor.unit_runner import collect_final_units, execute_u
 def test_old_checkpoint_database_is_rejected_before_running(tmp_path):
     with sqlite3.connect(tmp_path / "units.sqlite3") as db:
         db.execute("CREATE TABLE attempts (attempt_id TEXT PRIMARY KEY, files_json TEXT, rows INTEGER)")
-    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
+    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 5"):
         LocalUnitStore(str(tmp_path), "job-1")
 
 
 @pytest.mark.parametrize(
-    "version, schema_column", [(1, False), (2, True), (2, False), (3, True), (3, False), (4, True)]
+    "version, schema_column", [(1, False), (2, True), (2, False), (3, True), (3, False), (4, True), (4, False)]
 )
 def test_incompatible_checkpoint_is_rejected_without_migration(tmp_path, version, schema_column):
     store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
     attempt = store.begin(unit.unit_id, 0)
     store.commit(attempt, store.write_output(attempt, []))
     with sqlite3.connect(store.db_path) as db:
-        assert SCHEMA_VERSION == db.execute("SELECT schema_version FROM runs").fetchone()[0] == 4
+        assert SCHEMA_VERSION == db.execute("SELECT schema_version FROM runs").fetchone()[0] == 5
         columns = {row[1] for row in db.execute("PRAGMA table_info(attempts)")}
         assert "schema_hex" not in columns
         assert "stats_files_json" in columns
         db.execute("UPDATE runs SET schema_version=?", (version,))
         if schema_column:
             db.execute("ALTER TABLE attempts ADD COLUMN schema_hex TEXT")
-    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
+    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 5"):
         LocalUnitStore(str(tmp_path), "job-1")
-    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
+    with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 5"):
         LocalUnitStore(str(tmp_path), "another-job")
     with sqlite3.connect(store.db_path) as db:
         assert db.execute("SELECT schema_version FROM runs").fetchone()[0] == version
@@ -53,7 +57,7 @@ def test_v3_attempts_schema_is_rejected_without_migration(tmp_path, version):
         before = tuple(db.iterdump())
     # A v3 layout is incompatible even if its version marker claims v4.
     for run_id in ("job-1", "another-job"):
-        with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 4"):
+        with pytest.raises(ProtocolError, match="incompatible protocol version; expected version 5"):
             LocalUnitStore(str(tmp_path), run_id)
     with sqlite3.connect(store.db_path) as db:
         assert tuple(db.iterdump()) == before
@@ -113,7 +117,7 @@ def test_zero_output_and_many_outputs_are_complete_commits(tmp_path, empty_table
 
     second = store.begin(unit.unit_id, 1)
     assert second.input_commit_id == first.attempt_id
-    # The unit emits more rows than it received, across two physical files.
+    # The unit emits more rows than it received; both batches land in one file.
     files = store.write_output(
         second,
         [
@@ -125,31 +129,32 @@ def test_zero_output_and_many_outputs_are_complete_commits(tmp_path, empty_table
     reopened, _ = _store(tmp_path, rows=2, size=2)
     restored = reopened.get_commit(unit.unit_id, 1)
     assert restored is not None and restored.rows == 5
-    assert len(restored.files) == 2
+    assert len(restored.files) == 1
     assert restored.stats_files == ()
     assert reopened.pending(1) == ()
 
 
 @pytest.mark.parametrize("empty_output", [False, True])
-def test_business_and_stats_outputs_share_one_commit(tmp_path, empty_output):
+@pytest.mark.parametrize("different_stats", [False, True])
+def test_business_and_stats_outputs_share_one_commit(tmp_path, empty_output, different_stats):
     store, (unit,) = _store(tmp_path, rows=3, size=3)
     attempt = store.begin(unit.unit_id, 0)
+    last_stats = pa.table({"other_stat": [True]}) if different_stats else pa.table({"score": [0.5]})
     stats = store.write_output(
         attempt,
-        [pa.table({"score": [0.1, 0.9]}), pa.table({"score": []}), pa.table({"other_stat": [True]})],
+        [pa.table({"score": [0.1, 0.9]}), pa.table({"score": []}), last_stats],
         stats=True,
     )
     tables = [] if empty_output else [pa.table({"value": [1]}), pa.table({"value": [2]})]
     business = store.write_output(attempt, tables)
     assert stats.files == ()
     assert business.stats_files == ()
-    assert [item.path for item in stats.stats_files] == [
-        f"attempts/{attempt.attempt_id}/stats-00000000.parquet",
-        f"attempts/{attempt.attempt_id}/stats-00000002.parquet",
-    ]
-    assert [item.path for item in business.files] == [
-        f"attempts/{attempt.attempt_id}/part-{index:08d}.parquet" for index in range(len(tables))
-    ]
+    expected_stats = [f"attempts/{attempt.attempt_id}/stats.parquet"]
+    if different_stats:
+        expected_stats.append(f"attempts/{attempt.attempt_id}/stats-00000001.parquet")
+    assert [item.path for item in stats.stats_files] == expected_stats
+    expected_parts = [] if empty_output else [f"attempts/{attempt.attempt_id}/part.parquet"]
+    assert [item.path for item in business.files] == expected_parts
     output = PreparedOutput(business.files, stats.stats_files)
     assert store.get_commit(unit.unit_id, 0) is None
     assert store.pending(0) == (unit,)
@@ -197,19 +202,239 @@ def test_business_and_stats_manifests_roll_back_together(tmp_path):
     assert committed.files and committed.stats_files
 
 
-def test_one_unit_can_commit_files_with_different_schemas(tmp_path):
+@pytest.mark.parametrize("stats", [False, True])
+@pytest.mark.parametrize(
+    "tables",
+    [
+        [pa.table({"value": [1]}), pa.table({"value": ["two"]}), pa.table({"other": [True]})],
+        [pa.table({"value": [None]}), pa.table({"value": ["two"]}), pa.table({"value": [None]})],
+        [pa.table({"stats": [{"a": 1}]}), pa.table({"stats": [{"b": True}]})],
+    ],
+)
+def test_one_unit_can_commit_files_with_different_schemas(tmp_path, tables, stats):
     store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
     attempt = store.begin(unit.unit_id, 0)
-    tables = [pa.table({"value": [1]}), pa.table({"value": ["two"]}), pa.table({"other": [True]})]
-    output = store.write_output(attempt, [tables[0], pa.table({"empty": []}), *tables[1:]])
+    output = store.write_output(attempt, [tables[0], pa.table({"empty": []}), *tables[1:]], stats=stats)
     committed = store.commit(attempt, output)
-    assert committed.rows == 3
-    assert len(committed.files) == 3
+    assert committed.rows == (0 if stats else len(tables))
+    files = committed.stats_files if stats else committed.files
+    assert len(files) == len(tables)
     reopened, units = _store(tmp_path, rows=1, size=1, stages=1)
     assert reopened.get_commit(unit.unit_id, 0) == committed
-    blocks = collect_final_units(reopened, units, 0)
-    assert len(blocks) == len(tables)
+    blocks = [pq.read_table(reopened.root / item.path) for item in files]
     assert all(block.equals(table) for block, table in zip(blocks, tables))
+
+
+@pytest.mark.parametrize("stats", [False, True])
+@pytest.mark.parametrize("field_metadata", [False, True])
+def test_batch_metadata_changes_are_preserved(tmp_path, stats, field_metadata):
+    store, (unit,) = _store(tmp_path, rows=2, size=2, stages=1)
+    tables = []
+    for value in (1, 2):
+        metadata = {b"tag": str(value).encode(), b"data_juicer.batch_rows": b"user-value"}
+        field = pa.field("value", pa.int64(), metadata=metadata if field_metadata else None)
+        schema = pa.schema([field], metadata=None if field_metadata else metadata)
+        tables.append(pa.Table.from_pydict({"value": [value]}, schema=schema))
+    attempt = store.begin(unit.unit_id, 0)
+    output = store.write_output(attempt, tables, stats=stats)
+    committed = store.commit(attempt, output)
+    files = committed.stats_files if stats else committed.files
+    assert len(files) == 2
+    restored = list(store.read_output(files))
+    assert len(restored) == len(tables)
+    assert all(actual.equals(expected, check_metadata=True) for actual, expected in zip(restored, tables))
+    assert all(
+        pq.read_table(store.root / item.path).equals(table, check_metadata=True) for item, table in zip(files, tables)
+    )
+
+
+@pytest.mark.parametrize("stats", [False, True])
+def test_unregistered_extension_batches_can_be_committed(tmp_path, stats):
+    class CustomType(pa.ExtensionType):
+        def __init__(self):
+            super().__init__(pa.int64(), "data_juicer.test_unregistered")
+
+        def __arrow_ext_serialize__(self):
+            return b"custom"
+
+        @classmethod
+        def __arrow_ext_deserialize__(cls, storage_type, serialized):
+            return cls()
+
+    store, (unit,) = _store(tmp_path, rows=4, size=4, stages=1)
+    tables = [
+        pa.table({"value": pa.ExtensionArray.from_storage(CustomType(), pa.array(values))})
+        for values in ([1, 2], [3, 4])
+    ]
+    expected = []
+    for index, table in enumerate(tables):
+        path = tmp_path / f"native-{index}.parquet"
+        pq.write_table(table, path)
+        expected.append(pq.read_table(path))
+    attempt = store.begin(unit.unit_id, 0)
+    committed = store.commit(attempt, store.write_output(attempt, tables, stats=stats))
+    files = committed.stats_files if stats else committed.files
+    assert len(files) == 1
+    assert store.get_commit(unit.unit_id, 0) == committed
+    restored = list(store.read_output(files))
+    assert len(restored) == len(expected)
+    assert all(actual.equals(want, check_metadata=True) for actual, want in zip(restored, expected))
+
+
+@pytest.mark.parametrize("stats", [False, True])
+@pytest.mark.parametrize("rows", [2**20 + 1, 64 * 2**20 + 1])
+def test_large_producer_batch_keeps_its_boundary_on_readback(tmp_path, stats, rows):
+    store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
+    table = pa.table({"value": pa.repeat(pa.scalar(7, type=pa.int8()), rows)})
+    last = table.slice(0, 1)
+    attempt = store.begin(unit.unit_id, 0)
+    output = store.write_output(attempt, [table, last], stats=stats)
+    committed = store.commit(attempt, output)
+    files = committed.stats_files if stats else committed.files
+    assert len(files) == 1
+    restored = store.read_output(files)
+    assert next(restored).equals(table, check_metadata=True)
+    assert next(restored).equals(last, check_metadata=True)
+    assert list(restored) == []
+
+
+@pytest.mark.parametrize("stats", [False, True])
+@pytest.mark.parametrize("row_group_bytes", [None, 1])
+def test_same_schema_batches_share_row_groups_and_keep_boundaries(tmp_path, monkeypatch, stats, row_group_bytes):
+    if row_group_bytes is not None:
+        monkeypatch.setattr(unit_protocol, "_ROW_GROUP_BYTES", row_group_bytes)
+    store, (unit,) = _store(tmp_path, rows=4, size=4, stages=1)
+    attempt = store.begin(unit.unit_id, 0)
+    batches = [pa.table({"value": list(range(start, start + 2))}) for start in range(0, 8, 2)]
+    output = store.write_output(attempt, iter(batches), stats=stats)
+    files = output.stats_files if stats else output.files
+    assert len(files) == 1
+    with pq.ParquetFile(store.root / files[0].path) as parquet:
+        assert parquet.metadata.num_row_groups == (1 if row_group_bytes is None else 4)
+        assert parquet.read()["value"].to_pylist() == list(range(8))
+    committed = store.commit(attempt, output)
+    assert store.get_commit(unit.unit_id, 0) == committed
+    reads = []
+    read_group = pq.ParquetFile.read_row_group
+
+    def tracked_read(parquet, index, **kwargs):
+        reads.append(index)
+        return read_group(parquet, index, **kwargs)
+
+    monkeypatch.setattr(pq.ParquetFile, "read_row_group", tracked_read)
+    restored = store.read_output(files)
+    assert reads == []
+    assert next(restored).equals(batches[0], check_metadata=True)
+    assert reads == [0]
+    assert all(actual.equals(expected, check_metadata=True) for actual, expected in zip(list(restored), batches[1:]))
+    assert reads == ([0] if row_group_bytes is None else [0, 1, 2, 3])
+
+
+@pytest.mark.parametrize("stats", [False, True])
+@pytest.mark.parametrize("schema_change", [False, True])
+def test_generator_failure_never_commits_partial_output(tmp_path, stats, schema_change):
+    store, (unit,) = _store(tmp_path, rows=2, size=2, stages=1)
+    attempt = store.begin(unit.unit_id, 0)
+    tables = [pa.table({"value": [1]}), pa.table({"value": ["two"] if schema_change else [2]})]
+
+    def interrupted():
+        yield from tables
+        raise RuntimeError("interrupted output generation")
+
+    with pytest.raises(RuntimeError, match="interrupted output generation"):
+        store.write_output(attempt, interrupted(), stats=stats)
+    directory = store.root / "attempts" / attempt.attempt_id
+    assert not list(directory.glob("*.tmp"))
+    assert len(list(directory.glob("*.parquet"))) == (1 if schema_change else 0)
+    reopened, _ = _store(tmp_path, rows=2, size=2, stages=1)
+    assert reopened.get_commit(unit.unit_id, 0) is None
+    assert reopened.pending(0) == (unit,)
+    retry = reopened.begin(unit.unit_id, 0)
+    output = reopened.write_output(retry, tables, stats=stats)
+    committed = reopened.commit(retry, output)
+    files = committed.stats_files if stats else committed.files
+    rows = [row for item in files for row in pq.read_table(store.root / item.path).to_pylist()]
+    assert rows == [row for table in tables for row in table.to_pylist()]
+    assert reopened.pending(0) == ()
+
+
+@pytest.mark.parametrize("stats", [False, True])
+@pytest.mark.parametrize("failure", ["write_table", "close", "fsync", "link"])
+def test_output_io_failure_removes_temporary_file_and_can_retry(tmp_path, monkeypatch, stats, failure):
+    store, (unit,) = _store(tmp_path, rows=1, size=1, stages=1)
+    attempt = store.begin(unit.unit_id, 0)
+    target = pq.ParquetWriter if failure in ("write_table", "close") else os
+    original = getattr(target, failure)
+
+    def fail(*args, **kwargs):
+        if failure in ("write_table", "close"):
+            original(*args, **kwargs)
+        raise OSError("injected output IO failure")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(target, failure, fail)
+        with pytest.raises(OSError, match="injected output IO failure"):
+            store.write_output(attempt, [pa.table({"value": [1]})], stats=stats)
+    assert list((store.root / "attempts" / attempt.attempt_id).iterdir()) == []
+    assert store.get_commit(unit.unit_id, 0) is None
+    retry = store.begin(unit.unit_id, 0)
+    committed = store.commit(retry, store.write_output(retry, [pa.table({"value": [1]})], stats=stats))
+    assert store.get_commit(unit.unit_id, 0) == committed
+
+
+def _exit_during_output(directory, stats, crash_point):
+    store = LocalUnitStore(str(directory), "job-1")
+    attempt = store.begin("000000000000", 0)
+
+    def batches():
+        yield pa.table({"value": [0, 1]})
+        if crash_point == "row_group":
+            os._exit(86)
+        yield pa.table({"value": [2, 3]})
+
+    output = store.write_output(attempt, batches(), stats=stats)
+    if crash_point == "after_commit":
+        store.commit(attempt, output)
+    os._exit(86)
+
+
+@pytest.mark.parametrize("stats", [False, True])
+@pytest.mark.parametrize("crash_point", ["row_group", "before_commit", "after_commit"])
+def test_process_exit_at_output_boundaries_recovers_complete_unit(tmp_path, stats, crash_point):
+    store, (unit,) = _store(tmp_path, rows=4, size=4, stages=1)
+    child = multiprocessing.get_context("spawn").Process(
+        target=_exit_during_output, args=(tmp_path, stats, crash_point)
+    )
+    child.start()
+    try:
+        child.join(timeout=60)
+        assert child.exitcode == 86
+    finally:
+        if child.is_alive():
+            child.kill()
+            child.join()
+        child.close()
+    reopened, _ = _store(tmp_path, rows=4, size=4, stages=1)
+    committed = reopened.get_commit(unit.unit_id, 0)
+    if crash_point == "after_commit":
+        assert committed is not None
+        assert reopened.pending(0) == ()
+        with pytest.raises(ProtocolError, match="already committed"):
+            reopened.begin(unit.unit_id, 0)
+    else:
+        assert committed is None
+        assert reopened.pending(0) == (unit,)
+        if crash_point == "row_group":
+            assert list(store.root.rglob("*.tmp"))
+            assert not list(store.root.rglob("*.parquet"))
+        retry = reopened.begin(unit.unit_id, 0)
+        assert retry.generation == 2
+        output = reopened.write_output(retry, [pa.table({"value": list(range(4))})], stats=stats)
+        committed = reopened.commit(retry, output)
+    files = committed.stats_files if stats else committed.files
+    assert len(files) == 1
+    assert pq.read_table(store.root / files[0].path)["value"].to_pylist() == list(range(4))
+    assert reopened.pending(0) == ()
 
 
 @pytest.mark.parametrize("stats", [False, True])
@@ -382,7 +607,7 @@ def test_duplicate_paths_across_business_and_stats_are_rejected(tmp_path, on_rec
     attempt = store.begin(unit.unit_id, 0)
     output = store.write_output(attempt, [pa.table({"value": [1]})])
     # A different spelling of the same path must not bypass cross-list checks.
-    duplicate = replace(output.files[0], path=output.files[0].path.replace("/part-", "/./part-"))
+    duplicate = replace(output.files[0], path=output.files[0].path.replace("/part", "/./part"))
     if on_recovery:
         store.commit(attempt, output)
         with sqlite3.connect(store.db_path) as db:

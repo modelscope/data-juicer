@@ -128,6 +128,8 @@ def test_streaming_dispatch_uses_units_for_mapper_filter_and_resumes(tmp_path, l
     assert executor._should_use_streaming_recovery(_source(executor), ops)
     result = executor._process_with_simple_partitioning(_source(executor), ops)
     assert sorted(row["id"] for row in result.data.take_all()) == [2]
+    source_directory = tmp_path / "checkpoints" / "unit_recovery" / "source"
+    assert [path.name for path in source_directory.iterdir()] == ["manifest.json"]
 
     database = tmp_path / "checkpoints" / "unit_recovery" / "state" / "units.sqlite3"
     with sqlite3.connect(database) as db:
@@ -165,15 +167,30 @@ def test_streaming_resume_rejects_changed_input(tmp_path, local_ray):
         restarted._process_with_simple_partitioning(_source(restarted, changed=True), ops)
 
 
-def test_streaming_resume_rejects_missing_snapshot_file(tmp_path, local_ray):
+def test_streaming_resume_rejects_missing_input_manifest(tmp_path, local_ray):
     executor = _executor(tmp_path)
     ops = [WhitespaceNormalizationMapper(num_proc=1)]
     executor._process_with_simple_partitioning(_source(executor), ops)
-    snapshot_file = tmp_path / "checkpoints" / "unit_recovery" / "source" / "unit-000000000000.parquet"
-    snapshot_file.unlink()
+    manifest = tmp_path / "checkpoints" / "unit_recovery" / "source" / "manifest.json"
+    manifest.unlink()
     restarted = _executor(tmp_path, resume=True)
-    with pytest.raises(ProtocolError, match="snapshot file is missing or modified"):
+    with pytest.raises(ProtocolError, match="Unit snapshot is missing on resume"):
         restarted._process_with_simple_partitioning(_source(restarted), ops)
+
+
+@pytest.mark.parametrize("explicit_resume", [False, True])
+def test_resume_after_crash_during_snapshot(tmp_path, local_ray, explicit_resume):
+    recovery = tmp_path / "checkpoints" / "unit_recovery"
+    stale = recovery / ".source.crashed.tmp"
+    stale.mkdir(parents=True)
+    (stale / "unit-000000000000.parquet").write_bytes(b"partial")
+    restarted = _executor(tmp_path, resume=True)
+    restarted.cfg._resume_requested = explicit_resume
+    ops = [WhitespaceNormalizationMapper(num_proc=1), TextLengthFilter(min_len=1, max_len=2, num_proc=1)]
+    result = restarted._process_with_simple_partitioning(_source(restarted), ops)
+    assert sorted(row["id"] for row in result.data.take_all()) == [2]
+    assert not stale.exists()
+    assert (recovery / "source" / "manifest.json").is_file()
 
 
 def test_streaming_export_keeps_expansion_and_input_unit_order(tmp_path, local_ray):
@@ -395,7 +412,7 @@ class LoggedStatsTextLengthFilter(TextLengthFilter):
                     ).fetchone()[0]
                     is not None
                 )
-            stats_paths = sorted((self.state_dir / "attempts" / attempt_id).glob("stats-*.parquet"))
+            stats_paths = sorted((self.state_dir / "attempts" / attempt_id).glob("stats.parquet"))
             persisted = [row for path in stats_paths for row in pq.read_table(path).to_pylist()]
             assert sorted(row["id"] for row in persisted) == [2, 3]
             assert all(row[Fields.stats]["text_len"] == len(row["text"]) for row in persisted)
@@ -524,7 +541,7 @@ def test_streaming_predicate_failure_replays_only_pending_stats_unit(tmp_path, l
         assert db.execute(
             "SELECT files_json, stats_files_json, rows FROM attempts WHERE attempt_id=?", (failed_attempt,)
         ).fetchone() == (None, None, None)
-    orphan_stats = sorted((state_dir / "attempts" / failed_attempt).glob("stats-*.parquet"))
+    orphan_stats = sorted((state_dir / "attempts" / failed_attempt).glob("stats.parquet"))
     assert sorted(row["id"] for path in orphan_stats for row in pq.read_table(path).to_pylist()) == [2, 3]
     assert not stats_path.exists()
 

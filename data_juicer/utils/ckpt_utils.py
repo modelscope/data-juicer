@@ -60,22 +60,6 @@ def merge_row_id_ranges(ranges: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     return merged
 
 
-def row_id_in_ranges(row_id: int, ranges: List[Tuple[int, int]]) -> bool:
-    """Membership test for a row id against sorted, disjoint [lo, hi) ranges.
-
-    Rebuilds the ``lo`` index on every call: O(K) per row. For hot filter paths
-    that test many rows against the SAME ranges, use :func:`make_row_id_membership`
-    which hoists that index out of the per-row call.
-    """
-    import bisect
-
-    if not ranges:
-        return False
-    los = [lo for lo, _ in ranges]
-    idx = bisect.bisect_right(los, row_id) - 1
-    return idx >= 0 and ranges[idx][0] <= row_id < ranges[idx][1]
-
-
 def make_row_id_membership(ranges: List[Tuple[int, int]]):
     """Build a fast membership predicate over fixed, sorted, disjoint [lo, hi) ranges.
 

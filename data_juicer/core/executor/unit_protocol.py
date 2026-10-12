@@ -14,13 +14,16 @@ import sqlite3
 import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
+from itertools import chain, groupby
 from pathlib import Path
 from typing import Iterable, Optional, Tuple
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
+_BATCH_ROWS_METADATA_KEY = "data_juicer.batch_rows"
+_ROW_GROUP_BYTES = 128 << 20
 
 
 class ProtocolError(RuntimeError):
@@ -84,9 +87,9 @@ def _sha256_file(path: Path) -> str:
 class LocalUnitStore:
     """Single-host durable planner and conditional commit store.
 
-    The caller must provide a fingerprint of the *content and order* of the
-    immutable input snapshot and a fingerprint of the complete operator config.
-    Those values are compared on every open; they are not inferred from paths.
+    The caller must provide fingerprints of the input's *content and order* and
+    the complete operator config. Those values are compared on every open; they
+    are not inferred from paths.
     """
 
     def __init__(self, directory: str, run_id: str):
@@ -107,10 +110,10 @@ class LocalUnitStore:
                 "stats_files_json",
                 "rows",
             }:
-                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 4")
+                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 5")
             if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='runs'").fetchone():
                 if db.execute("SELECT 1 FROM runs WHERE schema_version != ?", (SCHEMA_VERSION,)).fetchone():
-                    raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 4")
+                    raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 5")
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS runs (
                     run_id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL,
@@ -177,7 +180,7 @@ class LocalUnitStore:
                     unit_id = f"{ordinal:012d}"
                     db.execute("INSERT INTO units VALUES (?, ?, ?, ?, ?)", (self.run_id, unit_id, ordinal, start, stop))
             elif prior["schema_version"] != SCHEMA_VERSION:
-                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 4")
+                raise ProtocolError("Checkpoint database uses an incompatible protocol version; expected version 5")
             elif (
                 tuple(
                     prior[key]
@@ -244,30 +247,70 @@ class LocalUnitStore:
             return Attempt(attempt_id, unit_id, stage, generation, input_commit_id)
 
     def write_output(self, attempt: Attempt, batches: Iterable[pa.Table], *, stats: bool = False) -> PreparedOutput:
-        """Write nonempty business or stats blocks as immutable attempt-owned files."""
+        """Coalesce consecutive same-schema batches into immutable attempt-owned files."""
         directory = self.root / "attempts" / attempt.attempt_id
         directory.mkdir(parents=True, exist_ok=True)
+
+        def nonempty_batches():
+            for batch in batches:
+                if not isinstance(batch, pa.Table):
+                    raise TypeError("Attempt output must contain PyArrow tables")
+                if batch.num_rows:
+                    yield batch
+
         files = []
-        for index, batch in enumerate(batches):
-            if not isinstance(batch, pa.Table):
-                raise TypeError("Attempt output must contain PyArrow tables")
-            if batch.num_rows == 0:
-                continue
-            name = f"{'stats' if stats else 'part'}-{index:08d}.parquet"
+        groups = groupby(nonempty_batches(), key=lambda batch: batch.schema.serialize().to_pybytes())
+        for index, (_, group) in enumerate(groups):
+            first = next(group)
+            prefix = "stats" if stats else "part"
+            suffix = f"-{index:08d}" if index else ""
+            name = f"{prefix}{suffix}.parquet"
             final = directory / name
             tmp = directory / f".{name}.{uuid.uuid4().hex}.tmp"
+            batch_rows = []
             try:
-                pq.write_table(batch, tmp)
+                with pq.ParquetWriter(tmp, first.schema) as writer:
+                    # Small producer batches as separate row groups bloat the footer and defeat compression.
+                    pending, pending_bytes = [], 0
+                    for batch in chain((first,), group):
+                        pending.append(batch)
+                        pending_bytes += batch.nbytes
+                        batch_rows.append(batch.num_rows)
+                        if pending_bytes >= _ROW_GROUP_BYTES:
+                            writer.write_table(pa.concat_tables(pending))
+                            pending, pending_bytes = [], 0
+                    if pending:
+                        writer.write_table(pa.concat_tables(pending))
+                    writer.add_key_value_metadata({_BATCH_ROWS_METADATA_KEY: json.dumps(batch_rows)})
                 with tmp.open("rb") as f:
                     os.fsync(f.fileno())
-                os.link(tmp, final)  # Fails if this attempt already wrote the part.
+                os.link(tmp, final)  # Fails if this attempt already wrote the file.
+                files.append(OutputFile(str(final.relative_to(self.root)), sum(batch_rows), _sha256_file(final)))
             finally:
                 tmp.unlink(missing_ok=True)
-            digest = _sha256_file(final)
-            files.append(OutputFile(str(final.relative_to(self.root)), batch.num_rows, digest))
         _fsync_dir(directory)
         _fsync_dir(directory.parent)
         return PreparedOutput((), tuple(files)) if stats else PreparedOutput(tuple(files))
+
+    def read_output(self, files: Iterable[OutputFile]) -> Iterable[pa.Table]:
+        for item in files:
+            with pq.ParquetFile(self.root / item.path) as parquet:
+                metadata = parquet.schema_arrow.metadata
+                batch_sizes = iter(json.loads(parquet.metadata.metadata[_BATCH_ROWS_METADATA_KEY.encode()]))
+                batch_size = next(batch_sizes, None)
+                pending, buffered_rows = [], 0
+                for index in range(parquet.num_row_groups):
+                    group = parquet.read_row_group(index)
+                    pending.append(group)
+                    buffered_rows += group.num_rows
+                    # Row groups and producer batches overlap arbitrarily; slicing is zero-copy.
+                    while batch_size is not None and buffered_rows >= batch_size:
+                        table = pa.concat_tables(pending)
+                        yield table.slice(0, batch_size).replace_schema_metadata(metadata)
+                        rest = table.slice(batch_size)
+                        pending = [rest] if rest.num_rows else []
+                        buffered_rows = rest.num_rows
+                        batch_size = next(batch_sizes, None)
 
     def commit(self, attempt: Attempt, output: PreparedOutput) -> Commit:
         """Atomically accept business and stats output, or reject a stale attempt."""

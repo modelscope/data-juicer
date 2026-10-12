@@ -90,7 +90,12 @@ class RayBatchPlan:
         else:
             function = ray_unit_runner.run_unit_task
             options.update(fn_args=(recovery.worker_context, self), max_retries=2, retry_exceptions=False)
-        return dataset.map_batches(function, batch_size=1, batch_format="pyarrow", **options)
+        return dataset.map_batches(
+            function,
+            batch_size=recovery.worker_context.unit_size if recovery.stage == 0 else 1,
+            batch_format="pyarrow",
+            **options,
+        )
 
 
 class BatchPlanWorker:

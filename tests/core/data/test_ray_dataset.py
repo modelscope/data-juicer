@@ -653,11 +653,15 @@ class RayBatchExecutionTest(unittest.TestCase):
                     dataset = RayDataset(MagicMock(), auto_op_parallelism=False)
                     dataset.data.map_batches.return_value = dataset.data
                     recovery = SimpleNamespace(
-                        complete=False, worker_context=None, recovery=SimpleNamespace(units=(0, 1))
+                        complete=False,
+                        stage=0,
+                        worker_context=SimpleNamespace(unit_size=4),
+                        recovery=SimpleNamespace(units=(0, 1)),
                     )
                     op = op_class(num_proc=concurrency, ray_execution_mode=mode)
                     dataset._run_single_op(op, defer_schema_probe=True, recovery=recovery)
                     options = dataset.data.map_batches.call_args.kwargs
+                    self.assertEqual(options["batch_size"], 4)
                     compute = options["compute"]
                     if mode == "task":
                         self.assertIsInstance(compute, TaskPoolStrategy)

@@ -1,68 +1,82 @@
-"""Ordered, addressable source snapshot for local recovery units."""
+"""Durable input identity for recovery units."""
 
 import hashlib
 import json
 import os
+import shutil
 import uuid
-from dataclasses import dataclass
 from pathlib import Path
 
 import pyarrow as pa
-import pyarrow.parquet as pq
+import ray
 
-from data_juicer.core.executor.unit_protocol import ProtocolError, _fsync_dir, _sha256_file
+from data_juicer.core.executor.ray_executor_partitioned import (
+    _PARTITION_CONTENT_HASH_ALGORITHM,
+    _combine_partition_hash_partials,
+    _hash_partition_batch,
+)
+from data_juicer.core.executor.unit_protocol import ProtocolError, _fsync_dir
 
-
-def _row_fingerprint_update(digest, table):
-    for row in table.to_pylist():
-        encoded = json.dumps(row, sort_keys=True, default=str, ensure_ascii=False, separators=(",", ":")).encode(
-            "utf-8"
-        )
-        digest.update(len(encoded).to_bytes(8, "big"))
-        digest.update(encoded)
-
-
-def fingerprint_dataset(dataset):
-    """Hash content and read order independently of Ray block boundaries."""
-    digest = hashlib.sha256()
-    rows = 0
-    schema = None
-    for table in dataset.iter_batches(batch_format="pyarrow", batch_size=512):
-        if schema is None:
-            schema = table.schema
-            digest.update(schema.serialize().to_pybytes())
-        elif not schema.equals(table.schema, check_metadata=True):
-            raise ProtocolError("Input schema changed between batches")
-        _row_fingerprint_update(digest, table)
-        rows += table.num_rows
-    if schema is None:
-        schema = dataset.schema()
-        if not isinstance(schema, pa.Schema):
-            raise ProtocolError("Empty input needs a concrete Arrow schema")
-        digest.update(schema.serialize().to_pybytes())
-    return digest.hexdigest(), rows
+SNAPSHOT_VERSION = 3
+_OFFSET_COLUMN = "__dj_unit_offset__"
 
 
-@dataclass(frozen=True)
-class ParquetUnitSource:
-    directory: str
-    unit_size: int
+def _scan_batch(batch):
+    offsets = batch[_OFFSET_COLUMN]
+    table = batch.drop_columns([_OFFSET_COLUMN])
+    rows = table.num_rows
+    first = offsets[0].as_py() if rows else 0
+    if rows and offsets[rows - 1].as_py() - first != rows - 1:
+        raise ProtocolError("Input block row offsets are not contiguous")
+    partial = _hash_partition_batch(table).to_pylist()[0]
+    schema_hash = hashlib.sha256(table.schema.serialize().to_pybytes()).digest()
+    return pa.table(
+        {
+            "start": [first],
+            "row_count": [rows],
+            "sequence_hash": [partial["sequence_hash"]],
+            "schema_hash": [schema_hash],
+        }
+    )
 
-    def __call__(self, start, stop):
-        if start % self.unit_size or not 0 < stop - start <= self.unit_size:
-            raise ProtocolError("Input unit does not match its source snapshot")
-        ordinal = start // self.unit_size
-        path = Path(self.directory) / f"unit-{ordinal:012d}.parquet"
-        if not path.is_file():
-            raise ProtocolError("Input unit snapshot file is missing")
-        table = pq.read_table(path)
-        if table.num_rows != stop - start:
-            raise ProtocolError("Input unit snapshot row count changed")
-        yield table
+
+def _fingerprint(schema_bytes, partials):
+    content_hash, _ = _combine_partition_hash_partials(partials)
+    payload = schema_bytes + f"{_PARTITION_CONTENT_HASH_ALGORITHM}:{content_hash}".encode("ascii")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _scan(dataset):
+    """Materialize and fingerprint the ordered input on Ray workers."""
+    data = dataset.materialize()
+    total_rows = data.count()
+    schema = data.schema()
+    schema = getattr(schema, "base_schema", schema)
+    if not isinstance(schema, pa.Schema):
+        raise ProtocolError("Input needs a concrete Arrow schema")
+    if _OFFSET_COLUMN in schema.names:
+        raise ProtocolError(f"Input contains reserved recovery column {_OFFSET_COLUMN}")
+    schema_bytes = schema.serialize().to_pybytes()
+    if total_rows == 0:
+        return _fingerprint(schema_bytes, []), 0, schema_bytes, data
+    offsets = ray.data.range(total_rows).rename_columns({"id": _OFFSET_COLUMN})
+    partials = data.zip(offsets).map_batches(_scan_batch, batch_format="pyarrow", batch_size=None).take_all()
+    partials = sorted((item for item in partials if item["row_count"]), key=lambda item: item["start"])
+    expected_start = 0
+    for partial in partials:
+        if partial["start"] != expected_start:
+            raise ProtocolError("Input blocks do not cover the input rows exactly once")
+        expected_start += partial["row_count"]
+    if expected_start != total_rows:
+        raise ProtocolError("Input blocks do not cover the input rows exactly once")
+    schema_hash = hashlib.sha256(schema_bytes).digest()
+    if {partial["schema_hash"] for partial in partials} != {schema_hash}:
+        raise ProtocolError("Input schema changed between batches")
+    return _fingerprint(schema_bytes, partials), total_rows, schema_bytes, data
 
 
 def open_or_create_snapshot(dataset, directory: str, unit_size: int, *, resuming: bool):
-    """Return a durable snapshot manifest, validating current input on resume."""
+    """Persist the input identity and return the verified materialized Dataset."""
     if unit_size < 1:
         raise ValueError("unit_size must be positive")
     root = Path(directory).resolve()
@@ -72,79 +86,32 @@ def open_or_create_snapshot(dataset, directory: str, unit_size: int, *, resuming
             raise ProtocolError("Unit snapshot is missing on resume")
         with manifest_path.open() as stream:
             manifest = json.load(stream)
-        if manifest.get("version") != 1 or manifest.get("unit_size") != unit_size:
+        if manifest.get("version") != SNAPSHOT_VERSION or manifest.get("unit_size") != unit_size:
             raise ProtocolError("Unit snapshot plan changed")
-        if len(manifest.get("files", [])) != (manifest["rows"] + unit_size - 1) // unit_size:
-            raise ProtocolError("Unit snapshot file count changed")
-        for index, item in enumerate(manifest["files"]):
-            path = root / f"unit-{index:012d}.parquet"
-            if (
-                item["name"] != path.name
-                or not path.is_file()
-                or _sha256_file(path) != item["sha256"]
-                or pq.read_metadata(path).num_rows != item["rows"]
-            ):
-                raise ProtocolError("Unit snapshot file is missing or modified")
-        current_hash, current_rows = fingerprint_dataset(dataset)
-        if (current_hash, current_rows) != (manifest["fingerprint"], manifest["rows"]):
+        fingerprint, rows, schema, data = _scan(dataset)
+        if (fingerprint, rows, schema.hex()) != (
+            manifest.get("fingerprint"),
+            manifest.get("rows"),
+            manifest.get("schema_hex"),
+        ):
             raise ProtocolError("Input content or read order changed since the unit snapshot")
-        return manifest, ParquetUnitSource(str(root), unit_size)
+        return manifest, data
 
     if root.exists():
         raise ProtocolError("Unit snapshot already exists; resume or use a new job ID")
     root.parent.mkdir(parents=True, exist_ok=True)
+    for stale in root.parent.glob(f".{root.name}.*.tmp"):
+        shutil.rmtree(stale, ignore_errors=True)
     tmp = root.parent / f".{root.name}.{uuid.uuid4().hex}.tmp"
     tmp.mkdir()
-    digest = hashlib.sha256()
-    schema = None
-    chunks = []
-    chunk_rows = 0
-    total_rows = 0
-    files = []
-
-    def flush():
-        nonlocal chunks, chunk_rows
-        if not chunks:
-            return
-        table = pa.concat_tables(chunks)
-        path = tmp / f"unit-{len(files):012d}.parquet"
-        pq.write_table(table, path)
-        with path.open("rb") as stream:
-            os.fsync(stream.fileno())
-        files.append({"name": path.name, "rows": table.num_rows, "sha256": _sha256_file(path)})
-        chunks = []
-        chunk_rows = 0
-
     try:
-        for table in dataset.iter_batches(batch_format="pyarrow", batch_size=unit_size):
-            if schema is None:
-                schema = table.schema
-                digest.update(schema.serialize().to_pybytes())
-            elif not schema.equals(table.schema, check_metadata=True):
-                raise ProtocolError("Input schema changed between batches")
-            _row_fingerprint_update(digest, table)
-            total_rows += table.num_rows
-            offset = 0
-            while offset < table.num_rows:
-                length = min(unit_size - chunk_rows, table.num_rows - offset)
-                chunks.append(table.slice(offset, length))
-                chunk_rows += length
-                offset += length
-                if chunk_rows == unit_size:
-                    flush()
-        flush()
-        if schema is None:
-            schema = dataset.schema()
-            if not isinstance(schema, pa.Schema):
-                raise ProtocolError("Empty input needs a concrete Arrow schema")
-            digest.update(schema.serialize().to_pybytes())
+        fingerprint, rows, schema, data = _scan(dataset)
         manifest = {
-            "version": 1,
-            "fingerprint": digest.hexdigest(),
-            "rows": total_rows,
+            "version": SNAPSHOT_VERSION,
+            "fingerprint": fingerprint,
+            "rows": rows,
             "unit_size": unit_size,
-            "schema_hex": None if schema is None else schema.serialize().to_pybytes().hex(),
-            "files": files,
+            "schema_hex": schema.hex(),
         }
         with (tmp / "manifest.json").open("w") as stream:
             json.dump(manifest, stream, sort_keys=True)
@@ -153,9 +120,7 @@ def open_or_create_snapshot(dataset, directory: str, unit_size: int, *, resuming
         _fsync_dir(tmp)
         os.replace(tmp, root)
         _fsync_dir(root.parent)
-        return manifest, ParquetUnitSource(str(root), unit_size)
+        return manifest, data
     except BaseException:
-        import shutil
-
         shutil.rmtree(tmp, ignore_errors=True)
         raise

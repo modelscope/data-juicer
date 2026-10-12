@@ -1434,6 +1434,13 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             and os.path.exists(os.path.join(self.ckpt_manager.ckpt_dir, "stream_run.json"))
         ):
             raise ProtocolError("Cannot resume a tee-sink job with the recovery-unit protocol; use a new job ID")
+        if (
+            resuming
+            and not os.path.exists(snapshot_dir)
+            and not os.path.exists(os.path.join(state_dir, "units.sqlite3"))
+        ):
+            logger.info("The interrupted run stopped before its unit snapshot was complete; rebuilding it")
+            resuming = False
         manifest, source = open_or_create_snapshot(dataset.data, snapshot_dir, unit_size, resuming=resuming)
 
         config_payload = [
@@ -1461,7 +1468,10 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             f"of up to {unit_size}, {len(ops)} operator stages, resuming={resuming}"
         )
         recovery = UnitRecovery(store, units, source, len(ops))
-        return self._wrap_with_precomputed_parallelism(dataset.data).process(ops, unit_recovery=recovery)
+        runner = self._wrap_with_precomputed_parallelism(source)
+        dataset.data = None
+        del source
+        return runner.process(ops, unit_recovery=recovery)
 
     def _stamp_row_ids(self, dataset: RayDataset) -> RayDataset:
         """Inject a dense, unique, read-order-stable global row id.

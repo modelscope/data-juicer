@@ -273,7 +273,7 @@ class RayDataset(DJDataset):
 
         try:
             if unit_recovery is not None:
-                self.data = ray.data.from_items(unit_recovery.open())
+                self.data = unit_recovery.open()
                 self.data.context.target_max_block_size = 1
                 self.data.context.target_min_block_size = 1
                 self.data.context.actor_task_retry_on_errors = False

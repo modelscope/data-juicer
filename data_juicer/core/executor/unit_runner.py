@@ -8,7 +8,6 @@ LocalUnitStore and conditionally accepts their immutable output files.
 from typing import Callable, Iterable, Sequence, Tuple
 
 import pyarrow as pa
-import pyarrow.parquet as pq
 
 from data_juicer.core.executor.unit_protocol import Attempt, Commit, LocalUnitStore, PreparedOutput, ProtocolError, Unit
 
@@ -35,7 +34,7 @@ def execute_unit_attempt(
     else:
         if attempt.input_commit_id != upstream.attempt.attempt_id:
             raise ProtocolError("Attempt does not reference the upstream commit")
-        input_tables = (pq.read_table(store.root / item.path) for item in upstream.files)
+        input_tables = store.read_output(upstream.files)
         expected_input_rows = upstream.rows
 
     def checked_tables():
@@ -102,5 +101,5 @@ def collect_final_units(store: LocalUnitStore, units: Sequence[Unit], stage: int
         commit = store.get_commit(unit.unit_id, stage)
         if commit is None:
             raise ProtocolError("Final unit stage has not committed")
-        final.extend(pq.read_table(store.root / item.path) for item in commit.files)
+        final.extend(store.read_output(commit.files))
     return tuple(final)

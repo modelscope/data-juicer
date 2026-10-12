@@ -3,12 +3,17 @@
 from dataclasses import dataclass
 
 import pyarrow as pa
-import pyarrow.parquet as pq
 import ray
 
 from data_juicer.core.data.ray_batch_plan import BatchPlanWorker
-from data_juicer.core.executor.unit_protocol import LocalUnitStore, PreparedOutput, ProtocolError
+from data_juicer.core.executor.unit_protocol import (
+    LocalUnitStore,
+    PreparedOutput,
+    ProtocolError,
+)
 from data_juicer.core.executor.unit_runner import execute_unit_attempt
+
+_SOURCE_OFFSET = "__dj_unit_source_offset__"
 
 
 def _ticket(unit, stage=-1, commit_id=""):
@@ -20,6 +25,34 @@ def _ticket(unit, stage=-1, commit_id=""):
         "stage": stage,
         "commit_id": commit_id,
     }
+
+
+def _initial_ticket(batch, unit_size, total_rows):
+    if batch.column_names.count(_SOURCE_OFFSET) != 1:
+        raise ProtocolError(f"Input contains reserved recovery column {_SOURCE_OFFSET}")
+    offsets = batch[_SOURCE_OFFSET]
+    table = batch.drop_columns([_SOURCE_OFFSET])
+    rows = table.num_rows
+    if not rows:
+        raise ProtocolError("Recovery unit source cannot be empty")
+    start = offsets[0].as_py()
+    stop = offsets[rows - 1].as_py() + 1
+    if (
+        start % unit_size
+        or stop - start != rows
+        or any(offsets[index].as_py() != start + index for index in range(rows))
+        or (rows != unit_size and stop != total_rows)
+    ):
+        raise ProtocolError("Ray repartition did not preserve an exact recovery unit")
+    ordinal = start // unit_size
+    return {
+        "unit_id": f"{ordinal:012d}",
+        "ordinal": ordinal,
+        "start": start,
+        "stop": stop,
+        "stage": -1,
+        "commit_id": "",
+    }, table
 
 
 @ray.remote(num_cpus=0)
@@ -51,32 +84,48 @@ class _UnitCoordinator:
 class UnitWorkerContext:
     directory: str
     run_id: str
-    source: object
     stage: int
+    unit_size: int
+    total_rows: int
     coordinator: object
 
 
 class _UnitTicketActor:
     def __init__(self, context, plan):
         self.store = LocalUnitStore(context.directory, context.run_id)
-        self.source = context.source
         self.stage = context.stage
+        self.unit_size = context.unit_size
+        self.total_rows = context.total_rows
         self.coordinator = context.coordinator
         self.operator = BatchPlanWorker(plan)
 
     def __call__(self, batch):
-        for item in batch.to_pylist():
+        if self.stage == 0:
+            work = (_initial_ticket(batch, self.unit_size, self.total_rows),)
+        else:
+            if _SOURCE_OFFSET in batch.column_names:
+                raise ProtocolError("Unit source survived beyond the first recovery stage")
+            work = ((item, None) for item in batch.to_pylist())
+        for item, source_table in work:
             unit, attempt, upstream, committed = ray.get(self.coordinator.claim.remote(item, self.stage))
             if committed is None:
+                source_reader = None
+                if self.stage == 0:
+
+                    def source_reader(start, stop):
+                        if (start, stop) != (unit.start, unit.stop):
+                            raise ProtocolError("Unit source does not match the requested unit")
+                        yield source_table
+
                 stats_files = ()
 
                 def write_stats(tables):
                     nonlocal stats_files
                     stats_files = self.store.write_output(attempt, tables, stats=True).stats_files
-                    return (pq.read_table(self.store.root / entry.path) for entry in stats_files)
+                    return self.store.read_output(stats_files)
 
                 output = execute_unit_attempt(
-                    self.store, attempt, unit, self.source, self.operator, upstream, write_stats=write_stats
+                    self.store, attempt, unit, source_reader, self.operator, upstream, write_stats=write_stats
                 )
                 output = PreparedOutput(output.files, stats_files)
                 committed = ray.get(self.coordinator.finish.remote(attempt, output))
@@ -99,8 +148,10 @@ class UnitRecoveryStage:
     @property
     def worker_context(self):
         recovery = self.recovery
+        unit_size = recovery.units[0].stop - recovery.units[0].start if recovery.units else 1
+        total_rows = recovery.units[-1].stop if recovery.units else 0
         return UnitWorkerContext(
-            str(recovery.store.root), recovery.store.run_id, recovery.source, self.stage, recovery.coordinator
+            str(recovery.store.root), recovery.store.run_id, self.stage, unit_size, total_rows, recovery.coordinator
         )
 
     def register_stats(self, export):
@@ -127,7 +178,20 @@ class UnitRecovery:
             self.first_stage = stage + 1
         if self.units and self.first_stage < self.stage_count:
             self.coordinator = _UnitCoordinator.remote(str(self.store.root), self.store.run_id, self.units)
-        return items
+        if not self.units or self.first_stage:
+            self.source = None
+            return ray.data.from_items(items)
+        if _SOURCE_OFFSET in self.source.schema().names:
+            raise ProtocolError(f"Input contains reserved recovery column {_SOURCE_OFFSET}")
+        total_rows = self.units[-1].stop
+        offsets = ray.data.range(total_rows).rename_columns({"id": _SOURCE_OFFSET})
+        source = (
+            self.source.zip(offsets)
+            .repartition(target_num_rows_per_block=self.units[0].stop - self.units[0].start, strict=True)
+            .materialize()
+        )
+        self.source = None
+        return source
 
     def stage(self, index):
         return UnitRecoveryStage(self, index)
