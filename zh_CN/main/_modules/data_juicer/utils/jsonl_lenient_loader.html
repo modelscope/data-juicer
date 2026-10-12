@@ -565,7 +565,19 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Build a :class:`datasets.Dataset` by streaming all given JSONL files."""</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_gen</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">add_suffix</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_file_stat</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">st_mtime_ns</span><span class="p">,</span> <span class="n">st</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
+
+    <span class="c1"># ``stats`` is unused by the generator; it is part of ``gen_kwargs`` so the</span>
+    <span class="c1"># HF cache fingerprint changes when a file is modified. It must stay</span>
+    <span class="c1"># index-aligned with ``pairs`` (HF shards list-valued kwargs together). The</span>
+    <span class="c1"># (mtime_ns, size) key is a heuristic: a same-size rewrite that preserves</span>
+    <span class="c1"># the mtime is not detected.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">add_suffix</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
         <span class="k">yield from</span> <span class="n">iter_lenient_jsonl_records</span><span class="p">(</span>
             <span class="n">pairs</span><span class="p">,</span>
             <span class="n">add_suffix_column</span><span class="o">=</span><span class="n">add_suffix</span><span class="p">,</span>
@@ -576,6 +588,7 @@
         <span class="n">gen_kwargs</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">"pairs"</span><span class="p">:</span> <span class="n">file_ext_pairs</span><span class="p">,</span>
             <span class="s2">"add_suffix"</span><span class="p">:</span> <span class="n">add_suffix_column</span><span class="p">,</span>
+            <span class="s2">"stats"</span><span class="p">:</span> <span class="p">[</span><span class="n">_file_stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">file_ext_pairs</span><span class="p">],</span>
         <span class="p">},</span>
     <span class="p">)</span></div>
 
