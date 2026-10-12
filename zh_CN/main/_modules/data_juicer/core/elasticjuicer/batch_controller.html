@@ -579,6 +579,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_next_reprobe_successes</span> <span class="o">=</span> <span class="n">oom_reprobe_successes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reprobe_origin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">capacity_recovery_hints</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_floor_recovery_pending</span> <span class="o">=</span> <span class="kc">False</span>
@@ -682,6 +683,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_next_reprobe_successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_reprobe_successes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reprobe_origin</span> <span class="o">=</span> <span class="n">previous_upper_bound</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_floor_recovery_pending</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_batch_size</span></div>
@@ -724,13 +726,51 @@
         <span class="k">return</span> <span class="kc">True</span></div>
 
 
+<div class="viewcode-block" id="AdaptiveBatchController.record_context_recovery_hint">
+<a class="viewcode-back" href="../../../../api/data_juicer.core.elasticjuicer.batch_controller.html#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.record_context_recovery_hint">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_context_recovery_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expires_at_ms</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Rearm probing using unconsumed, actor-local success in this context.</span>
+
+<span class="sd">        The caller must own actual, unexpired success evidence for the exact</span>
+<span class="sd">        input/resource context at a size above the current OOM bound. Remote</span>
+<span class="sd">        profiles and quota changes are not such evidence. Three fresh full</span>
+<span class="sd">        successes are still required; recording a hint never relaxes bounds.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">expires_at_ms</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clock_ms</span><span class="p">()</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_oom_reprobes</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">hard_limit</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprobe_origin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity_recovery_hints</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="o">=</span> <span class="n">expires_at_ms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">successes_since_oom</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_expire_capacity_recovery_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">now_ms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">resolved_now</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clock_ms</span><span class="p">()</span> <span class="k">if</span> <span class="n">now_ms</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">now_ms</span>
         <span class="k">if</span> <span class="n">resolved_now</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="AdaptiveBatchController.clear_context_recovery_hint">
+<a class="viewcode-back" href="../../../../api/data_juicer.core.elasticjuicer.batch_controller.html#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.clear_context_recovery_hint">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_context_recovery_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Revoke local evidence when the next input has a different context."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">False</span></div>
+
 
 <div class="viewcode-block" id="AdaptiveBatchController.observe_success">
 <a class="viewcode-back" href="../../../../api/data_juicer.core.elasticjuicer.batch_controller.html#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.observe_success">[文档]</a>
@@ -749,18 +789,26 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">successes_since_oom</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">context_reprobe</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">successes_since_oom</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">successes_before_growth</span>
+            <span class="p">)</span>
             <span class="n">floor_reprobe</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_floor_recovery_pending</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_batch_size</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hard_limit</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_batch_size</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">oom_reprobe_events</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_oom_reprobes</span>
-                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">successes_since_oom</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_reprobe_successes</span>
+                <span class="p">(</span><span class="n">context_reprobe</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_reprobe_events</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_oom_reprobes</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">context_reprobe</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">successes_since_oom</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_reprobe_successes</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_requires_hint</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="ow">or</span> <span class="n">floor_reprobe</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_batch_size</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">hard_limit</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_batch_size</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="n">previous_upper_bound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span>
+                <span class="k">if</span> <span class="n">context_reprobe</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">oom_reprobe_events</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_next_reprobe_successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_reprobe_successes</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">successes_since_oom</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="c1"># Reopening after a floor retry must test a *larger* size</span>
@@ -769,6 +817,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_reprobe_origin</span> <span class="o">=</span> <span class="n">previous_upper_bound</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">floor_reprobe</span> <span class="k">else</span> <span class="n">previous_upper_bound</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_floor_recovery_pending</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprobe_origin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">batch_size</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprobe_origin</span><span class="p">:</span>
@@ -779,6 +828,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_next_reprobe_successes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_reprobe_successes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_probe_ooms_for_bound</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">batch_size</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">oom_upper_bound</span><span class="p">:</span>
@@ -826,6 +876,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">successes_since_oom</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># A new local failure supersedes an unused external hint.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_context_recovery_hint</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_capacity_recovery_hint_expires_at_ms</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_floor_recovery_pending</span> <span class="o">=</span> <span class="kc">False</span>
 

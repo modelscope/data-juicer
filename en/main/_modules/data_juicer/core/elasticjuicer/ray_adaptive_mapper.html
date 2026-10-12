@@ -449,8 +449,9 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">OrderedDict</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
@@ -531,7 +532,12 @@
         <span class="k">if</span> <span class="n">stage_id</span><span class="p">:</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="n">STAGE_IDENTITY_ATTR</span><span class="p">,</span> <span class="n">stage_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stage_id</span> <span class="o">=</span> <span class="n">stage_id</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">or</span> <span class="n">op_class</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">AdaptiveBatchController</span><span class="p">(</span><span class="n">initial_batch_size</span><span class="o">=</span><span class="n">max_batch_size</span><span class="p">,</span> <span class="n">max_batch_size</span><span class="o">=</span><span class="n">max_batch_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">AdaptiveBatchController</span><span class="p">(</span>
+            <span class="n">initial_batch_size</span><span class="o">=</span><span class="n">max_batch_size</span><span class="p">,</span>
+            <span class="n">max_batch_size</span><span class="o">=</span><span class="n">max_batch_size</span><span class="p">,</span>
+            <span class="n">max_oom_reprobes</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">minimum_growth_fraction</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">actor_id</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">profile_diagnostics</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_profile_store</span> <span class="o">=</span> <span class="n">profile_store</span>
@@ -540,12 +546,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_seed_attempted</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_seeded_context</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_observations</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># This bounded history belongs to this incarnation, including when</span>
+        <span class="c1"># StageProfile is disabled. Only fully validated outer calls add proof.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_recovery_context</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span> <span class="o">=</span> <span class="n">OOMSafeAdaptiveMapper</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_slice</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="p">,</span>
             <span class="n">oom_cleanup</span><span class="o">=</span><span class="n">_cleanup_cuda</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stage_id</span><span class="p">,</span>
-            <span class="n">observation_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_observe</span> <span class="k">if</span> <span class="n">profile_store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">observation_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_observe</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -564,6 +576,17 @@
             <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_observe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"successes"</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">MAX_OBSERVED_SIZES</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span> <span class="o">=</span> <span class="p">{</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">}</span>
+                <span class="n">proof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">proof</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">proof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="p">[</span><span class="n">context</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observations</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
             <span class="n">sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
@@ -576,6 +599,42 @@
                     <span class="k">else</span> <span class="n">ordered</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">ordered</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">MAX_OBSERVED_SIZES</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:]</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_observations</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">make_profile_context</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_profile_resource_envelope</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_recovery_context</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">clear_context_recovery_hint</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_recovery_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time_ns</span><span class="p">()</span> <span class="o">//</span> <span class="mi">1_000_000</span>
+        <span class="k">for</span> <span class="n">context</span><span class="p">,</span> <span class="n">proof</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">proof</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">now</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="p">[</span><span class="n">context</span><span class="p">]</span>
+        <span class="n">proof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span><span class="p">)</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">oom_upper_bound</span>
+        <span class="k">if</span> <span class="n">proof</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">proof</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">upper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">proof</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">upper</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">record_context_recovery_hint</span><span class="p">(</span><span class="n">proof</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="c1"># The same old proof cannot repeatedly rearm a failing probe.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">proof</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">proof</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_publish_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span> <span class="ow">or</span> <span class="n">context</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span><span class="p">)</span>
+        <span class="n">proof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">proof</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">size</span> <span class="o">&gt;=</span> <span class="n">proof</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="c1"># Smaller successes must not renew larger, older capacity evidence.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="p">[</span><span class="n">context</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time_ns</span><span class="p">()</span> <span class="o">//</span> <span class="mi">1_000_000</span> <span class="o">+</span> <span class="mi">3_600_000</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_history</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_profile_store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_profile_request</span><span class="p">:</span>
@@ -647,6 +706,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_observations</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_profile</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_recovery</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
@@ -664,9 +724,12 @@
             <span class="c1"># No partially processed/skipped/contract-invalid outer batch can</span>
             <span class="c1"># contribute a successful profile, even if early slices succeeded.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_publish_profile</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_publish_recovery</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">result</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_observations</span> <span class="o">=</span> <span class="kc">None</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_observations</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_context</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recovery_successes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></div>
 
 </pre></div>
 

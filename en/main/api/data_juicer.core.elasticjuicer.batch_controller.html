@@ -636,6 +636,22 @@ remote quota operation and provides no proof that larger batches fit.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.record_context_recovery_hint">
+<span class="sig-name descname"><span class="pre">record_context_recovery_hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expires_at_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/elasticjuicer/batch_controller.html#AdaptiveBatchController.record_context_recovery_hint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.record_context_recovery_hint" title="Link to this definition">¶</a></dt>
+<dd><p>Rearm probing using unconsumed, actor-local success in this context.</p>
+<p>The caller must own actual, unexpired success evidence for the exact
+input/resource context at a size above the current OOM bound. Remote
+profiles and quota changes are not such evidence. Three fresh full
+successes are still required; recording a hint never relaxes bounds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.clear_context_recovery_hint">
+<span class="sig-name descname"><span class="pre">clear_context_recovery_hint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/elasticjuicer/batch_controller.html#AdaptiveBatchController.clear_context_recovery_hint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.clear_context_recovery_hint" title="Link to this definition">¶</a></dt>
+<dd><p>Revoke local evidence when the next input has a different context.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.observe_success">
 <span class="sig-name descname"><span class="pre">observe_success</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/elasticjuicer/batch_controller.html#AdaptiveBatchController.observe_success"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.observe_success" title="Link to this definition">¶</a></dt>
 <dd><p>Record a successful batch and cautiously probe after a stable streak.</p>
@@ -692,6 +708,8 @@ remote quota operation and provides no proof that larger batches fit.</p>
 <li><a class="reference internal" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.reset_oom_bound"><code class="docutils literal notranslate"><span class="pre">AdaptiveBatchController.reset_oom_bound()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.record_floor_recovery"><code class="docutils literal notranslate"><span class="pre">AdaptiveBatchController.record_floor_recovery()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.record_capacity_recovery_hint"><code class="docutils literal notranslate"><span class="pre">AdaptiveBatchController.record_capacity_recovery_hint()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.record_context_recovery_hint"><code class="docutils literal notranslate"><span class="pre">AdaptiveBatchController.record_context_recovery_hint()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.clear_context_recovery_hint"><code class="docutils literal notranslate"><span class="pre">AdaptiveBatchController.clear_context_recovery_hint()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.observe_success"><code class="docutils literal notranslate"><span class="pre">AdaptiveBatchController.observe_success()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.elasticjuicer.batch_controller.AdaptiveBatchController.observe_oom"><code class="docutils literal notranslate"><span class="pre">AdaptiveBatchController.observe_oom()</span></code></a></li>
 </ul>
