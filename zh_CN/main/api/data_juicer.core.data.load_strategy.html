@@ -624,6 +624,20 @@ rely on AutoFormatter for actual data loading</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.validate_limit">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">validate_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#validate_limit"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.validate_limit" title="链接到此定义。">¶</a></dt>
+<dd><p>Validate that a dataset row limit is a non-negative integer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>limit</strong> -- Maximum number of rows to keep, or None for no limit</p>
+</dd>
+<dt class="field-even">抛出<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- If limit is not a non-negative integer</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.load_strategy.</span></span><span class="sig-name descname"><span class="pre">DefaultHuggingfaceDataLoadStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data_juicer/core/data/load_strategy.html#DefaultHuggingfaceDataLoadStrategy"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy" title="链接到此定义。">¶</a></dt>
@@ -631,7 +645,7 @@ rely on AutoFormatter for actual data loading</p>
 <p>data load strategy for Huggingface dataset for LocalExecutor</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES">
-<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'optional_fields':</span> <span class="pre">['split',</span> <span class="pre">'limit',</span> <span class="pre">'name',</span> <span class="pre">'data_files',</span> <span class="pre">'data_dir'],</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CONFIG_VALIDATION_RULES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'custom_validators':</span> <span class="pre">{'limit':</span> <span class="pre">&lt;function</span> <span class="pre">validate_limit&gt;},</span> <span class="pre">'field_types':</span> <span class="pre">{'path':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;},</span> <span class="pre">'optional_fields':</span> <span class="pre">['split',</span> <span class="pre">'limit',</span> <span class="pre">'name',</span> <span class="pre">'data_files',</span> <span class="pre">'data_dir'],</span> <span class="pre">'required_fields':</span> <span class="pre">['path']}</span></span><a class="headerlink" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES" title="链接到此定义。">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -840,6 +854,7 @@ Uses PyArrow's HadoopFileSystem to read from HDFS.</p>
 <li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultLocalDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultLocalDataLoadStrategy.load_data()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#data_juicer.core.data.load_strategy.validate_limit"><code class="docutils literal notranslate"><span class="pre">validate_limit()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy"><code class="docutils literal notranslate"><span class="pre">DefaultHuggingfaceDataLoadStrategy</span></code></a><ul>
 <li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES"><code class="docutils literal notranslate"><span class="pre">DefaultHuggingfaceDataLoadStrategy.CONFIG_VALIDATION_RULES</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.load_data"><code class="docutils literal notranslate"><span class="pre">DefaultHuggingfaceDataLoadStrategy.load_data()</span></code></a></li>

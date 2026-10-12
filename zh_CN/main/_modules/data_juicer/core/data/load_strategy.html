@@ -861,6 +861,25 @@
 
 
 
+<div class="viewcode-block" id="validate_limit">
+<a class="viewcode-back" href="../../../../api/data_juicer.core.data.load_strategy.html#data_juicer.core.data.load_strategy.validate_limit">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Validate that a dataset row limit is a non-negative integer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        limit: Maximum number of rows to keep, or None for no limit</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If limit is not a non-negative integer</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">limit</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"limit must be a non-negative integer, got </span><span class="si">{</span><span class="n">limit</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="DefaultHuggingfaceDataLoadStrategy">
 <a class="viewcode-back" href="../../../../api/data_juicer.core.data.load_strategy.html#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy">[文档]</a>
 <span class="nd">@DataLoadStrategyRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"default"</span><span class="p">,</span> <span class="s2">"remote"</span><span class="p">,</span> <span class="s2">"huggingface"</span><span class="p">)</span>
@@ -873,8 +892,21 @@
         <span class="s2">"required_fields"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"path"</span><span class="p">],</span>
         <span class="s2">"optional_fields"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"split"</span><span class="p">,</span> <span class="s2">"limit"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"data_files"</span><span class="p">,</span> <span class="s2">"data_dir"</span><span class="p">],</span>
         <span class="s2">"field_types"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
-        <span class="s2">"custom_validators"</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s2">"custom_validators"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"limit"</span><span class="p">:</span> <span class="n">validate_limit</span><span class="p">},</span>
     <span class="p">}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_limit</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">limit</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Keep at most ``limit`` rows of a loaded dataset (per split for dataset dicts).</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">DatasetDict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">datasets</span><span class="o">.</span><span class="n">DatasetDict</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">IterableDatasetDict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">datasets</span><span class="o">.</span><span class="n">IterableDatasetDict</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">))))</span>
 
 <div class="viewcode-block" id="DefaultHuggingfaceDataLoadStrategy.load_data">
 <a class="viewcode-back" href="../../../../api/data_juicer.core.data.load_strategy.html#data_juicer.core.data.load_strategy.DefaultHuggingfaceDataLoadStrategy.load_data">[文档]</a>
@@ -886,10 +918,12 @@
             <span class="n">data_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data_files"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
             <span class="n">data_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data_dir"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
             <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-            <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"limit"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
             <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"limit"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_limit</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">limit</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">unify_format</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">text_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span> <span class="n">global_cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span></div>
 </div>
 

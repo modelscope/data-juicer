@@ -638,6 +638,11 @@
         <span class="n">_datasets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># load datasets with sample numbers</span>
         <span class="k">for</span> <span class="n">stra</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">sample_num</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_strategies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_numbers</span><span class="p">):</span>
+            <span class="c1"># random_sample treats 0 as "unset" and falls back to the raw weight,</span>
+            <span class="c1"># so a dataset allotted no samples must be skipped, not sampled</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sample_num</span> <span class="ow">and</span> <span class="n">sample_num</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
             <span class="c1"># load dataset with its load strategy</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">stra</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="o">**</span><span class="n">load_kwargs</span><span class="p">)</span>
 
