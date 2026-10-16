@@ -25,6 +25,7 @@ on:
 concurrency:
   group: ${{ github.event_name == 'pull_request' && format('docs-preview-{0}', github.run_id) || 'docs-deploy-gh-pages' }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   pages:
