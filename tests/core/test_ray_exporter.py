@@ -114,6 +114,38 @@ class TestRayExporter(DataJuicerTestCaseBase):
         self.assertListOfDictEqual(data_list, self._pop_raw_data_keys([Fields.stats]))
 
     @TEST_TAG('ray')
+    def test_lazy_plan_with_columns_executes_once(self):
+        import ray
+
+        marks = osp.join(self.tmp_dir, 'marks')
+        os.makedirs(marks)
+
+        def mark(batch):
+            for text in batch['text']:
+                open(osp.join(marks, f'{text}-{os.getpid()}-{len(os.listdir(marks))}'), 'w').close()
+            return batch
+
+        out_path = osp.join(self.tmp_dir, 'outdata.jsonl')
+        dataset = ray.data.from_items([{'text': str(i)} for i in range(6)]).map_batches(mark)
+        RayExporter(out_path).export(dataset, columns=['text'])
+
+        self.assertEqual(len(os.listdir(marks)), 6)
+        self.assertEqual(sorted(row['text'] for row in ray.data.read_json(out_path).take_all()),
+                         [str(i) for i in range(6)])
+
+    @TEST_TAG('ray')
+    def test_empty_lazy_plan_with_columns_exports_empty_file(self):
+        import ray
+
+        out_path = osp.join(self.tmp_dir, 'outdata.jsonl')
+        dataset = ray.data.from_items([{'text': 'a'}]).map_batches(lambda batch: {'text': batch['text'][:0]})
+        self.assertIsNone(dataset.columns(fetch_if_missing=False))
+        RayExporter(out_path).export(dataset, columns=['text'])
+
+        self.assertTrue(osp.isfile(out_path))
+        self.assertEqual(osp.getsize(out_path), 0)
+
+    @TEST_TAG('ray')
     def test_webdataset_multi_images(self):
         import io
         from PIL import Image

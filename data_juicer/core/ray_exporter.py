@@ -152,10 +152,14 @@ class RayExporter:
         :param columns: the columns to export.
         :return:
         """
-        # Handle empty dataset case - Ray returns None for columns() on empty datasets
-        # Check if dataset is empty by calling columns() regardless of columns parameter
-        cols = dataset.columns()
-        if cols is None:
+        # Handle empty dataset case - Ray returns None for columns() on empty datasets.
+        # Fetching an unknown schema executes the plan up to its first block, so an
+        # unexecuted plan is written directly and checked for emptiness afterwards.
+        cols = dataset.columns(fetch_if_missing=False)
+        probe_after_write = cols is None and bool(columns)
+        if cols is None and not columns:
+            cols = dataset.columns()
+        if cols is None and not probe_after_write:
             # Empty dataset with unknown schema - create an empty file
             logger.warning(f"Dataset is empty, creating empty export file at {export_path}")
             os.makedirs(os.path.dirname(export_path) or ".", exist_ok=True)
@@ -216,6 +220,14 @@ class RayExporter:
             os.makedirs(export_path_for_checks, exist_ok=True)
 
         result = export_method(dataset, export_path, **export_kwargs)
+
+        if probe_after_write and not is_remote_path(export_path_for_checks):
+            if os.path.isdir(export_path_for_checks) and not os.listdir(export_path_for_checks):
+                logger.warning(f"Dataset is empty, creating empty export file at {export_path_for_checks}")
+                os.rmdir(export_path_for_checks)
+                with open(export_path_for_checks, "w"):
+                    pass
+                return result
 
         # Encrypt all exported files in-place after Ray has finished writing
         if self.encrypt_before_export and self._fernet is not None and not is_remote_path(export_path_for_checks):
