@@ -674,20 +674,12 @@ class BuildBaseParserTest(DataJuicerTestCaseBase):
         cfg = parser.parse_args(["--auto", "--partition.gpu_probe_timeout_seconds=300"])
         self.assertEqual(cfg.partition.gpu_probe_timeout_seconds, 300.0)
 
-    def test_gpu_profile_and_execution_group_defaults(self):
+    def test_gpu_profile_defaults(self):
         parser = build_base_parser()
         cfg = parser.parse_args(["--auto"])
 
         self.assertEqual(cfg.partition.gpu_probe_warmup_batches, 1)
         self.assertEqual(cfg.partition.gpu_probe_steady_batches, 3)
-        self.assertEqual(cfg.partition.execution_group_size, "auto")
-        self.assertEqual(cfg.partition.max_initialization_overhead_ratio, 0.1)
-
-    def test_execution_group_accepts_explicit_positive_integer(self):
-        parser = build_base_parser()
-        cfg = parser.parse_args(["--auto", "--partition.execution_group_size=8"])
-
-        self.assertEqual(cfg.partition.execution_group_size, 8)
 
     def test_config_and_auto_mutually_exclusive(self):
         parser = build_base_parser()

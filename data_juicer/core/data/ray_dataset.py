@@ -22,20 +22,14 @@ from data_juicer.utils.file_utils import is_remote_path
 from data_juicer.utils.webdataset_utils import _custom_default_decoder
 
 
-def _build_actor_pool_strategy(
-    num_proc: Union[int, Tuple[int, int], List[int]], *, unit_count=None
-) -> ActorPoolStrategy:
+def _build_actor_pool_strategy(num_proc: Union[int, Tuple[int, int], List[int]]) -> ActorPoolStrategy:
     """Build a Ray ActorPool strategy for fixed or elastic concurrency."""
-    options = {} if unit_count is None else {"max_tasks_in_flight_per_actor": 1}
     if isinstance(num_proc, (tuple, list)):
         if len(num_proc) != 2:
             raise ValueError(f"Invalid ActorPool concurrency range: {num_proc}")
         min_size, max_size = num_proc
-        if unit_count is not None:
-            min_size, max_size = min(min_size, max(1, unit_count)), min(max_size, max(1, unit_count))
-        return ActorPoolStrategy(min_size=min_size, max_size=max_size, **options)
-    size = num_proc if unit_count is None else min(num_proc, max(1, unit_count))
-    return ActorPoolStrategy(size=size, **options)
+        return ActorPoolStrategy(min_size=min_size, max_size=max_size)
+    return ActorPoolStrategy(size=num_proc)
 
 
 def get_abs_path(path, dataset_dir):
@@ -238,7 +232,7 @@ class RayDataset(DJDataset):
         tracer=None,
         stats_only=False,
         defer_schema_probe=False,
-        unit_recovery=None,
+        partition_recovery=None,
     ) -> DJDataset:
         if operators is None:
             return self
@@ -249,15 +243,15 @@ class RayDataset(DJDataset):
 
         if self._auto_proc:
             calculate_ray_np(operators)
-        if unit_recovery is not None:
-            from data_juicer.core.executor.unit_protocol import ProtocolError
+        if partition_recovery is not None:
+            from data_juicer.core.executor.partition_protocol import ProtocolError
 
-            if not operators or len(operators) != unit_recovery.stage_count:
-                raise ProtocolError("Operator stages differ from the recovery plan")
+            if not operators or len(operators) != partition_recovery.stage_count:
+                raise ProtocolError("Operator stages differ from the checkpoint plan")
             if stats_only:
-                raise ProtocolError("Statistics-only execution needs a separate recovery plan")
+                raise ProtocolError("Statistics-only execution cannot be checkpointed")
             if any(not isinstance(op, (Mapper, Filter)) for op in operators):
-                raise ProtocolError("Recovery units require Mapper/Filter stages")
+                raise ProtocolError("Checkpointed stages must be Mapper/Filter operators")
             if any(getattr(op, "_prepare_for_ray_map_batches", None) is not None for op in operators):
                 raise ProtocolError("Shared Ray state requires its own recovery contract")
             defer_schema_probe = True
@@ -271,40 +265,29 @@ class RayDataset(DJDataset):
                 return self
             cached_columns = set(columns_result)
 
-        try:
-            if unit_recovery is not None:
-                self.data = unit_recovery.open()
-                self.data.context.target_max_block_size = 1
-                self.data.context.target_min_block_size = 1
-                self.data.context.actor_task_retry_on_errors = False
-                self.data.context.execution_options.preserve_order = False
-            for index, op in enumerate(operators):
-                options = dict(tracer=tracer, stats_only=stats_only, defer_schema_probe=defer_schema_probe)
-                if unit_recovery is not None:
-                    options["recovery"] = unit_recovery.stage(index)
+        if partition_recovery is not None:
+            self.data = partition_recovery.open()
+        for index, op in enumerate(operators):
+            options = dict(tracer=tracer, stats_only=stats_only, defer_schema_probe=defer_schema_probe)
+            if partition_recovery is not None:
+                self.data = partition_recovery.stage_input(index, self.data)
+                options["recovery"] = partition_recovery.stage(index)
+            try:
+                cached_columns = self._run_single_op(op, cached_columns, **options)
+            except Exception as e:
+                logger.error(f"Error processing operator {op}: {e}.")
+                if op.runtime_env is None:
+                    raise
+                logger.error("Try to fallback to the base runtime environment.")
+                original_runtime_env = op.runtime_env
                 try:
+                    op.runtime_env = None
                     cached_columns = self._run_single_op(op, cached_columns, **options)
-                except Exception as e:
-                    logger.error(f"Error processing operator {op}: {e}.")
-                    if op.runtime_env is None:
-                        raise
-                    logger.error("Try to fallback to the base runtime environment.")
-                    original_runtime_env = op.runtime_env
-                    try:
-                        op.runtime_env = None
-                        cached_columns = self._run_single_op(op, cached_columns, **options)
-                    finally:
-                        op.runtime_env = original_runtime_env
-            if unit_recovery is not None:
-                paths = unit_recovery.finish(self.data)
-                for stage, export in unit_recovery.stats_exports.items():
-                    export.publish(unit_recovery.output_paths(stage, stats=True))
-                self.data = ray.data.read_parquet(paths) if paths else ray.data.from_items([])
-                self.data.context.execution_options.preserve_order = True
-            return self
-        finally:
-            if unit_recovery is not None:
-                unit_recovery.close()
+                finally:
+                    op.runtime_env = original_runtime_env
+        if partition_recovery is not None:
+            self.data = partition_recovery.output(self.data)
+        return self
 
     def _run_single_op(
         self, op, cached_columns=None, tracer=None, stats_only=False, defer_schema_probe=False, recovery=None
@@ -356,9 +339,7 @@ class RayDataset(DJDataset):
 
                 try:
                     if op.use_ray_actor():
-                        compute = _build_actor_pool_strategy(
-                            op.num_proc, unit_count=len(recovery.recovery.units) if recovery is not None else None
-                        )
+                        compute = _build_actor_pool_strategy(op.num_proc)
                         actor_class = op.__class__
                         actor_args = op._init_args
                         actor_kwargs = op._init_kwargs
@@ -421,9 +402,7 @@ class RayDataset(DJDataset):
                         f"to preserve shared dedup state across workers"
                     )
                 if op.use_ray_actor() and not use_instance_for_ray_tasks:
-                    compute = _build_actor_pool_strategy(
-                        op.num_proc, unit_count=len(recovery.recovery.units) if recovery is not None else None
-                    )
+                    compute = _build_actor_pool_strategy(op.num_proc)
                     plan.map_batches(
                         RayOperatorActor,
                         fn_args=None,

@@ -638,12 +638,13 @@ class RayBatchExecutionTest(unittest.TestCase):
         empty = table.slice(0, 0)
         self.assertIs(filter_batch(empty, lambda samples: self.fail("Empty filters must not run")), empty)
 
-    def test_unit_compute_uses_shared_fixed_elastic_and_task_strategies(self):
+    def test_checkpoint_stage_keeps_native_compute_strategy(self):
         from types import SimpleNamespace
 
         from ray.data import ActorPoolStrategy, TaskPoolStrategy
 
         from data_juicer.core.data.ray_dataset import RayDataset
+        from data_juicer.core.executor import ray_partition_runner
         from data_juicer.ops.filter.text_length_filter import TextLengthFilter
         from data_juicer.ops.mapper.whitespace_normalization_mapper import WhitespaceNormalizationMapper
 
@@ -652,30 +653,29 @@ class RayBatchExecutionTest(unittest.TestCase):
                 with self.subTest(op=op_class, mode=mode, concurrency=concurrency):
                     dataset = RayDataset(MagicMock(), auto_op_parallelism=False)
                     dataset.data.map_batches.return_value = dataset.data
-                    recovery = SimpleNamespace(
-                        complete=False,
-                        stage=0,
-                        worker_context=SimpleNamespace(unit_size=4),
-                        recovery=SimpleNamespace(units=(0, 1)),
-                    )
+                    context = object()
+                    recovery = SimpleNamespace(context=context, batch_size=4, register_stats=lambda export: None)
                     op = op_class(num_proc=concurrency, ray_execution_mode=mode)
                     dataset._run_single_op(op, defer_schema_probe=True, recovery=recovery)
-                    options = dataset.data.map_batches.call_args.kwargs
+                    args, options = dataset.data.map_batches.call_args
                     self.assertEqual(options["batch_size"], 4)
                     compute = options["compute"]
                     if mode == "task":
+                        self.assertIs(args[0], ray_partition_runner.run_checkpoint_task)
+                        self.assertIs(options["fn_args"][0], context)
                         self.assertIsInstance(compute, TaskPoolStrategy)
                         self.assertEqual(compute.size, 3)
                     else:
+                        self.assertIs(args[0], ray_partition_runner.CheckpointStageActor)
+                        self.assertIs(options["fn_constructor_args"][0], context)
                         self.assertIsInstance(compute, ActorPoolStrategy)
-                        self.assertEqual(compute.min_size, 1 if isinstance(concurrency, tuple) else 2)
-                        self.assertEqual(compute.max_size, 2)
-                        self.assertEqual(compute.max_tasks_in_flight_per_actor, 1)
+                        self.assertEqual(compute.min_size, 1 if isinstance(concurrency, tuple) else 3)
+                        self.assertEqual(compute.max_size, 3)
                     self.assertEqual(options["num_cpus"], op.num_cpus)
                     self.assertEqual(options["num_gpus"], op.num_gpus)
                     self.assertEqual(options["runtime_env"], op.runtime_env)
 
-    def test_unit_batches_preserve_requested_mutability(self):
+    def test_partition_batches_preserve_requested_mutability(self):
         import numpy as np
         import pyarrow as pa
 
@@ -687,17 +687,17 @@ class RayBatchExecutionTest(unittest.TestCase):
 
         table = pa.table({"value": np.arange(3)})
         plan = RayBatchPlan().map_batches(mutate, batch_size=2, batch_format="numpy", zero_copy_batch=False)
-        result = [row for block in BatchPlanWorker(plan).process_unit([table]) for row in block.to_pylist()]
+        result = [row for block in BatchPlanWorker(plan).process_partition([table]) for row in block.to_pylist()]
         self.assertEqual(result, [{"value": 1}, {"value": 2}, {"value": 3}])
         self.assertEqual(table["value"].to_pylist(), [0, 1, 2])
 
-    def test_unit_worker_rejects_global_barrier(self):
+    def test_partition_worker_rejects_global_barrier(self):
         from data_juicer.core.data.ray_batch_plan import BatchPlanWorker, RayBatchPlan
 
         with self.assertRaisesRegex(RuntimeError, "global materialization barrier"):
-            list(BatchPlanWorker(RayBatchPlan().materialize()).process_unit([]))
+            list(BatchPlanWorker(RayBatchPlan().materialize()).process_partition([]))
 
-    def test_native_and_unit_plans_reject_invalid_business_batches(self):
+    def test_native_and_partition_plans_reject_invalid_business_batches(self):
         from types import SimpleNamespace
 
         from data_juicer.core.data.ray_batch_plan import RayBatchPlan
@@ -705,7 +705,7 @@ class RayBatchExecutionTest(unittest.TestCase):
         from data_juicer.ops.filter.text_length_filter import TextLengthFilter
 
         for size in (0, -1):
-            for recovery in (None, SimpleNamespace(recovery=SimpleNamespace(units=(0,)))):
+            for recovery in (None, SimpleNamespace(recovery=SimpleNamespace(partitions=(0,)))):
                 with self.subTest(size=size, recovery=recovery):
                     dataset = RayDataset(MagicMock(), auto_op_parallelism=False)
                     op = TextLengthFilter(batch_size=size, num_proc=1, ray_execution_mode="actor")

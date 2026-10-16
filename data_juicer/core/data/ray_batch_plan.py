@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from types import GeneratorType
 
 import pyarrow.fs as pafs
-import ray
 from ray.data import ActorPoolStrategy
 from ray.data._internal.block_batching import batch_blocks
 from ray.data.block import BlockAccessor
@@ -21,15 +20,12 @@ class StatsExport:
     path: str
     options: dict
 
-    def publish(self, paths):
-        if not paths:
-            return
-        prefix = "dj-stats-" + hashlib.sha256("\0".join(paths).encode()).hexdigest() + "_"
+    def publish(self, data, identity):
+        prefix = "dj-stats-" + hashlib.sha256("\0".join(identity).encode()).hexdigest() + "_"
         destinations, filesystem = _resolve_paths_and_filesystem(self.path, self.options.get("filesystem"))
         for entry in filesystem.get_file_info(pafs.FileSelector(destinations[0], allow_not_found=True)):
             if entry.is_file and entry.base_name.startswith(prefix) and entry.base_name.endswith(".json"):
                 filesystem.delete_file(entry.path)
-        data = ray.data.read_parquet(paths)
         # A stable ownership prefix permits replay without deleting unrelated exports.
         data._set_uuid(prefix)
         data.write_json(self.path, **self.options)
@@ -66,16 +62,16 @@ class RayBatchPlan:
                     dataset = dataset.materialize()
             return dataset
 
-        from data_juicer.core.executor import ray_unit_runner
-        from data_juicer.core.executor.unit_protocol import ProtocolError
+        from data_juicer.core.executor import ray_partition_runner
+        from data_juicer.core.executor.partition_protocol import ProtocolError
 
         if "materialize" in self.steps:
-            raise ProtocolError("A global materialization barrier cannot execute within a recovery unit")
+            raise ProtocolError("A global materialization barrier cannot execute within a checkpointed batch")
         for step in self.steps:
             if isinstance(step, StatsExport):
                 recovery.register_stats(step)
-        if recovery.complete:
-            return dataset
+        if dataset is None:
+            return None
         compute_step = next(
             step for step in self.steps if isinstance(step, BatchOperation) and "compute" in step.options
         )
@@ -85,17 +81,12 @@ class RayBatchPlan:
             if key in compute_step.options
         }
         if isinstance(options["compute"], ActorPoolStrategy):
-            function = ray_unit_runner._UnitTicketActor
-            options.update(fn_constructor_args=(recovery.worker_context, self), max_restarts=2, max_task_retries=2)
+            function = ray_partition_runner.CheckpointStageActor
+            options.update(fn_constructor_args=(recovery.context, self))
         else:
-            function = ray_unit_runner.run_unit_task
-            options.update(fn_args=(recovery.worker_context, self), max_retries=2, retry_exceptions=False)
-        return dataset.map_batches(
-            function,
-            batch_size=recovery.worker_context.unit_size if recovery.stage == 0 else 1,
-            batch_format="pyarrow",
-            **options,
-        )
+            function = ray_partition_runner.run_checkpoint_task
+            options.update(fn_args=(recovery.context, self))
+        return dataset.map_batches(function, batch_size=recovery.batch_size, batch_format="pyarrow", **options)
 
 
 class BatchPlanWorker:
@@ -129,7 +120,7 @@ class BatchPlanWorker:
             for output in outputs:
                 yield BlockAccessor.for_block(BlockAccessor.batch_to_block(output)).to_arrow()
 
-    def process_unit(self, tables, *, write_stats=None):
+    def process_partition(self, tables, *, write_stats=None):
         for index, step in enumerate(self.plan.steps):
             if isinstance(step, BatchOperation):
                 tables = self._map(tables, index, step)
@@ -138,5 +129,5 @@ class BatchPlanWorker:
                     raise RuntimeError("Statistics export requires an attempt-owned writer")
                 tables = write_stats(tables)
             else:
-                raise RuntimeError("A global materialization barrier cannot execute within a recovery unit")
+                raise RuntimeError("A global materialization barrier cannot execute within a checkpointed batch")
         yield from tables

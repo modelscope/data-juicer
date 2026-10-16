@@ -459,23 +459,10 @@ def build_base_parser() -> ArgumentParser:
     parser.add_argument(
         "--checkpoint.strategy",
         type=str,
-        default="every_n_ops",
-        choices=["every_op", "every_n_ops", "manual", "disabled"],
-        help="Checkpoint strategy: every_n_ops (default, balanced), every_op (max protection), "
-        "manual (after specific ops), disabled (best performance)",
-    )
-    parser.add_argument(
-        "--checkpoint.n_ops",
-        type=PositiveInt,
-        default=5,
-        help="Number of operations between checkpoints for every_n_ops strategy. "
-        "Default 5 balances fault tolerance with Ray optimization.",
-    )
-    parser.add_argument(
-        "--checkpoint.op_names",
-        type=List[str],
-        default=[],
-        help="List of operation names to checkpoint for manual strategy",
+        default="every_op",
+        choices=["every_op", "disabled"],
+        help="Checkpoint strategy: every_op commits each Mapper/Filter batch before passing it on; "
+        "disabled skips checkpointing",
     )
     # Event logging configuration
     parser.add_argument(
@@ -496,8 +483,8 @@ def build_base_parser() -> ArgumentParser:
         "--checkpoint_dir",
         type=str,
         default=None,
-        help="Directory for ray_partitioned Parquet checkpoints. Defaults to work_dir/checkpoints after job "
-        "directory resolution.",
+        help="Location of ray_partitioned checkpoints: a POSIX path shared by all nodes, or an s3:// URI "
+        "(AWS S3 or MinIO). Defaults to work_dir/checkpoints after job directory resolution.",
     )
     # Job management
     parser.add_argument(
@@ -687,9 +674,10 @@ def build_base_parser() -> ArgumentParser:
         type=Optional[PositiveInt],
         default=None,
         help=(
-            "Optional samples-per-partition target. In manual mode, the executor derives the partition count "
-            "after loading the dataset. In auto mode, this is used only when the optimizer cannot recommend "
-            "a valid sample count."
+            "Optional rows-per-partition target. With checkpointing, this is the target number of rows "
+            "per checkpoint commit; operators still use their own batch_size inside it. Without "
+            "checkpointing, it controls ordinary Ray input partitioning. When omitted, the executor derives "
+            "a bounded commit size from measured throughput."
         ),
     )
     parser.add_argument(
@@ -806,42 +794,6 @@ def build_base_parser() -> ArgumentParser:
         help=(
             "Seed for the shuffled GPU preflight sample, keeping repeated runs and cached probe "
             "reports comparable. Set null for a different sample on every run."
-        ),
-    )
-    parser.add_argument(
-        "--partition.execution_group_size",
-        type=Union[PositiveInt, Literal["auto"]],
-        default="auto",
-        help=(
-            "Number of logical checkpoint partitions processed by one GPU actor-pool lifecycle. "
-            "'auto' uses preflight initialization and throughput measurements."
-        ),
-    )
-    parser.add_argument(
-        "--partition.recovery_mode",
-        type=Literal["streaming", "partition"],
-        default="partition",
-        help=(
-            "'partition' (default) uses per-partition checkpoints. 'streaming' uses durable input "
-            "recovery units for Mapper/Filter chains, with bounded replay after a crash."
-        ),
-    )
-    parser.add_argument(
-        "--partition.unit_size",
-        type=Union[PositiveInt, Literal["auto"]],
-        default="auto",
-        help=(
-            "Input rows per streaming recovery unit. 'auto' chooses a bounded size from operator "
-            "throughput probes; an explicit integer pins the retry granularity."
-        ),
-    )
-    parser.add_argument(
-        "--partition.max_initialization_overhead_ratio",
-        type=float,
-        default=0.1,
-        help=(
-            "Maximum estimated fraction of execution-group time spent initializing GPU models; "
-            "must be between 0 and 1."
         ),
     )
     parser.add_argument(
