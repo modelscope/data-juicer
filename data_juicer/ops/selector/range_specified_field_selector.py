@@ -72,9 +72,12 @@ class RangeSpecifiedFieldSelector(Selector):
         if len(dataset) <= 1 or not self.field_key:
             return dataset
 
-        if self.lower_percentile is None and self.lower_rank is None:
-            return dataset
-        if self.upper_percentile is None and self.upper_rank is None:
+        if (
+            self.lower_percentile is None
+            and self.lower_rank is None
+            and self.upper_percentile is None
+            and self.upper_rank is None
+        ):
             return dataset
 
         lower_bound, upper_bound = 0, len(dataset)
