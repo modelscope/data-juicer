@@ -27,6 +27,7 @@ from data_juicer.core.executor.partition_protocol import (
     commit_key,
     concat_outputs,
     key_ranges,
+    open_export_attempt,
     read_tables,
     select_ranges,
     with_keys,
@@ -255,6 +256,13 @@ class PartitionRecovery:
             batch_size=None,
             zero_copy_batch=True,
         )
+
+    def export_attempt(self):
+        """Name this run's export files; ``finish`` runs before earlier attempts are removed."""
+        from data_juicer.core.ray_exporter import ExportAttempt
+
+        prefix, earlier = open_export_attempt(self.store)
+        return ExportAttempt(prefix, earlier, on_written=self.finish)
 
     def finish(self):
         """Verify complete delivery, then publish statistics of every commit."""

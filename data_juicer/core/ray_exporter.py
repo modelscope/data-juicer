@@ -1,6 +1,8 @@
 import os
+from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
+from typing import Callable, Optional, Tuple
 from urllib.parse import urlparse
 
 from loguru import logger
@@ -12,9 +14,46 @@ from data_juicer.utils.model_utils import filter_arguments
 from data_juicer.utils.webdataset_utils import reconstruct_custom_webdataset_format
 
 
+@dataclass(frozen=True)
+class ExportAttempt:
+    """One write of a job's export; ``earlier`` lists the prefixes of its earlier writes, oldest first."""
+
+    prefix: str
+    earlier: Tuple[str, ...] = ()
+    on_written: Optional[Callable[[], None]] = None
+
+
+def _prefixed_filenames(prefix, file_format):
+    from ray.data.datasource import FilenameProvider
+
+    class PrefixedFilenames(FilenameProvider):
+        def __init__(self):
+            super().__init__()
+            self.prefix = prefix
+            self.file_format = file_format
+
+        def get_filename_for_task(self, write_uuid, task_index):
+            return f"{self.prefix}_{write_uuid}_{task_index:06}.{self.file_format}"
+
+        def get_filename_for_block(self, block, write_uuid, task_index, block_index):
+            return f"{self.prefix}_{write_uuid}_{task_index:06}_{block_index:06}.{self.file_format}"
+
+    return PrefixedFilenames()
+
+
 class RayExporter:
     """The Exporter class is used to export a ray dataset to files of specific
     format."""
+
+    # Formats Ray writes as files named by a FilenameProvider, with Ray's default suffix.
+    _FILE_SUFFIXES = {
+        "json": "json",
+        "jsonl": "json",
+        "parquet": "parquet",
+        "csv": "csv",
+        "tfrecords": "tfrecords",
+        "webdataset": "tar",
+    }
 
     # TODO: support config for export, some export methods require additional args
     _SUPPORTED_FORMATS = {
@@ -143,7 +182,7 @@ class RayExporter:
         export_format = suffix
         return export_format
 
-    def _export_impl(self, dataset, export_path, columns=None):
+    def _export_impl(self, dataset, export_path, columns=None, attempt=None):
         """
         Export a dataset to specific path.
 
@@ -160,9 +199,13 @@ class RayExporter:
         if cols is None and not columns:
             cols = dataset.columns()
         if cols is None and not probe_after_write:
+            if attempt is not None:
+                self._complete_attempt(attempt, export_path)
             # Empty dataset with unknown schema - create an empty file
             logger.warning(f"Dataset is empty, creating empty export file at {export_path}")
             os.makedirs(os.path.dirname(export_path) or ".", exist_ok=True)
+            if os.path.isdir(export_path) and not os.listdir(export_path):
+                os.rmdir(export_path)
             with open(export_path, "w"):
                 pass  # Create empty file
             return
@@ -188,9 +231,21 @@ class RayExporter:
 
         export_method = RayExporter._router()[self.export_format]
         export_kwargs = {
-            "export_extra_args": self.export_extra_args,
+            "export_extra_args": dict(self.export_extra_args),
             "export_format": self.export_format,
         }
+        if attempt is not None:
+            if self.export_format not in self._FILE_SUFFIXES:
+                if attempt.earlier:
+                    raise NotImplementedError(
+                        f'Resuming a checkpointed job cannot replace a partial "{self.export_format}" export; '
+                        f"remove {export_path} before resuming"
+                    )
+            else:
+                self._prepare_attempt(attempt, export_path)
+                export_kwargs["export_extra_args"]["filename_provider"] = _prefixed_filenames(
+                    attempt.prefix, self._FILE_SUFFIXES[self.export_format]
+                )
         # Add S3 filesystem if available
         if self.s3_filesystem is not None:
             export_kwargs["export_extra_args"]["filesystem"] = self.s3_filesystem
@@ -221,36 +276,90 @@ class RayExporter:
 
         result = export_method(dataset, export_path, **export_kwargs)
 
-        if probe_after_write and not is_remote_path(export_path_for_checks):
-            if os.path.isdir(export_path_for_checks) and not os.listdir(export_path_for_checks):
-                logger.warning(f"Dataset is empty, creating empty export file at {export_path_for_checks}")
-                os.rmdir(export_path_for_checks)
-                with open(export_path_for_checks, "w"):
-                    pass
-                return result
-
-        # Encrypt all exported files in-place after Ray has finished writing
+        # Encrypt the exported files in-place after Ray has finished writing
         if self.encrypt_before_export and self._fernet is not None and not is_remote_path(export_path_for_checks):
             from data_juicer.utils.encryption_utils import encrypt_file
 
             export_dir = Path(export_path)
             if export_dir.is_dir():
                 for fpath in export_dir.iterdir():
-                    if fpath.is_file():
+                    if fpath.is_file() and (attempt is None or fpath.name.startswith(f"{attempt.prefix}_")):
                         encrypt_file(str(fpath), str(fpath), self._fernet)
                         logger.debug(f"Encrypted exported file: {fpath}")
 
+        if attempt is not None:
+            self._complete_attempt(attempt, export_path_for_checks)
+
+        if probe_after_write and not is_remote_path(export_path_for_checks):
+            if os.path.isdir(export_path_for_checks) and not os.listdir(export_path_for_checks):
+                logger.warning(f"Dataset is empty, creating empty export file at {export_path_for_checks}")
+                os.rmdir(export_path_for_checks)
+                with open(export_path_for_checks, "w"):
+                    pass
+
         return result
 
-    def export(self, dataset, columns=None):
+    def _export_files(self, export_path):
+        """Return the filesystem and every file path below ``export_path``."""
+        import pyarrow.fs as pafs
+
+        scheme = urlparse(export_path).scheme.lower()
+        if scheme == "s3":
+            filesystem = self.s3_filesystem
+            parsed = urlparse(export_path)
+            base = f"{parsed.netloc}{parsed.path}".rstrip("/")
+        elif scheme == "hdfs":
+            from data_juicer.utils.hdfs_utils import strip_hdfs_scheme
+
+            filesystem = self.hdfs_filesystem
+            base = strip_hdfs_scheme(export_path).rstrip("/")
+        else:
+            filesystem = pafs.LocalFileSystem()
+            base = os.path.abspath(export_path)
+        infos = filesystem.get_file_info(pafs.FileSelector(base, allow_not_found=True, recursive=True))
+        return filesystem, [info.path for info in infos if info.type == pafs.FileType.File]
+
+    def _remove_attempts(self, export_path, prefixes):
+        if not prefixes:
+            return
+        filesystem, paths = self._export_files(export_path)
+        starts = tuple(f"{prefix}_" for prefix in prefixes)
+        stale = [path for path in paths if os.path.basename(path).startswith(starts)]
+        for path in stale:
+            filesystem.delete_file(path)
+        if stale:
+            logger.info(f"Removed {len(stale)} file(s) of earlier export attempts from {export_path}")
+
+    def _prepare_attempt(self, attempt, export_path):
+        # The latest earlier attempt stays until this one is complete, so a failed resume never
+        # leaves less exported output than it found; anything older is already superseded.
+        self._remove_attempts(export_path, attempt.earlier[:-1])
+        _, paths = self._export_files(export_path)
+        known = tuple(f"{prefix}_" for prefix in attempt.earlier)
+        foreign = [path for path in paths if not os.path.basename(path).startswith(known)]
+        if foreign:
+            logger.warning(
+                f"{len(foreign)} file(s) in {export_path} were not written by this job and are kept; "
+                f"readers of the directory will see them next to the export, e.g. {foreign[0]}"
+            )
+
+    def _complete_attempt(self, attempt, export_path):
+        if attempt.on_written is not None:
+            attempt.on_written()
+        if self.export_format in self._FILE_SUFFIXES:
+            self._remove_attempts(export_path, attempt.earlier)
+
+    def export(self, dataset, columns=None, attempt=None):
         """
         Export method for a dataset.
 
         :param dataset: the dataset to export.
         :param columns: the columns to export.
+        :param attempt: an ``ExportAttempt`` that names this write's files so files of earlier
+            attempts of the same job are removed only after this write and ``on_written`` succeed.
         :return:
         """
-        self._export_impl(dataset, self.export_path, columns)
+        self._export_impl(dataset, self.export_path, columns, attempt)
 
     @staticmethod
     def write_json(dataset, export_path, **kwargs):

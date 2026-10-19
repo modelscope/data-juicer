@@ -22,6 +22,7 @@ The `ray_partitioned` executor processes a dataset on Ray Data and can checkpoin
 │   └── partition_recovery/
 │       ├── run.json              # Input fingerprint and recipe identity
 │       ├── commits/              # One immutable manifest per committed batch
+│       ├── exports/              # One record per export attempt
 │       └── data/                 # Parquet files referenced by the manifests
 ├── logs/                         # Human-readable logs
 └── metadata/                     # Job metadata
@@ -277,12 +278,20 @@ strict resume in the following order:
    operator that it has not consumed yet, reading committed rows from storage on
    the workers;
 6. verify after the export that every input row was consumed and delivered
-   exactly once.
+   exactly once;
+7. only then remove the export files that the interrupted runs left behind.
 
 `partition.size` is not part of the identity and may change on resume. If the
 input, its order or the checkpointed operators changed, explicit resume stops
 with an error and leaves the existing checkpoints unchanged. Starting a new run
 with the ID of an existing checkpoint is rejected rather than mixed with it.
+
+The export is written while the operators run, so an interrupted job usually
+leaves a partial export behind. A resumed job writes the complete export under
+new file names and removes the earlier files only after its own export is
+complete and verified, so a failed resume never loses exported output. Files in
+the export directory that the job did not write are kept and reported in a
+warning. A partial Lance export must be removed before resuming.
 
 Use `--job_id` to name a job. To resume it, add `--resume` with the original job ID to the original command.
 

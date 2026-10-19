@@ -34,6 +34,7 @@ KEY_COLUMNS = (SEQ_COLUMN, IDX_COLUMN)
 RUN_KEY = "run.json"
 COMMIT_DIR = "commits"
 DATA_DIR = "data"
+EXPORT_DIR = "exports"
 
 Ranges = Tuple[Tuple[int, int, int], ...]
 
@@ -304,6 +305,15 @@ class Commit:
 
 def commit_key(stage: int, seq: int) -> str:
     return f"{COMMIT_DIR}/{stage:04d}-{seq:016d}.json"
+
+
+def open_export_attempt(store) -> Tuple[str, Tuple[str, ...]]:
+    """Register a new export filename prefix; return it with earlier prefixes, oldest first."""
+    earlier = tuple(json.loads(store.get(key))["prefix"] for key in sorted(store.list(EXPORT_DIR)))
+    prefix = f"dj{len(earlier):04d}-{uuid.uuid4().hex[:12]}"
+    if not store.put_if_absent(f"{EXPORT_DIR}/{len(earlier):08d}.json", json.dumps({"prefix": prefix}).encode()):
+        raise ProtocolError("Another driver started an export of this job")
+    return prefix, earlier
 
 
 def write_tables(store, tables: Iterable[pa.Table], kind: str = "part") -> Tuple[OutputFile, ...]:

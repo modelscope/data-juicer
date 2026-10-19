@@ -114,6 +114,38 @@ class TestRayExporter(DataJuicerTestCaseBase):
         self.assertListOfDictEqual(data_list, self._pop_raw_data_keys([Fields.stats]))
 
     @TEST_TAG('ray')
+    def test_export_attempt_replaces_earlier_attempts_only_after_success(self):
+        import ray
+        from data_juicer.core.ray_exporter import ExportAttempt
+
+        out_path = osp.join(self.tmp_dir, 'outdata.jsonl')
+        os.makedirs(out_path)
+        for name in ['dj0000-a_x_000000.json', 'dj0001-b_x_000000.json', 'user.json']:
+            with open(osp.join(out_path, name), 'w') as f:
+                f.write('{"text": "%s"}\n' % name)
+        dataset = ray.data.from_items([{'text': str(i)} for i in range(6)])
+
+        def fail():
+            raise RuntimeError('verification failed')
+
+        with self.assertRaises(RuntimeError):
+            RayExporter(out_path).export(dataset, attempt=ExportAttempt('dj0002-c', ('dj0000-a', 'dj0001-b'), fail))
+        names = os.listdir(out_path)
+        self.assertNotIn('dj0000-a_x_000000.json', names)
+        self.assertIn('dj0001-b_x_000000.json', names)
+        self.assertIn('user.json', names)
+        self.assertTrue(any(name.startswith('dj0002-c_') for name in names))
+
+        verified = []
+        attempt = ExportAttempt('dj0003-d', ('dj0000-a', 'dj0001-b', 'dj0002-c'), lambda: verified.append(True))
+        RayExporter(out_path).export(dataset, attempt=attempt)
+        names = sorted(os.listdir(out_path))
+        self.assertEqual(verified, [True])
+        self.assertEqual([name for name in names if not name.startswith('dj0003-d_')], ['user.json'])
+        rows = ray.data.read_json([osp.join(out_path, name) for name in names if name != 'user.json']).take_all()
+        self.assertEqual(sorted(row['text'] for row in rows), [str(i) for i in range(6)])
+
+    @TEST_TAG('ray')
     def test_lazy_plan_with_columns_executes_once(self):
         import ray
 

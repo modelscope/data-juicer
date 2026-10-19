@@ -89,6 +89,23 @@ verifies that every stage consumed all rows produced by its predecessor and
 that every final row was delivered. Statistics are published only after that
 check.
 
+## Export
+
+The export streams with the operators, so an interrupted run usually leaves part
+of it behind, and a resumed run writes the complete output again. Each run
+registers an export attempt, `exports/{n:08d}.json`, and names its files
+`dj{n:04d}-{id}_*`:
+
+1. before writing, files of attempts older than the previous one are removed,
+   so repeated failures keep at most one earlier partial export;
+2. the attempt writes the complete output and the delivery check above runs;
+3. only then are the files of every earlier attempt removed.
+
+A failed resume therefore never leaves less exported output than it found.
+Files in the export directory that no attempt of the job wrote are kept, with a
+warning. Formats that Ray does not write as named files (Lance) cannot replace
+a partial export; resume stops until it is removed.
+
 ## Scope
 
 Only the leading Mapper/Filter operators are checkpointed. A Deduplicator,

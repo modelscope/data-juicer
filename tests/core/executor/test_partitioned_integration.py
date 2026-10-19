@@ -79,10 +79,8 @@ class PartitionedExecutorIntegrationTest(DataJuicerTestCaseBase):
                     events = [line for line in f if json.loads(line).get('event_type') != 'job_complete']
                 with open(path, 'w') as f:
                     f.writelines(events)
-        if os.path.isdir(cfg.export_path):
-            shutil.rmtree(cfg.export_path)
-        else:
-            os.remove(cfg.export_path)
+        # The export of the interrupted run stays behind, as it does after a real crash.
+        first_files = set(os.listdir(cfg.export_path))
 
         cfg2 = _cli_configs(args + ['--resume', cfg.job_id])
         PartitionedRayExecutor(cfg2).run()
@@ -91,6 +89,7 @@ class PartitionedExecutorIntegrationTest(DataJuicerTestCaseBase):
         self.assertTrue(set(commits) - set(resumed) <= {n for n in commits if int(n.split('-')[0]) == last_stage})
         self.assertTrue({n for n in commits if int(n.split('-')[0]) < last_stage} <= set(resumed))
         self.assertTrue(any(int(n.split('-')[0]) == last_stage for n in set(resumed) - set(commits)))
+        self.assertFalse(first_files & set(os.listdir(cfg2.export_path)))
         self.assertEqual(sorted(_read_export(cfg2.export_path)), sorted(exported))
 
     @TEST_TAG('ray')
