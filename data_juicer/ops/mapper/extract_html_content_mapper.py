@@ -61,15 +61,17 @@ class ExtractHtmlContentMapper(Mapper):
             parts to reduce noise, 'recall' keeps more of them to avoid missing
             content, and 'balanced' sits in between.
         :param include_tables: Whether to keep tables in the output text.
-        :param include_links: Whether to keep link targets. Only effective
-            when `output_format` is 'markdown'.
+        :param include_links: Whether to keep link targets as Markdown-style
+            links in both 'txt' and 'markdown' output.
         :param include_comments: Whether to keep the user comment section of
             the page in addition to the main content.
         :param fast: Whether to skip the fallback extraction algorithms
             (jusText and readability), which is faster but may extract less
             content from unusual page layouts.
-        :param url_key: Optional field name holding the page URL. The URL helps
-            to resolve relative links and fills the url-related metadata.
+        :param url_key: Optional field name or dot-separated dictionary path
+            holding the page URL. An exact top-level field name takes precedence
+            over a nested path. Missing paths and non-string values are ignored.
+            The URL helps to resolve relative links and fills URL metadata.
         :param extract_metadata: Whether to extract page metadata and store it
             in the sample's meta field.
         :param metadata_field_name: Field name in meta to store the metadata.
@@ -140,6 +142,18 @@ class ExtractHtmlContentMapper(Mapper):
             metadata[self.metadata_field_name] = self._empty_metadata()
         return metadata, write_metadata
 
+    def _get_page_url(self, sample):
+        if not self.url_key:
+            return None
+        if self.url_key in sample:
+            return sample[self.url_key]
+        value = sample
+        for key in self.url_key.split("."):
+            if not isinstance(value, dict):
+                return None
+            value = value.get(key)
+        return value
+
     def process_single(self, sample):
         html = sample[self.text_key]
         metadata, write_metadata = self._initialize_metadata(sample)
@@ -147,7 +161,7 @@ class ExtractHtmlContentMapper(Mapper):
             logger.warning("Invalid input text! Expected a string.")
             return sample
 
-        url = sample.get(self.url_key) if self.url_key else None
+        url = self._get_page_url(sample)
         if url is not None and not isinstance(url, str):
             logger.warning("Invalid page URL! Expected a string.")
             url = None

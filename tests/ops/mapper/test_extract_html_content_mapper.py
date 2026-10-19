@@ -98,6 +98,64 @@ class ExtractHtmlContentMapperTest(DataJuicerTestCaseBase):
         text = self._extract_one(op, url="https://example.org/science/rivers")["text"]
         self.assertIn("[vegetation](https://example.org/plants)", text)
 
+    def test_txt_link_targets(self):
+        for include_links in (False, True):
+            with self.subTest(include_links=include_links):
+                op = ExtractHtmlContentMapper(output_format="txt", include_links=include_links, url_key="url")
+                text = self._extract_one(op, url="https://example.org/science/rivers")["text"]
+                self.assert_article_kept(text)
+                self.assertEqual("[vegetation](https://example.org/plants)" in text, include_links)
+
+    def test_nested_url_links_and_metadata(self):
+        op = ExtractHtmlContentMapper(
+            output_format="markdown",
+            include_links=True,
+            extract_metadata=True,
+            url_key="page.source.url",
+            num_proc=2,
+        )
+        page = {"source": {"url": "https://example.org/science/rivers"}, "keep": "original"}
+        dataset = self._run(op, [{"text": self.html, "page": page}] * 4)
+        for sample in dataset:
+            self.assertIn("[vegetation](https://example.org/plants)", sample["text"])
+            metadata = sample[Fields.meta][MetaKeys.html_metadata]
+            self.assertEqual(metadata["url"], "https://example.org/science/rivers")
+            self.assertEqual(metadata["hostname"], "example.org")
+            self.assertEqual(sample["page"], page)
+
+    def test_literal_url_key_takes_precedence(self):
+        op = ExtractHtmlContentMapper(
+            output_format="markdown",
+            include_links=True,
+            extract_metadata=True,
+            url_key="page.url",
+        )
+        sample = self._extract_one(
+            op,
+            **{
+                "page.url": "https://literal.example.org/article",
+                "page": {"url": "https://nested.example.org/article"},
+            },
+        )
+        self.assertIn("[vegetation](https://literal.example.org/plants)", sample["text"])
+        self.assertEqual(sample[Fields.meta][MetaKeys.html_metadata]["url"], "https://literal.example.org/article")
+
+    def test_missing_and_invalid_nested_urls_are_ignored(self):
+        cases = ({}, {"page": None}, {"page": "not a dictionary"}, {"page": {}}, {"page": {"url": 42}})
+        for extra in cases:
+            with self.subTest(extra=extra):
+                op = ExtractHtmlContentMapper(
+                    output_format="markdown",
+                    include_links=True,
+                    extract_metadata=True,
+                    url_key="page.url",
+                )
+                sample = self._extract_one(op, **extra)
+                self.assert_article_kept(sample["text"])
+                metadata = sample[Fields.meta][MetaKeys.html_metadata]
+                self.assertEqual(metadata["url"], "")
+                self.assertEqual(metadata["hostname"], "")
+
     def test_exclude_tables(self):
         text = self._extract_one(ExtractHtmlContentMapper(include_tables=False))["text"]
         self.assert_article_kept(text)

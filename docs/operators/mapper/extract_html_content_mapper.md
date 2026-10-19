@@ -19,16 +19,20 @@ Tags 标签: cpu, text
 | `output_format` | str | `'txt'` | Output format: `'txt'` or `'markdown'`. 输出格式：`'txt'` 或 `'markdown'`。 |
 | `focus` | str | `'balanced'` | Extraction trade-off: `'precision'` reduces noise, `'recall'` reduces missing content, and `'balanced'` sits in between. 提取取舍：`'precision'` 减少噪声，`'recall'` 减少正文遗漏，`'balanced'` 在两者之间。 |
 | `include_tables` | bool | `True` | Whether to keep tables in the output text. 是否在输出正文中保留表格。 |
-| `include_links` | bool | `False` | Whether to keep link targets; only effective for Markdown output. 是否保留链接地址；仅对 Markdown 输出有效。 |
+| `include_links` | bool | `False` | Whether to keep link targets as Markdown-style links in both TXT and Markdown output. 是否在 TXT 和 Markdown 输出中以 Markdown 链接形式保留链接地址。 |
 | `include_comments` | bool | `False` | Whether to keep user comments in addition to the main content. 是否在正文之外保留用户评论。 |
 | `fast` | bool | `False` | Skip fallback extraction algorithms for speed. 为提高速度而跳过备用提取算法。 |
-| `url_key` | str or null | `None` | Optional field containing the page URL, used to resolve relative links and populate URL metadata. 可选的页面 URL 字段，用于解析相对链接并填充 URL 元数据。 |
+| `url_key` | str or null | `None` | Optional page URL field or dot-separated dictionary path, used to resolve relative links and populate URL metadata. An exact top-level field name takes precedence; missing paths and non-string values are ignored. 可选的页面 URL 字段或以点号分隔的字典路径，用于解析相对链接并填充 URL 元数据。优先匹配完整的顶层字段名；路径缺失或值不是字符串时忽略。 |
 | `extract_metadata` | bool | `False` | Whether to extract page metadata. 是否提取页面元数据。 |
 | `metadata_field_name` | str | `'html_metadata'` | Field in `meta` used to store metadata. `meta` 中用于保存元数据的字段名。 |
 
 When metadata extraction is enabled, the operator stores `title`, `author`, `date`, `url`, `hostname`, `sitename`, `description`, `categories` and `tags` under `meta[metadata_field_name]`. To store HTML tables as separate structured data, use `extract_tables_from_html_mapper` before this operator rewrites the HTML text.
 
 启用元数据提取后，算子会在 `meta[metadata_field_name]` 中保存 `title`、`author`、`date`、`url`、`hostname`、`sitename`、`description`、`categories` 和 `tags`。如果需要将 HTML 表格单独保存为结构化数据，请在本算子改写 HTML 文本之前使用 `extract_tables_from_html_mapper`。
+
+For example, `url_key='page.url'` reads `sample['page']['url']` unless the sample contains an exact top-level key named `page.url`. This nested-path support applies to `url_key`; it does not change `text_key` handling.
+
+例如，`url_key='page.url'` 会读取 `sample['page']['url']`；若样本中存在名为 `page.url` 的顶层字段，则优先读取该字段。此嵌套路径支持仅适用于 `url_key`，不改变 `text_key` 的处理方式。
 
 ## 📊 Effect demonstration 效果演示
 ### test_markdown_output
