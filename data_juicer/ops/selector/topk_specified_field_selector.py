@@ -82,7 +82,10 @@ class TopkSpecifiedFieldSelector(Selector):
             for key in field_keys[1:]:
                 assert key in field_value.keys(), "'{}' not in {}".format(key, field_value.keys())
                 field_value = field_value[key]
-            field_value_list.append(stats_to_number(field_value, self.reverse))
+            # keep native numbers as-is so large integers are compared exactly
+            if not isinstance(field_value, (int, float)):
+                field_value = stats_to_number(field_value, self.reverse)
+            field_value_list.append(field_value)
 
         if self.reverse:
             select_index = heapq.nlargest(int(select_num), range(len(dataset)), field_value_list.__getitem__)

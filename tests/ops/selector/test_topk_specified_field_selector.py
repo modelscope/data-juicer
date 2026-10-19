@@ -736,6 +736,21 @@ class TopkSpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
             'score': 7.0
         }], op)
 
+    def test_top_level_large_int_select(self):
+        # 2**53 and 2**53 + 1 collapse to the same float
+        small, large = 2**53, 2**53 + 1
+        for a, b in [(small, large), (-large, -small)]:
+            ds_list = [{'text': 'a', 'score': a}, {'text': 'b', 'score': b}]
+            dataset = Dataset.from_list(ds_list)
+
+            op = TopkSpecifiedFieldSelector(field_key='score', topk=1)
+            self._run_topk_selector(dataset, [{'text': 'b', 'score': b}], op)
+
+            op = TopkSpecifiedFieldSelector(field_key='score',
+                                            topk=1,
+                                            reverse=False)
+            self._run_topk_selector(dataset, [{'text': 'a', 'score': a}], op)
+
 
 if __name__ == '__main__':
     unittest.main()
