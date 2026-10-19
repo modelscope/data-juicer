@@ -89,6 +89,16 @@ for s in res_ds:
 ## 📰 News
 
 <details open>
+<summary>[2026-10-19] Release v1.6.1: <b>Throughput-Aware GPU Actor Planning; Adaptive GPU Microbatching; Leaner Ray MinHash Dedup</b></summary>
+
+* 🎛️ *Throughput-Aware GPU Actor Planning* — `ray_partitioned` runs a GPU preflight that measures each GPU operator's memory, steady-state throughput, and output ratio, then plans actor counts independently of the partition count. Partitions in one execution group share an actor pool to avoid repeated model loading. Enabled by default; set `partition.gpu_preflight_enabled: false` to keep explicitly configured GPU resources.
+* 🪄 *Adaptive GPU Microbatching (opt-in)* — With `elastic_juicer_adaptive_batching: true`, eligible CUDA mappers retry the same rows in smaller microbatches after an OOM and cautiously grow back once input pressure eases. `elastic_juicer_profile_seed: true` reuses compatible batch bounds across execution groups and replacement actors within one `ray_partitioned` run. Both are off by default.
+* 🧮 *Leaner Ray MinHash Dedup* — `ray_bts_minhash_deduplicator` keeps edge buffers and hash keys in packed NumPy arrays instead of Python objects, reducing memory overhead with unchanged configuration and results.
+* 🔧 *Operator Fixes* — `clean_html_mapper` works with selectolax 1.0; `remove_specific_chars_mapper` escapes regex characters and no longer strips `|`; `remove_header_mapper` now applies its default `drop_no_head=True` and clears texts without a LaTeX header; the entity-relation and support-text extractors honour `drop_text`; `general_field_filter` accepts negative numbers in conditions; local Hugging Face embeddings in `text_embd_similarity_filter` no longer mix the model's repr into the input text.
+* 🗂️ *Loading, Analysis & Tool Fixes* — The HuggingFace load strategy applies `limit` after loading; datasets allotted zero samples under `max_sample_num` are skipped; the lenient JSONL cache refreshes when source files change; overall analysis keeps stats columns whose first value is null; the visualization app no longer raises `KeyError` when no filter has tunable stats; the GPT evaluator excludes failed judge calls from averages and reports their count.
+</details>
+
+<details open>
 <summary>[2026-09-08] Release v1.6.0: <b>Juicer Model Release; Cluster-Aware Partitioning; Config Validation; LiteLLM Backend</b></summary>
 
 * 🧮 *Cluster-Aware Partitioning* — Automatic partition counts use live Ray cluster resources. Manual `partition.size` targets split data at row boundaries, including inputs with fewer blocks than partitions.
@@ -109,7 +119,7 @@ for s in res_ds:
 * 🧪 *Playground* — Try data-refinement recipes in the [Juicer Playground](https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground).
 </details>
 
-<details open>
+<details>
 <summary>[2026-08-07] Release v1.5.5: <b>External OP Plugins; HDFS I/O & Ray Data Optimizations; Elastic Multi-node Sharding</b></summary>
 
 * 🧩 *External OP Plugins* — Third-party operators can now be shipped as standalone pip packages and auto-registered via Python entry points.
