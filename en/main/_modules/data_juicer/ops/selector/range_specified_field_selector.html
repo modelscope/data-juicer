@@ -462,13 +462,15 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">RangeSpecifiedFieldSelector</span><span class="p">(</span><span class="n">Selector</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Selects a range of samples based on the sorted values of a specified field.</span>
 
-<span class="sd">    This operator selects samples whose values for a specified field fall within a given</span>
-<span class="sd">    range. The range can be defined using percentiles or ranks, and the operator will use</span>
-<span class="sd">    the more inclusive bounds if both are provided. The field values are first sorted in</span>
-<span class="sd">    ascending order, and then the samples are selected based on the lower and upper bounds.</span>
-<span class="sd">    If no bounds are provided, the original dataset is returned. The operator ensures that</span>
-<span class="sd">    the specified field exists in the dataset and handles multi-level fields by separating</span>
-<span class="sd">    keys with dots."""</span>
+<span class="sd">    This operator ranks samples by the values of a specified field in ascending order</span>
+<span class="sd">    and selects samples within a given rank or percentile range.</span>
+<span class="sd">    Either bound may be omitted: an omitted lower bound defaults to 0, and an omitted</span>
+<span class="sd">    upper bound defaults to the dataset size. When both percentile and rank constraints</span>
+<span class="sd">    are provided, the larger lower bound and the smaller upper bound are used.</span>
+<span class="sd">    If no bounds are provided, the original dataset and its order are preserved.</span>
+<span class="sd">    Datasets with zero or one sample are returned unchanged. The operator ensures that</span>
+<span class="sd">    the specified field exists in the dataset and supports nested fields with keys</span>
+<span class="sd">    separated by dots."""</span>
 
 <div class="viewcode-block" id="RangeSpecifiedFieldSelector.__init__">
 <a class="viewcode-back" href="../../../../api/data_juicer.ops.selector.range_specified_field_selector.html#data_juicer.ops.selector.RangeSpecifiedFieldSelector.__init__">[docs]</a>
@@ -526,9 +528,12 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_key</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_percentile</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_rank</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">dataset</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_percentile</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_rank</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lower_percentile</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_rank</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_percentile</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_rank</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
         <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
