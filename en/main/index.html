@@ -541,6 +541,16 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>demos/process_
 <section id="news">
 <h2>📰 News<a class="headerlink" href="#news" title="Link to this heading">¶</a></h2>
 <details open>
+<summary>[2026-10-19] Release v1.6.1: <b>Throughput-Aware GPU Actor Planning; Adaptive GPU Microbatching; Leaner Ray MinHash Dedup</b></summary>
+<ul class="simple">
+<li><p>🎛️ <em>Throughput-Aware GPU Actor Planning</em> — <code class="docutils literal notranslate"><span class="pre">ray_partitioned</span></code> runs a GPU preflight that measures each GPU operator’s memory, steady-state throughput, and output ratio, then plans actor counts independently of the partition count. Partitions in one execution group share an actor pool to avoid repeated model loading. Enabled by default; set <code class="docutils literal notranslate"><span class="pre">partition.gpu_preflight_enabled:</span> <span class="pre">false</span></code> to keep explicitly configured GPU resources.</p></li>
+<li><p>🪄 <em>Adaptive GPU Microbatching (opt-in)</em> — With <code class="docutils literal notranslate"><span class="pre">elastic_juicer_adaptive_batching:</span> <span class="pre">true</span></code>, eligible CUDA mappers retry the same rows in smaller microbatches after an OOM and cautiously grow back once input pressure eases. <code class="docutils literal notranslate"><span class="pre">elastic_juicer_profile_seed:</span> <span class="pre">true</span></code> reuses compatible batch bounds across execution groups and replacement actors within one <code class="docutils literal notranslate"><span class="pre">ray_partitioned</span></code> run. Both are off by default.</p></li>
+<li><p>🧮 <em>Leaner Ray MinHash Dedup</em> — <code class="docutils literal notranslate"><span class="pre">ray_bts_minhash_deduplicator</span></code> keeps edge buffers and hash keys in packed NumPy arrays instead of Python objects, reducing memory overhead with unchanged configuration and results.</p></li>
+<li><p>🔧 <em>Operator Fixes</em> — <code class="docutils literal notranslate"><span class="pre">clean_html_mapper</span></code> works with selectolax 1.0; <code class="docutils literal notranslate"><span class="pre">remove_specific_chars_mapper</span></code> escapes regex characters and no longer strips <code class="docutils literal notranslate"><span class="pre">|</span></code>; <code class="docutils literal notranslate"><span class="pre">remove_header_mapper</span></code> now applies its default <code class="docutils literal notranslate"><span class="pre">drop_no_head=True</span></code> and clears texts without a LaTeX header; the entity-relation and support-text extractors honour <code class="docutils literal notranslate"><span class="pre">drop_text</span></code>; <code class="docutils literal notranslate"><span class="pre">general_field_filter</span></code> accepts negative numbers in conditions; local Hugging Face embeddings in <code class="docutils literal notranslate"><span class="pre">text_embd_similarity_filter</span></code> no longer mix the model’s repr into the input text.</p></li>
+<li><p>🗂️ <em>Loading, Analysis &amp; Tool Fixes</em> — The HuggingFace load strategy applies <code class="docutils literal notranslate"><span class="pre">limit</span></code> after loading; datasets allotted zero samples under <code class="docutils literal notranslate"><span class="pre">max_sample_num</span></code> are skipped; the lenient JSONL cache refreshes when source files change; overall analysis keeps stats columns whose first value is null; the visualization app no longer raises <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> when no filter has tunable stats; the GPT evaluator excludes failed judge calls from averages and reports their count.</p></li>
+</ul>
+</details>
+<details open>
 <summary>[2026-09-08] Release v1.6.0: <b>Juicer Model Release; Cluster-Aware Partitioning; Config Validation; LiteLLM Backend</b></summary>
 <ul class="simple">
 <li><p>🧮 <em>Cluster-Aware Partitioning</em> — Automatic partition counts use live Ray cluster resources. Manual <code class="docutils literal notranslate"><span class="pre">partition.size</span></code> targets split data at row boundaries, including inputs with fewer blocks than partitions.</p></li>
@@ -561,7 +571,7 @@ dj-process<span class="w"> </span>--config<span class="w"> </span>demos/process_
 <li><p>🧪 <em>Playground</em> — Try data-refinement recipes in the <a class="reference external" href="https://github.com/datajuicer/data-juicer-hub/tree/main/juicer_playground">Juicer Playground</a>.</p></li>
 </ul>
 </details>
-<details open>
+<details>
 <summary>[2026-08-07] Release v1.5.5: <b>External OP Plugins; HDFS I/O & Ray Data Optimizations; Elastic Multi-node Sharding</b></summary>
 <ul class="simple">
 <li><p>🧩 <em>External OP Plugins</em> — Third-party operators can now be shipped as standalone pip packages and auto-registered via Python entry points.</p></li>
