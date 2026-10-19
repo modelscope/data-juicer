@@ -13,13 +13,15 @@ from ..base_op import OPERATORS, Selector
 class RangeSpecifiedFieldSelector(Selector):
     """Selects a range of samples based on the sorted values of a specified field.
 
-    This operator selects samples whose values for a specified field fall within a given
-    range. The range can be defined using percentiles or ranks, and the operator will use
-    the more inclusive bounds if both are provided. The field values are first sorted in
-    ascending order, and then the samples are selected based on the lower and upper bounds.
-    If no bounds are provided, the original dataset is returned. The operator ensures that
-    the specified field exists in the dataset and handles multi-level fields by separating
-    keys with dots."""
+    This operator ranks samples by the values of a specified field in ascending order
+    and selects samples within a given rank or percentile range.
+    Either bound may be omitted: an omitted lower bound defaults to 0, and an omitted
+    upper bound defaults to the dataset size. When both percentile and rank constraints
+    are provided, the larger lower bound and the smaller upper bound are used.
+    If no bounds are provided, the original dataset and its order are preserved.
+    Datasets with zero or one sample are returned unchanged. The operator ensures that
+    the specified field exists in the dataset and supports nested fields with keys
+    separated by dots."""
 
     def __init__(
         self,
