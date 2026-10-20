@@ -678,6 +678,79 @@ class TopkSpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
                                         reverse=False)
         self._run_topk_selector(dataset, tgt_list, op)
 
+    def test_top_level_str_select(self):
+        ds_list = [{
+            'text': 'a',
+            'score': '9'
+        }, {
+            'text': 'b',
+            'score': '10'
+        }, {
+            'text': 'c',
+            'score': '2.5'
+        }, {
+            'text': 'd',
+            'score': '100'
+        }]
+        tgt_list = [{
+            'text': 'd',
+            'score': '100'
+        }, {
+            'text': 'b',
+            'score': '10'
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = TopkSpecifiedFieldSelector(field_key='score', topk=2)
+        self._run_topk_selector(dataset, tgt_list, op)
+
+    def test_top_level_none_select(self):
+        ds_list = [{
+            'text': 'a',
+            'score': 3.0
+        }, {
+            'text': 'b',
+            'score': None
+        }, {
+            'text': 'c',
+            'score': 7.0
+        }]
+        dataset = Dataset.from_list(ds_list)
+
+        op = TopkSpecifiedFieldSelector(field_key='score', topk=2)
+        self._run_topk_selector(dataset, [{
+            'text': 'c',
+            'score': 7.0
+        }, {
+            'text': 'a',
+            'score': 3.0
+        }], op)
+
+        op = TopkSpecifiedFieldSelector(field_key='score',
+                                        topk=2,
+                                        reverse=False)
+        self._run_topk_selector(dataset, [{
+            'text': 'a',
+            'score': 3.0
+        }, {
+            'text': 'c',
+            'score': 7.0
+        }], op)
+
+    def test_top_level_large_int_select(self):
+        # 2**53 and 2**53 + 1 collapse to the same float
+        small, large = 2**53, 2**53 + 1
+        for a, b in [(small, large), (-large, -small)]:
+            ds_list = [{'text': 'a', 'score': a}, {'text': 'b', 'score': b}]
+            dataset = Dataset.from_list(ds_list)
+
+            op = TopkSpecifiedFieldSelector(field_key='score', topk=1)
+            self._run_topk_selector(dataset, [{'text': 'b', 'score': b}], op)
+
+            op = TopkSpecifiedFieldSelector(field_key='score',
+                                            topk=1,
+                                            reverse=False)
+            self._run_topk_selector(dataset, [{'text': 'a', 'score': a}], op)
+
 
 if __name__ == '__main__':
     unittest.main()
