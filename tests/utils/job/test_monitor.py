@@ -9,7 +9,8 @@ from unittest.mock import MagicMock, patch
 
 from data_juicer.utils.job.monitor import JobProgressMonitor, main, show_job_progress
 from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
-from tests.utils.job import isolate_job_logging
+
+from . import isolate_job_logging
 
 
 def setUpModule():

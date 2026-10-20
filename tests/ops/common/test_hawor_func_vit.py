@@ -4,7 +4,8 @@ from unittest import mock
 import torch
 
 from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
-from tests.ops.common.test_hawor_imports import load_test_modules
+
+from .test_hawor_imports import load_test_modules
 
 hw, hv, dw = load_test_modules()
 

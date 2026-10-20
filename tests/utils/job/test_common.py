@@ -13,7 +13,8 @@ from data_juicer.utils.job.common import (
     list_running_jobs,
 )
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
-from tests.utils.job import isolate_job_logging
+
+from . import isolate_job_logging
 
 
 def setUpModule():
