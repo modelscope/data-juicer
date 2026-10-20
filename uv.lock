@@ -7344,6 +7344,7 @@ all = [
     { name = "vllm" },
     { name = "wandb" },
     { name = "wordcloud" },
+    { name = "yacs" },
 ]
 audio = [
     { name = "audiomentations" },
@@ -7377,6 +7378,7 @@ dev = [
     { name = "sphinx-copybutton" },
     { name = "toml" },
     { name = "wandb" },
+    { name = "yacs" },
 ]
 distributed = [
     { name = "bitarray" },
@@ -7647,6 +7649,8 @@ requires-dist = [
     { name = "wget" },
     { name = "wordcloud", marker = "extra == 'all'", specifier = "==1.9.4" },
     { name = "wordcloud", marker = "extra == 'tools'", specifier = "==1.9.4" },
+    { name = "yacs", marker = "extra == 'all'", specifier = ">=0.1.8" },
+    { name = "yacs", marker = "extra == 'dev'", specifier = ">=0.1.8" },
     { name = "zstandard" },
 ]
 provides-extras = ["ai-services", "all", "audio", "dev", "distributed", "generic", "nlp", "tools", "vision"]
@@ -11988,6 +11992,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/0f/f8/f6c61fd794229cc3848d144f73754a0c107854372d7261419dcbbd286299/xxhash-3.5.0-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4e2febf914ace002132aa09169cc572e0d8959d0f305f93d5828c4836f9bc5a6", size = 32020, upload-time = "2024-08-17T09:20:13.537Z" },
     { url = "https://files.pythonhosted.org/packages/79/d3/c029c99801526f859e6b38d34ab87c08993bf3dcea34b11275775001638a/xxhash-3.5.0-pp310-pypy310_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:5d3a10609c51da2a1c0ea0293fc3968ca0a18bd73838455b5bca3069d7f8e32b", size = 40515, upload-time = "2024-08-17T09:20:14.669Z" },
     { url = "https://files.pythonhosted.org/packages/62/e3/bef7b82c1997579c94de9ac5ea7626d01ae5858aa22bf4fcb38bf220cb3e/xxhash-3.5.0-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:5a74f23335b9689b66eb6dbe2a931a88fcd7a4c2cc4b1cb0edba8ce381c7a1da", size = 30064, upload-time = "2024-08-17T09:20:15.925Z" },
+]
+
+[[package]]
+name = "yacs"
+version = "0.1.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/44/3e/4a45cb0738da6565f134c01d82ba291c746551b5bc82e781ec876eb20909/yacs-0.1.8.tar.gz", hash = "sha256:efc4c732942b3103bea904ee89af98bcd27d01f0ac12d8d4d369f1e7a2914384", size = 11100, upload-time = "2020-08-10T16:37:47.755Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/4f/fe9a4d472aa867878ce3bb7efb16654c5d63672b86dc0e6e953a67018433/yacs-0.1.8-py3-none-any.whl", hash = "sha256:99f893e30497a4b66842821bac316386f7bd5c4f47ad35c9073ef089aa33af32", size = 14747, upload-time = "2020-08-10T16:37:46.4Z" },
 ]
 
 [[package]]
