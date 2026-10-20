@@ -1,6 +1,7 @@
 import gzip
 import io
 import os
+import subprocess
 import tarfile
 import tempfile
 import unittest
@@ -13,7 +14,7 @@ from data_juicer.download.arxiv import (
     ArxivIterator,
     download_arxiv,
 )
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
+from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
 
 
 class ArxivDownloaderTest(DataJuicerTestCaseBase):
@@ -45,7 +46,17 @@ class ArxivDownloaderTest(DataJuicerTestCaseBase):
                         with redirect_stdout(output):
                             result = downloader.download(f"src-{verbose}.tar")
                     kwargs = run.call_args.kwargs
-                    expected = None if verbose else __import__("subprocess").DEVNULL
+                    expected = None if verbose else subprocess.DEVNULL
+                    self.assertEqual(
+                        run.call_args.args[0],
+                        [
+                            "s5cmd",
+                            "--request-payer=requester",
+                            "cp",
+                            f"s3://arxiv/src/src-{verbose}.tar",
+                            os.path.join(tmpdir, f"src-{verbose}.tar"),
+                        ],
+                    )
                     self.assertEqual(kwargs["stdout"], expected)
                     self.assertEqual(kwargs["stderr"], expected)
                     self.assertEqual(result, os.path.join(tmpdir, f"src-{verbose}.tar"))
@@ -190,11 +201,12 @@ class DownloadArxivTest(DataJuicerTestCaseBase):
     @TEST_TAG("standalone")
     def test_download_arxiv_builds_controlled_pipeline(self):
         sentinel = object()
-        with tempfile.TemporaryDirectory() as tmpdir, patch(
-            "data_juicer.download.arxiv.get_arxiv_urls", return_value=["a.tar", "b.tar", "c.tar"]
-        ), patch("data_juicer.download.arxiv.expand_outdir_and_mkdir") as mkdir, patch(
-            "data_juicer.download.arxiv.download_and_extract", return_value=sentinel
-        ) as run:
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch("data_juicer.download.arxiv.get_arxiv_urls", return_value=["a.tar", "b.tar", "c.tar"]),
+            patch("data_juicer.download.arxiv.expand_outdir_and_mkdir") as mkdir,
+            patch("data_juicer.download.arxiv.download_and_extract", return_value=sentinel) as run,
+        ):
             result = download_arxiv(
                 tmpdir,
                 output_type="parquet",
@@ -221,11 +233,12 @@ class DownloadArxivTest(DataJuicerTestCaseBase):
 
     @TEST_TAG("standalone")
     def test_download_arxiv_respects_explicit_raw_directory_without_limit(self):
-        with tempfile.TemporaryDirectory() as tmpdir, patch(
-            "data_juicer.download.arxiv.get_arxiv_urls", return_value=["one.tar"]
-        ), patch("data_juicer.download.arxiv.expand_outdir_and_mkdir") as mkdir, patch(
-            "data_juicer.download.arxiv.download_and_extract", return_value=MagicMock()
-        ) as run:
+        with (
+            tempfile.TemporaryDirectory() as tmpdir,
+            patch("data_juicer.download.arxiv.get_arxiv_urls", return_value=["one.tar"]),
+            patch("data_juicer.download.arxiv.expand_outdir_and_mkdir") as mkdir,
+            patch("data_juicer.download.arxiv.download_and_extract", return_value=MagicMock()) as run,
+        ):
             raw_dir = os.path.join(tmpdir, "raw")
             download_arxiv(tmpdir, raw_download_dir=raw_dir, url_limit=0)
 

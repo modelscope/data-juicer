@@ -1,16 +1,19 @@
 import io
+import json
 import os
 import tempfile
 import unittest
 from contextlib import redirect_stdout
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-from data_juicer.utils.job.monitor import (
-    JobProgressMonitor,
-    main,
-    show_job_progress,
-)
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
+from data_juicer.utils.job.monitor import JobProgressMonitor, main, show_job_progress
+from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
+from tests.utils.job import isolate_job_logging
+
+
+def setUpModule():
+    isolate_job_logging()
 
 
 class JobProgressMonitorTest(DataJuicerTestCaseBase):
@@ -43,14 +46,35 @@ class JobProgressMonitorTest(DataJuicerTestCaseBase):
         self.assertEqual(data["job_summary"]["status"], "running")
         self.assertEqual(data["dataset_mapping"]["partition_size"], 10)
         self.assertEqual(data["partition_status"], {})
+        self.assertEqual(data["overall_progress"], {"job_status": "running"})
+        monitor.job_utils.calculate_overall_progress.assert_called_once_with()
+
+    def test_progress_from_event_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            monitor = self._monitor(tmpdir)
+            job_dir = monitor.work_dir
+            (job_dir / "job_summary.json").write_text(json.dumps({"status": "completed", "start_time": 100}))
+            events = [
+                {"event_type": "partition_start", "partition_id": 0, "timestamp": 1},
+                {"event_type": "partition_complete", "partition_id": 0, "timestamp": 5},
+            ]
+            (job_dir / "events.jsonl").write_text("\n".join(json.dumps(event) for event in events))
+            data = monitor.get_progress_data()
+            progress = data["overall_progress"]
+            self.assertEqual(progress["total_partitions"], 1)
+            self.assertEqual(progress["completed_partitions"], 1)
+            self.assertEqual(progress["progress_percentage"], 100.0)
+            self.assertEqual(data["partition_status"][0]["status"], "completed")
+            output = io.StringIO()
+            with redirect_stdout(output):
+                monitor.display_progress(detailed=True)
+            self.assertIn("100.0% (1/1 partitions)", output.getvalue())
 
     @TEST_TAG("standalone")
     def test_display_progress_detailed_covers_all_sections(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             monitor = self._monitor(tmpdir)
-            monitor.job_utils.load_job_summary = MagicMock(
-                return_value={"start_time": 1, "duration": 12.5}
-            )
+            monitor.job_utils.load_job_summary = MagicMock(return_value={"start_time": 1, "duration": 12.5})
             monitor.job_utils.load_dataset_mapping = MagicMock(
                 return_value={
                     "original_dataset_path": "input.jsonl",
@@ -110,7 +134,7 @@ class JobProgressMonitorTest(DataJuicerTestCaseBase):
         text = output.getvalue()
         for expected in (
             "input.jsonl",
-            "1970-01-01",
+            datetime.fromtimestamp(1).strftime("%Y-%m-%d %H:%M:%S"),
             "12.5 seconds",
             "2.0 minutes",
             "filter",
@@ -162,9 +186,10 @@ class MonitorConvenienceAndCliTest(DataJuicerTestCaseBase):
 
     @TEST_TAG("standalone")
     def test_main_once(self):
-        with patch("sys.argv", ["monitor", "abc", "--base-dir", "/tmp/base", "--detailed"]), patch(
-            "data_juicer.utils.job.monitor.JobProgressMonitor"
-        ) as monitor_cls:
+        with (
+            patch("sys.argv", ["monitor", "abc", "--base-dir", "/tmp/base", "--detailed"]),
+            patch("data_juicer.utils.job.monitor.JobProgressMonitor") as monitor_cls,
+        ):
             main()
 
         monitor_cls.assert_called_once_with("abc", "/tmp/base")
@@ -172,11 +197,12 @@ class MonitorConvenienceAndCliTest(DataJuicerTestCaseBase):
 
     @TEST_TAG("standalone")
     def test_main_watch_stops_on_keyboard_interrupt(self):
-        with patch("sys.argv", ["monitor", "abc", "--watch", "--interval", "3"]), patch(
-            "data_juicer.utils.job.monitor.JobProgressMonitor"
-        ) as monitor_cls, patch("data_juicer.utils.job.monitor.os.system") as clear, patch(
-            "data_juicer.utils.job.monitor.time.sleep", side_effect=KeyboardInterrupt
-        ) as sleep:
+        with (
+            patch("sys.argv", ["monitor", "abc", "--watch", "--interval", "3"]),
+            patch("data_juicer.utils.job.monitor.JobProgressMonitor") as monitor_cls,
+            patch("data_juicer.utils.job.monitor.os.system") as clear,
+            patch("data_juicer.utils.job.monitor.time.sleep", side_effect=KeyboardInterrupt) as sleep,
+        ):
             output = io.StringIO()
             with redirect_stdout(output):
                 main()
@@ -192,10 +218,10 @@ class MonitorConvenienceAndCliTest(DataJuicerTestCaseBase):
             (FileNotFoundError("missing"), "Error: missing"),
             (RuntimeError("boom"), "Unexpected error: boom"),
         ):
-            with self.subTest(error=type(error).__name__), patch(
-                "sys.argv", ["monitor", "abc"]
-            ), patch(
-                "data_juicer.utils.job.monitor.JobProgressMonitor", side_effect=error
+            with (
+                self.subTest(error=type(error).__name__),
+                patch("sys.argv", ["monitor", "abc"]),
+                patch("data_juicer.utils.job.monitor.JobProgressMonitor", side_effect=error),
             ):
                 output = io.StringIO()
                 with redirect_stdout(output), self.assertRaises(SystemExit) as raised:

@@ -4,13 +4,17 @@ import os
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
-from types import SimpleNamespace
 from unittest.mock import MagicMock, mock_open, patch
 
 import psutil
 
 from data_juicer.utils.job.stopper import JobStopper, main, stop_job
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
+from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
+from tests.utils.job import isolate_job_logging
+
+
+def setUpModule():
+    isolate_job_logging()
 
 
 class JobStopperTest(DataJuicerTestCaseBase):
@@ -79,6 +83,29 @@ class JobStopperTest(DataJuicerTestCaseBase):
         self.assertEqual(summary["status"], "stopped")
         self.assertEqual(summary["stop_time"], 9.5)
         self.assertEqual(summary["stop_reason"], "manual_stop")
+        self.assertEqual(summary["start_time"], 1)
+
+    @TEST_TAG("standalone")
+    def test_stop_job_reads_logs_and_persists_cleanup(self):
+        cases = [
+            ([{"event_type": "job_start", "timestamp": 1}], 0),
+            ([{"event_type": "op_start", "process_id": 999999999, "timestamp": 1}], 1),
+        ]
+        for events, expected_count in cases:
+            with self.subTest(processes_found=expected_count), tempfile.TemporaryDirectory() as tmpdir:
+                stopper = self._stopper(tmpdir)
+                summary_path = stopper.work_dir / "job_summary.json"
+                summary_path.write_text(json.dumps({"status": "running", "start_time": 100}))
+                (stopper.work_dir / "events.jsonl").write_text("\n".join(json.dumps(event) for event in events))
+                with patch("data_juicer.utils.job.common.psutil.Process", side_effect=psutil.NoSuchProcess(999999999)):
+                    result = stopper.stop_job()
+                self.assertFalse(result["success"])
+                self.assertEqual(result["processes_found"], expected_count)
+                self.assertEqual(result["processes_terminated"], 0)
+                summary = json.loads(summary_path.read_text())
+                self.assertEqual(summary["status"], "stopped")
+                self.assertEqual(summary["stop_reason"], "manual_stop")
+                self.assertEqual(summary["start_time"], 100)
 
     @TEST_TAG("standalone")
     def test_cleanup_handles_empty_summary_and_write_error(self):
@@ -111,9 +138,7 @@ class JobStopperTest(DataJuicerTestCaseBase):
             stopper = self._stopper(tmpdir)
             good = MagicMock(pid=11)
             bad = MagicMock(pid=22)
-            stopper.job_utils.load_job_summary = MagicMock(
-                return_value={"status": "running", "start_time": 1}
-            )
+            stopper.job_utils.load_job_summary = MagicMock(return_value={"status": "running", "start_time": 1})
             stopper.job_utils.extract_process_thread_ids = MagicMock(
                 return_value={"process_ids": {11, 22}, "thread_ids": {33}}
             )
@@ -169,8 +194,10 @@ class StopperConvenienceAndCliTest(DataJuicerTestCaseBase):
             {"job_id": "bad", "status": "failed", "processes": 0},
         ]
         for returned, expected in ((jobs, "done"), ([], "No DataJuicer jobs found")):
-            with self.subTest(empty=not returned), patch("sys.argv", ["stopper", "--list"]), patch(
-                "data_juicer.utils.job.stopper.list_running_jobs", return_value=returned
+            with (
+                self.subTest(empty=not returned),
+                patch("sys.argv", ["stopper", "--list"]),
+                patch("data_juicer.utils.job.stopper.list_running_jobs", return_value=returned),
             ):
                 output = io.StringIO()
                 with redirect_stdout(output):
@@ -187,11 +214,12 @@ class StopperConvenienceAndCliTest(DataJuicerTestCaseBase):
     @TEST_TAG("standalone")
     def test_main_success_and_verbose(self):
         result = {"success": True, "processes_terminated": 2, "threads_terminated": 1, "errors": []}
-        with patch(
-            "sys.argv", ["stopper", "abc", "--base-dir", "/tmp/base", "--force", "--timeout", "4", "--verbose"]
-        ), patch("data_juicer.utils.job.stopper.stop_job", return_value=result) as stop, patch(
-            "data_juicer.utils.job.stopper.logger.remove"
-        ) as remove, patch("data_juicer.utils.job.stopper.logger.add") as add:
+        with (
+            patch("sys.argv", ["stopper", "abc", "--base-dir", "/tmp/base", "--force", "--timeout", "4", "--verbose"]),
+            patch("data_juicer.utils.job.stopper.stop_job", return_value=result) as stop,
+            patch("data_juicer.utils.job.stopper.logger.remove") as remove,
+            patch("data_juicer.utils.job.stopper.logger.add") as add,
+        ):
             output = io.StringIO()
             with redirect_stdout(output):
                 main()
@@ -204,8 +232,9 @@ class StopperConvenienceAndCliTest(DataJuicerTestCaseBase):
     @TEST_TAG("standalone")
     def test_main_failure_exits(self):
         result = {"success": False, "processes_terminated": 0, "threads_terminated": 0, "errors": ["failed"]}
-        with patch("sys.argv", ["stopper", "abc"]), patch(
-            "data_juicer.utils.job.stopper.stop_job", return_value=result
+        with (
+            patch("sys.argv", ["stopper", "abc"]),
+            patch("data_juicer.utils.job.stopper.stop_job", return_value=result),
         ):
             output = io.StringIO()
             with redirect_stdout(output), self.assertRaises(SystemExit) as raised:
