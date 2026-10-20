@@ -21,11 +21,19 @@ class HaworVitTest(DataJuicerTestCaseBase):
         self.assertEqual(no_cls.shape, (1, 2, 3))
 
     @TEST_TAG("standalone")
-    def test_drop_path(self):
-        drop = hv.DropPath(1.0)
-        drop.train()
-        self.assertEqual(int(torch.count_nonzero(drop(torch.ones(2, 3)))), 0)
-        self.assertEqual(drop.extra_repr(), "p=1.0")
+    def test_drop_path_forwards_probability_and_training_mode(self):
+        drop = hv.DropPath(0.25)
+        inputs = torch.arange(6, dtype=torch.float32).reshape(2, 3)
+        expected = object()
+        for training in (True, False):
+            with (
+                self.subTest(training=training),
+                mock.patch.object(hv.timm.layers, "drop_path", return_value=expected) as drop_path,
+            ):
+                drop.train(training)
+                self.assertIs(drop(inputs), expected)
+                drop_path.assert_called_once_with(inputs, 0.25, training)
+        self.assertEqual(drop.extra_repr(), "p=0.25")
 
     @TEST_TAG("standalone")
     def test_small_network_blocks(self):

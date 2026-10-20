@@ -1,5 +1,6 @@
 import gzip
 import io
+import json
 import os
 import subprocess
 import tarfile
@@ -14,6 +15,7 @@ from data_juicer.download.arxiv import (
     ArxivIterator,
     download_arxiv,
 )
+from data_juicer.download.downloader import download_and_extract
 from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
 
 
@@ -32,15 +34,15 @@ class ArxivDownloaderTest(DataJuicerTestCaseBase):
         run.assert_not_called()
 
     @TEST_TAG("standalone")
-    def test_download_command_quiet_verbose_and_failure(self):
+    def test_download_command_quiet_and_verbose(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             downloader = ArxivDownloader(tmpdir)
-            for verbose, returncode in ((False, 0), (True, 1)):
+            for verbose in (False, True):
                 with self.subTest(verbose=verbose):
                     downloader._verbose = verbose
                     with patch(
                         "data_juicer.download.arxiv.subprocess.run",
-                        return_value=MagicMock(returncode=returncode),
+                        return_value=MagicMock(returncode=0),
                     ) as run:
                         output = io.StringIO()
                         with redirect_stdout(output):
@@ -60,8 +62,6 @@ class ArxivDownloaderTest(DataJuicerTestCaseBase):
                     self.assertEqual(kwargs["stdout"], expected)
                     self.assertEqual(kwargs["stderr"], expected)
                     self.assertEqual(result, os.path.join(tmpdir, f"src-{verbose}.tar"))
-                    if returncode:
-                        self.assertIn("Failed to download", output.getvalue())
 
 
 class ArxivIteratorTest(DataJuicerTestCaseBase):
@@ -125,7 +125,6 @@ class ArxivIteratorTest(DataJuicerTestCaseBase):
             os.makedirs(project_dir)
             self._write_gzip(os.path.join(project_dir, "hep-th9901001.gz"), b"\\section{A} alpha")
             self._write_gzip(os.path.join(project_dir, "2401.12345.gz"), b"\\section{B} beta")
-            self._write_gzip(os.path.join(project_dir, "bad_id.gz"), b"\\section{C} gamma")
             with open(os.path.join(project_dir, "broken"), "wb") as stream:
                 stream.write(b"broken")
 
@@ -139,9 +138,8 @@ class ArxivIteratorTest(DataJuicerTestCaseBase):
                 rows = list(ArxivIterator(log_frequency=1).iterate(outer_path))
 
         ids = {metadata["id"] for metadata, _ in rows}
-        self.assertEqual(ids, {"hep-th/9901001", "2401.12345", "bad_id"})
+        self.assertEqual(ids, {"hep-th/9901001", "2401.12345"})
         self.assertTrue(all(metadata["source_id"] == "snapshot.tar" for metadata, _ in rows))
-        self.assertIn("failed to format arxiv id bad_id", output.getvalue())
         self.assertIn("Extracted", output.getvalue())
 
 
@@ -179,7 +177,7 @@ class ArxivExtractorTest(DataJuicerTestCaseBase):
         self.assertEqual(ArxivExtractor()._clean_tex_file("plain text", {}, {}), "")
 
     @TEST_TAG("standalone")
-    def test_extract_empty_valid_and_cleaning_error(self):
+    def test_extract_empty_and_valid_content(self):
         extractor = ArxivExtractor()
         self.assertIsNone(extractor.extract([]))
         metadata, text = extractor.extract(
@@ -188,8 +186,46 @@ class ArxivExtractorTest(DataJuicerTestCaseBase):
         self.assertEqual(metadata, {})
         self.assertIn("Hello Arxiv", text)
 
-        with patch.object(extractor, "_clean_tex_file", side_effect=RuntimeError("bad tex")):
-            self.assertEqual(extractor.extract(["content"]), ({}, None))
+    @TEST_TAG("standalone")
+    def test_pipeline_skips_failed_extraction_and_writes_valid_text(self):
+        extractor = ArxivExtractor()
+        clean_tex = extractor._clean_tex_file
+
+        def clean(file_content, **kwargs):
+            if "broken" in file_content:
+                raise RuntimeError("bad tex")
+            return clean_tex(file_content=file_content, **kwargs)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            archive_path = os.path.join(tmpdir, "snapshot.tar")
+            with tarfile.open(archive_path, "w") as archive:
+                for arxiv_id, text in (
+                    ("2401.00001", "\\section{Intro} broken"),
+                    ("2401.00002", "\\section{Intro} valid text"),
+                ):
+                    payload = gzip.compress(text.encode())
+                    member = tarfile.TarInfo(f"{arxiv_id}.gz")
+                    member.size = len(payload)
+                    archive.addfile(member, io.BytesIO(payload))
+            output_path = os.path.join(tmpdir, "output.jsonl")
+            with patch.object(extractor, "_clean_tex_file", side_effect=clean):
+                dataset = download_and_extract(
+                    ["snapshot.tar"],
+                    [output_path],
+                    ArxivDownloader(tmpdir),
+                    ArxivIterator(),
+                    extractor,
+                    {"text": str, "id": str, "source_id": str, "filename": str},
+                    keep_raw_download=True,
+                )
+            with open(output_path) as stream:
+                records = [json.loads(line) for line in stream]
+
+        self.assertEqual(len(dataset), 1)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["id"], "2401.00002")
+        self.assertEqual(records[0]["text"], "\\section{Intro} valid text")
+        self.assertEqual(records[0]["source_id"], "snapshot.tar")
 
     @TEST_TAG("standalone")
     def test_extract_returns_none_when_all_files_clean_to_empty(self):

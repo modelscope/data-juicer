@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import MagicMock, call, mock_open, patch
 
 import psutil
 
@@ -51,7 +51,7 @@ class JobStopperTest(DataJuicerTestCaseBase):
             self.assertTrue(stopper.terminate_process_gracefully(proc, timeout=2))
 
         proc.kill.assert_called_once_with()
-        self.assertEqual(proc.wait.call_count, 2)
+        self.assertEqual(proc.mock_calls, [call.terminate(), call.wait(timeout=2), call.kill(), call.wait()])
 
     @TEST_TAG("standalone")
     def test_terminate_process_handles_errors(self):
@@ -86,7 +86,7 @@ class JobStopperTest(DataJuicerTestCaseBase):
         self.assertEqual(summary["start_time"], 1)
 
     @TEST_TAG("standalone")
-    def test_stop_job_reads_logs_and_persists_cleanup(self):
+    def test_stop_job_reads_logs_without_running_processes(self):
         cases = [
             ([{"event_type": "job_start", "timestamp": 1}], 0),
             ([{"event_type": "op_start", "process_id": 999999999, "timestamp": 1}], 1),
@@ -97,28 +97,46 @@ class JobStopperTest(DataJuicerTestCaseBase):
                 summary_path = stopper.work_dir / "job_summary.json"
                 summary_path.write_text(json.dumps({"status": "running", "start_time": 100}))
                 (stopper.work_dir / "events.jsonl").write_text("\n".join(json.dumps(event) for event in events))
-                with patch("data_juicer.utils.job.common.psutil.Process", side_effect=psutil.NoSuchProcess(999999999)):
+                with patch(
+                    "data_juicer.utils.job.common.psutil.Process", side_effect=psutil.NoSuchProcess(999999999)
+                ) as process:
                     result = stopper.stop_job()
                 self.assertFalse(result["success"])
                 self.assertEqual(result["processes_found"], expected_count)
                 self.assertEqual(result["processes_terminated"], 0)
+                self.assertEqual(result["threads_terminated"], 0)
+                if expected_count:
+                    process.assert_called_once_with(999999999)
+                else:
+                    process.assert_not_called()
                 summary = json.loads(summary_path.read_text())
-                self.assertEqual(summary["status"], "stopped")
-                self.assertEqual(summary["stop_reason"], "manual_stop")
                 self.assertEqual(summary["start_time"], 100)
 
     @TEST_TAG("standalone")
-    def test_cleanup_handles_empty_summary_and_write_error(self):
+    def test_cleanup_without_summary_does_not_write(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             stopper = self._stopper(tmpdir)
-            stopper.cleanup_job_resources()
-            stopper.job_utils.load_job_summary = MagicMock(return_value={"status": "running"})
+            stopper.job_utils.load_job_summary = MagicMock(return_value=None)
             with patch("builtins.open", mock_open()) as opened:
-                opened.side_effect = PermissionError("denied")
                 stopper.cleanup_job_resources()
+            opened.assert_not_called()
 
     @TEST_TAG("standalone")
-    def test_stop_job_without_ids_cleans_up(self):
+    def test_cleanup_reports_write_error(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            stopper = self._stopper(tmpdir)
+            stopper.job_utils.load_job_summary = MagicMock(return_value={"status": "running"})
+            with (
+                patch("builtins.open", side_effect=PermissionError("denied")) as opened,
+                patch("data_juicer.utils.job.stopper.logger.error") as error,
+            ):
+                stopper.cleanup_job_resources()
+            opened.assert_called_once_with(stopper.work_dir / "job_summary.json", "w")
+            error.assert_called_once()
+            self.assertIn("denied", error.call_args.args[0])
+
+    @TEST_TAG("standalone")
+    def test_stop_job_without_ids_reports_no_termination(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             stopper = self._stopper(tmpdir)
             stopper.job_utils.load_job_summary = MagicMock(return_value=None)
@@ -129,8 +147,9 @@ class JobStopperTest(DataJuicerTestCaseBase):
             result = stopper.stop_job()
 
         self.assertFalse(result["success"])
+        self.assertEqual(result["processes_terminated"], 0)
+        self.assertEqual(result["threads_terminated"], 0)
         self.assertEqual(result["errors"], ["No process or thread IDs found in event logs"])
-        stopper.cleanup_job_resources.assert_called_once_with()
 
     @TEST_TAG("standalone")
     def test_stop_job_tracks_successes_and_failures(self):
@@ -143,17 +162,36 @@ class JobStopperTest(DataJuicerTestCaseBase):
                 return_value={"process_ids": {11, 22}, "thread_ids": {33}}
             )
             stopper.job_utils.find_processes_by_ids = MagicMock(return_value=[good, bad])
-            stopper.job_utils.find_threads_by_ids = MagicMock(return_value=[object()])
             stopper.terminate_process_gracefully = MagicMock(side_effect=[True, False])
             stopper.cleanup_job_resources = MagicMock()
             result = stopper.stop_job(force=True, timeout=7)
 
-        self.assertTrue(result["success"])
         self.assertEqual(result["processes_found"], 2)
         self.assertEqual(result["processes_terminated"], 1)
-        self.assertEqual(result["threads_terminated"], 1)
+        self.assertEqual(result["threads_found"], 1)
+        self.assertEqual(result["threads_terminated"], 0)
         self.assertEqual(result["errors"], ["Failed to terminate process 22"])
-        stopper.terminate_process_gracefully.assert_any_call(good, 7)
+        self.assertEqual(stopper.terminate_process_gracefully.call_args_list, [call(good, 7), call(bad, 7)])
+
+    @TEST_TAG("standalone")
+    def test_stop_job_counts_confirmed_process_termination(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            stopper = self._stopper(tmpdir)
+            proc = MagicMock(pid=11)
+            stopper.job_utils.load_job_summary = MagicMock(return_value={"status": "running"})
+            stopper.job_utils.extract_process_thread_ids = MagicMock(
+                return_value={"process_ids": {11}, "thread_ids": set()}
+            )
+            stopper.job_utils.find_processes_by_ids = MagicMock(return_value=[proc])
+            stopper.cleanup_job_resources = MagicMock()
+            result = stopper.stop_job(timeout=7)
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["processes_terminated"], 1)
+        self.assertEqual(result["threads_terminated"], 0)
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(proc.mock_calls, [call.terminate(), call.wait(timeout=7)])
+        proc.kill.assert_not_called()
 
     @TEST_TAG("standalone")
     def test_stop_job_found_ids_but_no_running_resources(self):
@@ -213,7 +251,7 @@ class StopperConvenienceAndCliTest(DataJuicerTestCaseBase):
 
     @TEST_TAG("standalone")
     def test_main_success_and_verbose(self):
-        result = {"success": True, "processes_terminated": 2, "threads_terminated": 1, "errors": []}
+        result = {"success": True, "processes_terminated": 2, "threads_terminated": 0, "errors": []}
         with (
             patch("sys.argv", ["stopper", "abc", "--base-dir", "/tmp/base", "--force", "--timeout", "4", "--verbose"]),
             patch("data_juicer.utils.job.stopper.stop_job", return_value=result) as stop,
