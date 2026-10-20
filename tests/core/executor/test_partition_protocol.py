@@ -1,6 +1,7 @@
 """Ray-free checks of checkpoint storage and the lineage commit log."""
 
 import os
+import threading
 
 import pyarrow as pa
 import pytest
@@ -162,3 +163,37 @@ def test_stats_files_are_returned_by_stage(tmp_path):
     commit, _ = log.prepare(0, [(SOURCE_SEQ, 0, 2)], (), stats)
     _persist(store, commit)
     assert CommitLog(store, stage_count=1, source_rows=2).verify() == {0: stats}
+
+
+def test_find_and_summary_include_empty_output_commits(tmp_path):
+    store = LocalStore(str(tmp_path))
+    log = CommitLog(store, stage_count=2, source_rows=5)
+    first, _ = _prepare(store, log, 0, [(SOURCE_SEQ, 0, 3)], 2)
+    _prepare(store, log, 0, [(SOURCE_SEQ, 3, 5)], 0)
+    last, _ = _prepare(store, log, 1, [(first.seq, 0, 2)], 4)
+    assert log.find(0, [[SOURCE_SEQ, 0, 3]]) == first
+    assert log.find(0, [(SOURCE_SEQ, 0, 2)]) is None
+    assert log.find(1, [(first.seq, 0, 2)]) == last
+    assert log.summary() == {0: (2, 5, 2), 1: (1, 2, 4)}
+    restored = CommitLog(store, stage_count=2, source_rows=5)
+    assert restored.find(0, first.consumed) == first
+    assert restored.summary() == log.summary()
+
+
+def test_manifest_reads_overlap_and_record_in_dependency_order(tmp_path):
+    store = LocalStore(str(tmp_path))
+    log = CommitLog(store, stage_count=2, source_rows=2)
+    first, _ = _prepare(store, log, 0, [(SOURCE_SEQ, 0, 2)], 2)
+    _prepare(store, log, 1, [(first.seq, 0, 2)], 1)
+    barrier = threading.Barrier(2)
+
+    class ConcurrentStore:
+        def list(self, prefix):
+            return list(reversed(store.list(prefix)))
+
+        def get(self, key):
+            barrier.wait(timeout=5)
+            return store.get(key)
+
+    restored = CommitLog(ConcurrentStore(), stage_count=2, source_rows=2)
+    assert restored.summary() == {0: (1, 2, 2), 1: (1, 2, 1)}

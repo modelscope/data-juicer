@@ -652,13 +652,14 @@ class RayBatchExecutionTest(unittest.TestCase):
             for mode, concurrency in (("actor", 3), ("actor", (1, 3)), ("task", 3)):
                 with self.subTest(op=op_class, mode=mode, concurrency=concurrency):
                     dataset = RayDataset(MagicMock(), auto_op_parallelism=False)
-                    dataset.data.map_batches.return_value = dataset.data
+                    dataset.data._map_batches_without_batch_size_validation.return_value = dataset.data
                     context = object()
-                    recovery = SimpleNamespace(context=context, batch_size=4, register_stats=lambda export: None)
+                    recovery = SimpleNamespace(context=context, register_stats=lambda export: None)
                     op = op_class(num_proc=concurrency, ray_execution_mode=mode)
                     dataset._run_single_op(op, defer_schema_probe=True, recovery=recovery)
-                    args, options = dataset.data.map_batches.call_args
-                    self.assertEqual(options["batch_size"], 4)
+                    args, options = dataset.data._map_batches_without_batch_size_validation.call_args
+                    self.assertIsNone(options["batch_size"])
+                    dataset.data.map_batches.assert_not_called()
                     compute = options["compute"]
                     if mode == "task":
                         self.assertIs(args[0], ray_partition_runner.run_checkpoint_task)

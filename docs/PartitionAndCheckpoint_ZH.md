@@ -50,7 +50,7 @@ partition:
   gpu_probe_sample_shuffle: false     # true 时先随机化 block 顺序再取样
   gpu_probe_sample_seed: 42           # 随机取样的种子；null 表示每次运行都重新取样，因此永不复用报告
   target_size_mb: 256    # 目标分区大小（128、256、512 或 1024）
-  size: 5000             # 自动分析失败时的回退值；启用检查点时为每次提交的行数
+  size: 5000             # 自动分析失败时的回退值；启用检查点时为每次提交的输入行数上限
   max_size_mb: 256       # 回退最大大小
 ```
 
@@ -110,15 +110,15 @@ checkpoint:
   enabled: true
   strategy: every_op     # every_op（默认）或 disabled
 partition:
-  size: 5000             # 每次提交的目标输入行数
+  size: 5000             # 每次提交的输入行数上限
 checkpoint_dir: s3://bucket/jobs/my_job   # 可选；默认 <work_dir>/checkpoints
 ```
 
-recipe 开头连续的每个 Mapper/Filter 都是保存点。数据始终留在 Ray Data 上：算子像不加检查点时一样经 object store 读写 block，每个 worker 在把输出 batch 往下游传之前，顺带把一份副本写到 `checkpoint_dir`。恢复单元在这一刻形成，而不是在读入数据时预先切好：一次提交记录这个 batch 消费了哪些输入行、产出了哪些 Parquet 文件，因此 Mapper 扩行或 Filter 全部过滤都能被准确记录。`partition.size` 是每次提交的目标输入行数；未设置时按 preflight 吞吐取约 30 秒的工作量（限制在 64–2048 行），没有吞吐数据时为 512。
+recipe 开头连续的每个 Mapper/Filter 都是保存点。数据始终留在 Ray Data 上：算子像不加检查点时一样经 object store 读写 block，每个 worker 在把输出 batch 往下游传之前，顺带把一份副本写到 `checkpoint_dir`。恢复单元在这一刻形成，而不是在读入数据时预先切好：一次提交记录这个 batch 消费了哪些输入行、产出了哪些 Parquet 文件，因此 Mapper 扩行或 Filter 全部过滤都能被准确记录。被检查点覆盖的阶段向 Ray 传入 `batch_size=None`，不会为凑满 `partition.size` 合并小 block；每个 Ray block 内切为最多 `partition.size` 输入行的提交，算子内部推理的 `batch_size` 不变。未设置 `partition.size` 时，该上限按 preflight 吞吐取约 30 秒的工作量（限制在 64–2048 行），没有吞吐数据时为 512。
 
 遇到第一个 Deduplicator、`Pipeline` 或其他需要一次看到全部数据的算子时，检查点前缀结束。该算子及其后的所有算子在合并后的输出上原样运行、不保存检查点，并会打印告警指出是哪个算子。
 
-提交由一个固定在 driver 节点上的协调 Ray actor 负责，它只处理元数据：分配提交序号，并拒绝输入行与另一个已提交 batch 重叠的提交。输入完全相同的重试 batch 直接复用已有提交，不会再写一份。每次提交以“仅在不存在时创建”的 manifest 发布，因此提交永远不会被覆盖。
+提交由一个固定在 driver 节点上的协调 Ray actor 负责，它只处理元数据：分配提交序号，并拒绝输入行与另一个已提交 batch 重叠的提交。重试时，worker 在运行算子前按阶段及已消费血缘查找持久化提交；若已存在，直接读取原输出，不再运行算子。并发尝试以先提交者为准，后提交者复用其输出。每次提交以“仅在不存在时创建”的 manifest 发布，因此提交永远不会被覆盖。
 
 `checkpoint_dir` 必须对所有 Ray worker 可见。支持共享 POSIX 路径和 `s3://`（AWS S3 或 MinIO 等 S3 兼容服务，通过 `boto3` 的 `If-None-Match` 条件写入）；其他协议会在启动时报错。
 
@@ -163,7 +163,7 @@ dj-process --config config.yaml --resume my_experiment_001
 1. 定位原任务的工作目录和检查点目录；
 2. 确认当前配置与首次运行配置一致；
 3. 重新读取输入并计算指纹，与 `run.json` 中的指纹、行数、schema 和被检查点覆盖的算子配置比较；
-4. 读取提交 manifest，算出每个算子还有哪些输入行没有消费；
+4. 以最多 32 个并行存储 `get` 读取提交 manifest，按 stage 顺序登记提交，算出每个算子还有哪些输入行没有消费；
 5. 每个算子只处理这些行，加上上一个算子已提交、但本算子尚未消费的行（由 worker 从存储读取）；
 6. 导出后校验每一条输入行都被恰好消费和交付一次；
 7. 校验通过后，才删除之前中断的运行留下的导出文件。

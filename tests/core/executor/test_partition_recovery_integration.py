@@ -236,10 +236,50 @@ def test_worker_death_after_yield_replays_the_committed_batch(tmp_path, local_ra
     else:
         monkeypatch.setattr(ray_partition_runner, "run_checkpoint_task", exit_after_first_commit_task)
     kwargs = {"num_proc": 1, "ray_execution_mode": mode}
-    ops = [DuplicateMapper(batch_size=1, **kwargs), WhitespaceNormalizationMapper(**kwargs)]
+    log_path = str(tmp_path / "calls.jsonl")
+    ops = [
+        LoggingMapper(log_path, batch_size=1, **kwargs),
+        DuplicateMapper(batch_size=1, **kwargs),
+        WhitespaceNormalizationMapper(**kwargs),
+    ]
     rows = _run(_executor(tmp_path), ops)
     assert (tmp_path / "checkpoints" / "partition_recovery" / "exited-once").exists()
     assert sorted(row["id"] for row in rows) == [0, 0, 1, 1, 2, 2, 3, 3]
+    assert sorted(_logged_ids(log_path)) == [0, 1, 2, 3]
+
+
+@pytest.mark.parametrize("block_rows,max_rows,expected", [(2, 8, [2, 2, 2, 2]), (8, 3, [3, 3, 2])])
+def test_commit_size_does_not_merge_blocks(tmp_path, local_ray, block_rows, max_rows, expected):
+    import pyarrow as pa
+
+    from data_juicer.core.data.ray_batch_plan import RayBatchPlan, map_whole_blocks
+    from data_juicer.core.executor.partition_protocol import SOURCE_SEQ, with_keys
+
+    store = LocalStore(str(tmp_path))
+    coordinator = ray_partition_runner._CommitCoordinator.remote(store, 1, 8)
+    context = ray_partition_runner.StageContext(store, 0, coordinator, max_rows)
+    plan = RayBatchPlan().map_batches(lambda batch: batch, batch_format="pyarrow")
+    table = with_keys(pa.table({"id": list(range(8))}), SOURCE_SEQ)
+    source = ray.data.from_arrow([table.slice(start, block_rows) for start in range(0, 8, block_rows)])
+    try:
+        result = map_whole_blocks(
+            source,
+            ray_partition_runner.run_checkpoint_task,
+            fn_args=(context, plan),
+            batch_format="pyarrow",
+        )
+        assert sorted(row["id"] for row in result.take_all()) == list(range(8))
+        commits = [Commit.from_bytes(store.get(key)) for key in store.list(COMMIT_DIR)]
+        assert sorted(commit.rows for commit in commits) == sorted(expected)
+    finally:
+        ray.kill(coordinator)
+
+
+def test_gpu_whole_block_plan_has_no_bundling_threshold(local_ray):
+    from data_juicer.core.data.ray_batch_plan import map_whole_blocks
+
+    result = map_whole_blocks(ray.data.range(4), lambda batch: batch, num_gpus=1)
+    assert result._logical_plan.dag.min_rows_per_bundled_input is None
 
 
 def test_expansion_shrinking_and_batches_within_commits(tmp_path, local_ray):

@@ -90,7 +90,7 @@ override_num_blocks: null                                   # override the numbe
 # partition configuration (for ray_partitioned executor)
 partition:
   mode: auto                                                # partition mode: "auto" (use optimizer) or "manual" (specify count or sample target)
-  size: null                                                # with checkpointing: target rows per checkpoint commit; otherwise the ordinary input-partition target; null derives a bounded commit size from measured throughput
+  size: null                                                # with checkpointing: max input rows per commit, without merging small blocks; otherwise the ordinary input-partition target; null derives a bounded commit size from measured throughput
   num_of_partitions: null                                   # optional explicit count; defaults to 4 when neither this nor size is set; "auto" derives a cluster-aware count in auto mode (floor = nodes x partitions_per_node / resolved concurrency, ceiling = optimizer estimate)
   partitions_per_node: auto                                 # per-node partition multiplier for auto mode; "auto" uses per-node GPU slots for GPU pipelines (2x for CPU-only), set a positive integer to override
   max_concurrent_partitions: auto                           # resource-aware driver concurrency; set a positive integer to override

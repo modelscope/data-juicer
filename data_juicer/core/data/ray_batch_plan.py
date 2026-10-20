@@ -1,9 +1,10 @@
 import hashlib
+import inspect
 from dataclasses import dataclass
 from types import GeneratorType
 
 import pyarrow.fs as pafs
-from ray.data import ActorPoolStrategy
+from ray.data import ActorPoolStrategy, Dataset
 from ray.data._internal.block_batching import batch_blocks
 from ray.data.block import BlockAccessor
 from ray.data.datasource.path_util import _resolve_paths_and_filesystem
@@ -86,7 +87,23 @@ class RayBatchPlan:
         else:
             function = ray_partition_runner.run_checkpoint_task
             options.update(fn_args=(recovery.context, self))
-        return dataset.map_batches(function, batch_size=recovery.batch_size, batch_format="pyarrow", **options)
+        return map_whole_blocks(dataset, function, batch_format="pyarrow", zero_copy_batch=True, **options)
+
+
+def map_whole_blocks(dataset, function, **options):
+    """Hand every Ray block to ``function`` unmerged, also for GPU stages.
+
+    An integer ``batch_size`` makes Ray merge smaller blocks into one task, and
+    the public ``map_batches`` rejects ``batch_size=None`` together with GPUs.
+    """
+    method = dataset._map_batches_without_batch_size_validation
+    accepted = inspect.signature(method).parameters
+    defaults = {
+        name: parameter.default
+        for name, parameter in inspect.signature(Dataset.map_batches).parameters.items()
+        if name in accepted and parameter.default is not inspect.Parameter.empty
+    }
+    return method(function, **{**defaults, **options, "batch_size": None})
 
 
 class BatchPlanWorker:
@@ -98,7 +115,9 @@ class BatchPlanWorker:
         options = step.options
         batch_size = options.get("batch_size")
         if batch_size == "auto":
-            from ray.data._internal.execution.operators.map_transformer import _compute_auto_batch_size
+            from ray.data._internal.execution.operators.map_transformer import (
+                _compute_auto_batch_size,
+            )
 
             batch_size, tables = _compute_auto_batch_size(tables)
         batches = batch_blocks(

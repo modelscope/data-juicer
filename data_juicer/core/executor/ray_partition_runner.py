@@ -13,6 +13,7 @@ from dataclasses import dataclass
 import numpy as np
 import pyarrow as pa
 import ray
+from loguru import logger
 from ray.util.scheduling_strategies import NodeAffinitySchedulingStrategy
 
 from data_juicer.core.data.ray_batch_plan import BatchPlanWorker
@@ -76,6 +77,21 @@ class _CommitCoordinator:
             self.condition.notify_all()
         return commit
 
+    def lookup(self, stage, consumed):
+        """Return the durable commit of each consumed set, or ``None`` if it is not committed."""
+        with self.condition:
+            self._check()
+            commits = [self.log.find(stage, item) for item in consumed]
+            self.condition.wait_for(
+                lambda: self.failure is not None or all(c is None or c.seq in self.durable for c in commits)
+            )
+            self._check()
+            return commits
+
+    def summary(self):
+        with self.condition:
+            return self.log.summary()
+
     def deliver(self, consumed):
         with self.condition:
             self._check()
@@ -92,12 +108,10 @@ class StageContext:
     store: object
     stage: int
     coordinator: object
+    max_rows: int
 
 
-def _checkpoint_batch(context, worker, batch):
-    if not batch.num_rows:
-        return
-    consumed = key_ranges(batch[SEQ_COLUMN].to_numpy(), batch[IDX_COLUMN].to_numpy())
+def _commit_slice(context, worker, batch, consumed):
     stats_files = ()
 
     def write_stats(tables):
@@ -111,10 +125,29 @@ def _checkpoint_batch(context, worker, batch):
     files = write_tables(context.store, outputs)
     commit = ray.get(context.coordinator.commit.remote(context.stage, consumed, files, stats_files))
     if commit.files != files:
-        # A retried batch must replay the winner its consumers may already hold.
+        # A concurrent attempt won; consumers may already hold its output.
         outputs = list(read_tables(context.store, commit.files))
-    if outputs:
-        yield with_keys(concat_outputs(outputs), commit.seq)
+    return commit, outputs
+
+
+def _checkpoint_batch(context, worker, batch):
+    """Commit a Ray block in slices of at most ``max_rows`` rows.
+
+    A retried block replays the slices it already committed instead of
+    recomputing them, because consumers may already hold those outputs.
+    """
+    slices = [batch.slice(start, context.max_rows) for start in range(0, batch.num_rows, context.max_rows)]
+    if not slices:
+        return
+    consumed = [key_ranges(item[SEQ_COLUMN].to_numpy(), item[IDX_COLUMN].to_numpy()) for item in slices]
+    committed = ray.get(context.coordinator.lookup.remote(context.stage, consumed))
+    for piece, ranges, commit in zip(slices, consumed, committed):
+        if commit is None:
+            commit, outputs = _commit_slice(context, worker, piece, ranges)
+        else:
+            outputs = list(read_tables(context.store, commit.files))
+        if outputs:
+            yield with_keys(concat_outputs(outputs), commit.seq)
 
 
 class CheckpointStageActor:
@@ -188,11 +221,7 @@ class RecoveryStage:
 
     @property
     def context(self):
-        return StageContext(self.recovery.store, self.index, self.recovery.coordinator)
-
-    @property
-    def batch_size(self):
-        return self.recovery.partition_size
+        return StageContext(self.recovery.store, self.index, self.recovery.coordinator, self.recovery.partition_size)
 
     def register_stats(self, export):
         self.recovery.stats_exports[self.index] = export
@@ -267,6 +296,11 @@ class PartitionRecovery:
     def finish(self):
         """Verify complete delivery, then publish statistics of every commit."""
         stats = ray.get(self.coordinator.verify.remote())
+        for stage, (commits, consumed, produced) in sorted(ray.get(self.coordinator.summary.remote()).items()):
+            logger.info(
+                f"Checkpoint stage {stage}: {commits} commit(s), {consumed} rows in "
+                f"({consumed / commits:.1f} per commit), {produced} rows out"
+            )
         for stage, export in sorted(self.stats_exports.items()):
             files = stats.get(stage, ())
             if files:

@@ -16,6 +16,7 @@ import os
 import time
 import uuid
 from bisect import bisect_right
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from itertools import groupby
 from pathlib import Path
@@ -385,15 +386,17 @@ class CommitLog:
         self.consumed: Dict[Tuple[int, int], IntervalSet] = {}
         self.digests: Dict[str, Optional[int]] = {}
         self.next_seq = 0
-        # Key order loads every upstream stage before its consumers.
-        for key in sorted(store.list(COMMIT_DIR)):
-            commit = Commit.from_bytes(store.get(key))
-            if key != commit_key(commit.stage, commit.seq) or not 0 <= commit.stage < stage_count:
-                raise ProtocolError(f"Checkpoint commit {key} does not belong to this run")
-            digest, duplicate = self._claim(commit.stage, commit.consumed)
-            if duplicate:
-                raise ProtocolError(f"Checkpoint commit {key} duplicates an earlier commit")
-            self._record(digest, commit)
+        # Listing initializes the S3 client before concurrent reads start.
+        keys = sorted(store.list(COMMIT_DIR))
+        with ThreadPoolExecutor(max_workers=min(32, len(keys)) or 1) as pool:
+            for key, data in zip(keys, pool.map(store.get, keys)):
+                commit = Commit.from_bytes(data)
+                if key != commit_key(commit.stage, commit.seq) or not 0 <= commit.stage < stage_count:
+                    raise ProtocolError(f"Checkpoint commit {key} does not belong to this run")
+                digest, duplicate = self._claim(commit.stage, commit.consumed)
+                if duplicate:
+                    raise ProtocolError(f"Checkpoint commit {key} duplicates an earlier commit")
+                self._record(digest, commit)
 
     def _upstream_rows(self, level: int, seq: int) -> int:
         if level == 0:
@@ -405,11 +408,30 @@ class CommitLog:
             raise ProtocolError(f"Stage {level} consumed rows of an unknown upstream commit {seq}")
         return upstream.rows
 
+    @staticmethod
+    def _digest(level: int, consumed: Ranges) -> str:
+        return hashlib.sha256(json.dumps([level, consumed]).encode()).hexdigest()
+
+    def find(self, stage: int, consumed) -> Optional[Commit]:
+        seq = self.digests.get(self._digest(stage, _canonical(consumed)))
+        return self.commits[seq] if seq is not None else None
+
+    def summary(self) -> Dict[int, Tuple[int, int, int]]:
+        totals = {}
+        for commit in self.commits.values():
+            count, consumed, produced = totals.get(commit.stage, (0, 0, 0))
+            totals[commit.stage] = (
+                count + 1,
+                consumed + sum(stop - start for _, start, stop in commit.consumed),
+                produced + commit.rows,
+            )
+        return totals
+
     def _claim(self, level: int, consumed: Ranges) -> Tuple[str, bool]:
         """Reserve consumed keys; return ``(digest, is_exact_duplicate)``."""
         if not consumed:
             raise ProtocolError("A commit must consume at least one row")
-        digest = hashlib.sha256(json.dumps([level, consumed]).encode()).hexdigest()
+        digest = self._digest(level, consumed)
         if digest in self.digests:
             return digest, True
         previous = None

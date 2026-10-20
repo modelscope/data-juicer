@@ -7,11 +7,13 @@ configuration and usage see [PartitionAndCheckpoint.md](PartitionAndCheckpoint.m
 ## Data path
 
 All operators run in one Ray Data plan, and rows move between them through
-the Ray object store exactly as without checkpoints. Checkpointing is a side
-path: a worker that finishes an outer batch of `partition.size` rows writes its
-output to storage, commits it, and only then yields the batch downstream. A
-downstream commit therefore never references a row whose producing batch is
-not committed.
+the Ray object store exactly as without checkpoints. Checkpointed stages pass
+`batch_size=None` to Ray, so small blocks are not combined to reach
+`partition.size`. Within each Ray block, workers form commits of at most
+`partition.size` input rows; the operator's internal inference `batch_size`
+is unchanged. Checkpointing is a side path: a worker writes its output to
+storage, commits it, and only then yields it downstream. A downstream commit
+therefore never references a row whose producing batch is not committed.
 
 ## Lineage keys
 
@@ -36,9 +38,14 @@ recording:
 - the produced Parquet files under `data/`, each with row count and SHA-256;
 - the Filter statistics files, if the stage exports statistics.
 
-Commits are not planned ahead. Their number and boundaries follow the batches
-that Ray Data actually forms, so a Mapper may expand rows and a Filter may drop
-all of them; an empty output still commits its consumed ranges.
+Commits are not planned ahead. Their boundaries follow Ray blocks, split into
+at most `partition.size` input rows per commit. A Mapper may expand rows and a
+Filter may drop all of them; an empty output still commits its consumed ranges.
+
+Before running the operator, a worker looks up a durable commit by the stage
+and consumed lineage. If one exists, it reads and yields that commit's output
+without running the operator. Concurrent attempts may both compute, but the
+first to commit wins; later attempts reuse its output.
 
 A Ray actor pinned to the driver node coordinates commits. It handles metadata
 only; data files are written by the workers. Under a lock it checks the consumed
@@ -74,7 +81,8 @@ its order or the operator configuration changed, or if commits exist without
 
 ## Resume
 
-Loading every manifest gives, per stage, the committed consumed ranges. The
+Manifest loading uses at most 32 concurrent storage `get` calls and registers
+commits in stage order, giving each stage's committed consumed ranges. The
 resumed plan is built stage by stage:
 
 - the input of stage 0 is the input rows that stage 0 has not consumed;

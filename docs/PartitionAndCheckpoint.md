@@ -50,7 +50,7 @@ partition:
   gpu_probe_sample_shuffle: false     # true randomizes block order before sampling
   gpu_probe_sample_seed: 42           # Seed for the shuffled sample; null re-samples, and never reuses the report
   target_size_mb: 256    # Target partition size (128, 256, 512, or 1024)
-  size: 5000             # Fallback if auto-analysis fails; rows per commit when checkpointing
+  size: 5000             # Fallback if auto-analysis fails; max input rows per commit when checkpointing
   max_size_mb: 256       # Fallback max size
 ```
 
@@ -197,7 +197,7 @@ checkpoint:
   enabled: true
   strategy: every_op     # every_op (default) or disabled
 partition:
-  size: 5000             # Target rows per commit
+  size: 5000             # Maximum input rows per commit
 checkpoint_dir: s3://bucket/jobs/my_job   # Optional; defaults to <work_dir>/checkpoints
 ```
 
@@ -208,9 +208,12 @@ uncheckpointed run, and each worker writes a copy of its output batch to
 is formed at that moment rather than when the input is read: one commit records
 which input rows the batch consumed and which Parquet files it produced, so a
 Mapper that expands rows or a Filter that drops all of them is still recorded
-exactly. `partition.size` is the target number of input rows per commit;
-without it, the size is derived from preflight throughput (about 30 seconds of
-work, between 64 and 2048 rows) and defaults to 512.
+exactly. Checkpointed stages pass `batch_size=None` to Ray, so small blocks are
+not combined to reach `partition.size`. Each Ray block is split into commits
+of at most `partition.size` input rows, without changing the operator's internal
+inference `batch_size`. Without `partition.size`, the limit is derived from
+preflight throughput (about 30 seconds of work, between 64 and 2048 rows) and
+defaults to 512.
 
 The first Deduplicator, `Pipeline` or other operator that needs all rows at
 once ends the checkpointed prefix. It and every later operator run unchanged on
@@ -218,9 +221,11 @@ the merged output without checkpoints, and a warning names the operator.
 
 Commits are coordinated by a metadata-only Ray actor pinned to the driver node.
 It hands out commit sequence numbers and rejects a batch whose input rows
-overlap a different committed batch. A retried batch with identical input reuses
-the existing commit instead of writing a second one. Each commit is published as
-a manifest that is created only if absent, so a commit is never overwritten.
+overlap a different committed batch. Before running the operator, a retry looks
+up a durable commit by the stage and consumed lineage; if found, it reads the
+original output without running the operator. Concurrent attempts use the
+first committed result; later attempts reuse its output. Each commit is published
+as a manifest that is created only if absent, so a commit is never overwritten.
 
 `checkpoint_dir` must be visible to every Ray worker. Supported locations are a
 shared POSIX path and `s3://` (AWS S3 or an S3-compatible service such as
@@ -272,8 +277,8 @@ strict resume in the following order:
 2. verify that the current configuration matches the original run;
 3. read and fingerprint the input again and compare it, its row count, schema
    and the checkpointed operator configuration with `run.json`;
-4. load the commit manifests and work out, for every operator, which input rows
-   are not yet consumed;
+4. load commit manifests with at most 32 concurrent storage `get` calls,
+   register commits in stage order, and determine each operator's unconsumed rows;
 5. run each operator only on those rows plus the committed rows of the previous
    operator that it has not consumed yet, reading committed rows from storage on
    the workers;

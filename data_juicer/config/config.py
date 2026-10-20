@@ -674,8 +674,8 @@ def build_base_parser() -> ArgumentParser:
         type=Optional[PositiveInt],
         default=None,
         help=(
-            "Optional rows-per-partition target. With checkpointing, this is the target number of rows "
-            "per checkpoint commit; operators still use their own batch_size inside it. Without "
+            "Optional rows-per-partition target. With checkpointing, this is the maximum number of input rows "
+            "per checkpoint commit; small Ray blocks are not merged. Operators keep their own batch_size. Without "
             "checkpointing, it controls ordinary Ray input partitioning. When omitted, the executor derives "
             "a bounded commit size from measured throughput."
         ),
