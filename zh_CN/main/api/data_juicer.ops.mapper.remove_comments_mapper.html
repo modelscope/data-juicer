@@ -467,7 +467,7 @@ parameters. Currently, it is designed to work with 'tex' documents. The operator
 processes each sample in the batch and applies regular expressions to remove comments.
 The processed text is then updated in the original samples.</p>
 <ul class="simple">
-<li><p>Inline comments are removed using the pattern <cite>[^]%.+$</cite>.</p></li>
+<li><p>Inline comments are removed without consuming the preceding text or line break.</p></li>
 <li><p>Multiline comments are removed using the pattern <a href="#id1"><span class="problematic" id="id2">`</span></a>^%.*</p></li>
 </ul>
 </div></blockquote>
