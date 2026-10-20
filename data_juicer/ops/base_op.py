@@ -789,6 +789,10 @@ class Mapper(OP):
                 self.process = original_process
 
         free_models()
+        if getattr(self, "drop_text", False):
+            from data_juicer.ops.mapper.drop_text import remove_text_from_dataset
+
+            new_dataset = remove_text_from_dataset(new_dataset, self.text_key)
         return new_dataset
 
 
