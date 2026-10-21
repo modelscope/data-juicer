@@ -5,9 +5,12 @@ from jsonargparse import Namespace
 from contextlib import redirect_stdout
 from io import StringIO
 from data_juicer.config import init_configs
-from data_juicer.core.data.dataset_builder import (rewrite_cli_datapath, 
-                                                   parse_cli_datapath,
-                                                   DatasetBuilder)
+from data_juicer.core.data.dataset_builder import (
+    DatasetBuilder,
+    _redact_sensitive_config,
+    parse_cli_datapath,
+    rewrite_cli_datapath,
+)
 from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, TEST_TAG)
 from data_juicer.core.data.load_strategy import RayLocalJsonDataLoadStrategy
@@ -35,6 +38,34 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
     def tearDown(self):
         super().tearDown()
         os.chdir(self._original_cwd)
+
+    def test_redact_sensitive_dataset_config(self):
+        config = {
+            "configs": [
+                {
+                    "source": "iceberg",
+                    "catalog_kwargs": {
+                        "s3.access-key-id": "access",
+                        "s3.secret-access-key": "secret",
+                        "oauth_token": "token",
+                        "adls.account-key": "account-key",
+                        "uri": "postgresql://user:password@catalog.example.com/db",
+                        "warehouse": "s3://bucket/path",
+                    },
+                }
+            ]
+        }
+        redacted = _redact_sensitive_config(config)
+
+        self.assertEqual(redacted["configs"][0]["catalog_kwargs"]["s3.access-key-id"], "***")
+        self.assertEqual(redacted["configs"][0]["catalog_kwargs"]["s3.secret-access-key"], "***")
+        self.assertEqual(redacted["configs"][0]["catalog_kwargs"]["oauth_token"], "***")
+        self.assertEqual(redacted["configs"][0]["catalog_kwargs"]["adls.account-key"], "***")
+        self.assertEqual(
+            redacted["configs"][0]["catalog_kwargs"]["uri"], "postgresql://***@catalog.example.com/db"
+        )
+        self.assertEqual(redacted["configs"][0]["catalog_kwargs"]["warehouse"], "s3://bucket/path")
+        self.assertEqual(config["configs"][0]["catalog_kwargs"]["s3.secret-access-key"], "secret")
 
     def test_rewrite_cli_datapath_local_single_file(self):
         dataset_path = os.path.join(WORK_DIR, "test_data/sample.txt")

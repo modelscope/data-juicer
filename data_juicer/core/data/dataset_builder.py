@@ -1,4 +1,5 @@
 import os
+import re
 import shlex
 from typing import List, Tuple
 
@@ -13,6 +14,29 @@ from data_juicer.core.data.data_validator import DataValidatorRegistry
 from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
 from data_juicer.utils.file_utils import is_absolute_path
 from data_juicer.utils.sample import random_sample
+
+
+def _redact_sensitive_config(value):
+    if isinstance(value, dict):
+        redacted = {}
+        for key, item in value.items():
+            tokens = str(key).lower().replace("-", "_").replace(".", "_").split("_")
+            sensitive = any(
+                token in {"password", "passwd", "secret", "token", "credential", "credentials", "authorization"}
+                for token in tokens
+            ) or any(
+                tokens[index : index + 2] in (["access", "key"], ["account", "key"], ["api", "key"], ["private", "key"])
+                for index in range(len(tokens) - 1)
+            )
+            redacted[key] = "***" if sensitive else _redact_sensitive_config(item)
+        return redacted
+    if isinstance(value, str):
+        return re.sub(r"(?<=://)[^/@\s]+@", "***@", value)
+    if isinstance(value, list):
+        return [_redact_sensitive_config(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_redact_sensitive_config(item) for item in value)
+    return value
 
 
 def deprecated_load_data_np_kwargs(load_data_np, executor_type: str) -> dict:
@@ -80,7 +104,7 @@ class DatasetBuilder(object):
             logger.info(f"found dataset_path setting: {cfg.dataset_path}")
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
         elif hasattr(cfg, "dataset") and cfg.dataset:
-            logger.info(f"found dataset setting: {cfg.dataset}")
+            logger.info(f"found dataset setting: {_redact_sensitive_config(cfg.dataset)}")
             ds_configs = cfg.dataset
         else:
             logger.warning(
