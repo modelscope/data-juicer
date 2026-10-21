@@ -6,11 +6,15 @@ This operator implements a scalable near-duplicate image detection algorithm des
 
 Both this operator and its `_with_uid` variant require exactly one image per sample. Image paths and image bytes can each be a scalar or a one-element list. Bytes take precedence, with missing bytes falling back to the path for that sample. Multi-image samples and samples with neither source are rejected instead of silently dropping content.
 
+If both DALI and Pillow fail to decode an image, the operation raises an error instead of replacing it with a black image. An explicit positive `minhash_batch_size` is honored on CPU and GPU; only `"auto"` estimates a batch size from available memory. Each invocation uses independent union-find actors, so an operator instance can be reused while previous results remain lazy.
+
 一个在 Ray 分布式模式下运行的图像 MinHash LSH 去重器。
 
 该算子实现了一种专为大规模数据集设计的可扩展的近似重复图像检测算法。它利用预训练的视觉模型（如 BEiT）提取代表图像块语义内容的离散视觉 token。这些 token 用于计算 MinHash 签名，然后通过局部敏感哈希 (LSH) 进行处理。最后，使用平衡树结构 (BTS) 并查集算法在分布式 Ray worker 间解析连通分量，从而根据 Jaccard 相似度阈值过滤掉重复图像。它支持 CPU 和 GPU 执行，并在可用时利用 NVIDIA DALI 加速图像解码。
 
 该算子及其 `_with_uid` 版本要求每条样本恰好包含一张图片。图片路径和图片字节均支持单值或单元素列表；优先使用字节，缺失时逐样本回退到路径。多图样本及两种来源均缺失的样本会明确报错，不会静默丢弃内容。
+
+DALI 与 Pillow 均无法解码图片时，算子会明确报错，不会用黑图替代。CPU 和 GPU 均遵循显式指定的正整数 `minhash_batch_size`；仅 `"auto"` 按可用内存估算批大小。每次运行使用独立并查集 actor，同一算子实例可以重复使用，先前返回的惰性结果仍可正常读取。
 
 Type 算子类型: **deduplicator**
 

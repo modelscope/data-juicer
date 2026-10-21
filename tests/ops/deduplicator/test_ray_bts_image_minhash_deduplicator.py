@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import sys
@@ -125,16 +126,18 @@ class ImageMinHashRegressionTest(unittest.TestCase):
             np.testing.assert_array_equal(actual.cpu().numpy(), expected)
         return actor
 
-    def _op(self, op_class=RayImageBTSMinhashDeduplicator):
+    def _op(self, op_class=RayImageBTSMinhashDeduplicator, **kwargs):
+        options = dict(
+            num_permutations=16,
+            num_bands=4,
+            num_rows_per_band=4,
+            work_dir=self.work_dir,
+            accelerator="cpu",
+            minhash_batch_size=2,
+        )
+        options.update(kwargs)
         with patch.object(image_minhash, "prepare_model", return_value="offline-model"):
-            return op_class(
-                num_permutations=16,
-                num_bands=4,
-                num_rows_per_band=4,
-                work_dir=self.work_dir,
-                accelerator="cpu",
-                minhash_batch_size=2,
-            )
+            return op_class(**options)
 
     def _check_signatures(self, use_cuda=False, simulate_cuda=False):
         actor = self._actor(use_cuda)
@@ -309,6 +312,43 @@ class ImageMinHashRegressionTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Missing image bytes and path"):
                     actor._decode_images(samples)
 
+    def test_decode_failures_do_not_become_valid_black_images(self):
+        actor = self._actor()
+        bad_path = Path(self.work_dir, "bad.png")
+        bad_path.write_bytes(b"invalid image")
+        black_path = Path(self.work_dir, "black.png")
+        Image.new("RGB", (224, 224), (0, 0, 0)).save(black_path)
+        with patch.dict(sys.modules, {"nvidia.dali": None}), patch.object(ImageFile, "LOAD_TRUNCATED_IMAGES", False):
+            for samples in (
+                {"images": [[str(bad_path)], [str(black_path)]]},
+                {"images": [[str(black_path)], [str(bad_path)]]},
+                {"image_bytes": [b"invalid image", black_path.read_bytes()]},
+                {"images": [[str(Path(self.work_dir, "missing.png"))]]},
+            ):
+                with self.subTest(samples=list(samples)):
+                    with self.assertRaisesRegex(ValueError, "could not decode image at row [01]") as raised:
+                        actor.compute_minhash(samples)
+                    self.assertIsNotNone(raised.exception.__cause__)
+                    actor.processor.assert_not_called()
+                    actor.model.assert_not_called()
+                    self.assertFalse(ImageFile.LOAD_TRUNCATED_IMAGES)
+            decoded = actor._decode_images({"images": [[str(black_path)]]})
+            self.assertEqual(tuple(decoded.shape), (1, 224, 224, 3))
+            self.assertEqual(int(torch.count_nonzero(decoded)), 0)
+            self.assertFalse(ImageFile.LOAD_TRUNCATED_IMAGES)
+
+    def test_find_compresses_a_deep_chain_without_recursion(self):
+        graph = image_minhash.BTSUnionFind(256, 1, 0, [], 20, 10)
+        graph.parent = {uid: uid - 1 for uid in range(1, 10000)}
+        self.assertEqual(graph.find(9999), 0)
+        self.assertEqual(set(graph.parent.values()), {0})
+        self.assertEqual(graph.find(10000), 10000)
+
+    def test_invalid_explicit_batch_sizes_are_rejected(self):
+        for value in (None, True, 0, -1, "invalid"):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "positive integer"):
+                self._op(minhash_batch_size=value)
+
     def test_with_uid_converts_arrow_integers_before_union(self):
         op = self._op(image_minhash.RayImageBTSMinhashDeduplicatorWithUid)
         graph = image_minhash.BTSUnionFind(256, 1, 0, [], 20, 10)
@@ -359,12 +399,27 @@ class ImageMinHashRegressionTest(unittest.TestCase):
                 self.assertEqual(dataset.map_batches.call_args.args, (image_minhash.ImageMinHashActor,))
                 options = dataset.map_batches.call_args.kwargs
                 self.assertEqual(options["num_gpus"], int(use_cuda))
-                self.assertGreater(options["batch_size"], 0)
+                self.assertEqual(options["batch_size"], 2)
+                self.assertEqual(options["fn_constructor_kwargs"]["batch_size"], 2)
                 self.assertEqual((options["compute"].min_size, options["compute"].max_size), (1, 1))
                 self.assertEqual(options["fn_kwargs"], {"image_key": "images", "image_bytes_key": "image_bytes"})
                 for name in ("perm_a", "perm_b"):
                     self.assertIs(options["fn_constructor_kwargs"][name], getattr(op, name))
                     np.testing.assert_array_equal(getattr(op, name), getattr(self, name))
+
+    def test_auto_batch_sizes_still_follow_available_memory(self):
+        for use_cuda, expected in ((False, 229), (True, 28)):
+            with self.subTest(use_cuda=use_cuda):
+                op, dataset = self._op(minhash_batch_size="auto"), Mock()
+                with (
+                    patch.object(op, "use_cuda", return_value=use_cuda),
+                    patch.object(image_minhash, "ray") as ray_mock,
+                    patch.object(image_minhash, "ray_gpu_count", return_value=1),
+                    patch.object(image_minhash, "ray_available_gpu_memories", return_value=[1024]),
+                ):
+                    ray_mock.cluster_resources.return_value = {"CPU": 4, "memory": 16 * 1024**3}
+                    op._compute_minhash(dataset)
+                self.assertEqual(dataset.map_batches.call_args.kwargs["batch_size"], expected)
 
     def test_independent_runs_keep_lazy_inputs_and_use_unique_scratch(self):
         job_dir = Path(self.work_dir, ".tmp", "same-job")
@@ -399,18 +454,87 @@ class ImageMinHashRegressionTest(unittest.TestCase):
                 writer = dataset.map_batches.return_value.map_batches.return_value.write_parquet
                 writer.side_effect = write_parquet
                 result = op.run(dataset)
-                self.assertEqual(op.union_find_parallel_num, 1)
+                self.assertIsNone(op.union_find_parallel_num)
                 writer.assert_called_once()
                 ray_mock.data.read_parquet.assert_called_with(writer.call_args.args[0], concurrency=1)
-                strategy.assert_any_call(op.filter_with_union_find, concurrency=1)
                 filtered = ray_mock.data.read_parquet.return_value.map_batches
-                self.assertEqual(filtered.call_args.args, (op.filter_with_union_find,))
+                filter_function = filtered.call_args.args[0]
+                run_op = filter_function.__self__
+                self.assertIsNot(run_op, op)
+                self.assertTrue(run_op._actors_initialized)
+                self.assertEqual(run_op.union_find_parallel_num, 1)
+                strategy.assert_any_call(filter_function, concurrency=1)
                 self.assertEqual(filtered.call_args.kwargs["compute"].size, 1)
                 self.assertIs(result, filtered.return_value)
         self.assertEqual(len(set(paths)), 2)
         self.assertEqual(sentinel.read_bytes(), b"untouched")
         for path in paths:
             self.assertEqual((path / "part.parquet").read_bytes(), b"current-run")
+
+
+class ImageMinHashRayRegressionTest(DataJuicerTestCaseBase):
+    """Real Ray graph tests with precomputed signatures; no model or GPU required."""
+
+    def setUp(self):
+        super().setUp()
+        # CI's Ray containers share the repository mount, but not /tmp.
+        tmp = tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parent)
+        self.addCleanup(tmp.cleanup)
+        self.work_dir = tmp.name
+        patcher = patch.object(RayImageBTSMinhashDeduplicator, "_compute_minhash", lambda self, dataset: dataset)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _op(self, cls):
+        with patch.object(image_minhash, "prepare_model", return_value="offline-model"):
+            return cls(
+                accelerator="cpu",
+                work_dir=self.work_dir,
+                num_permutations=2,
+                num_bands=2,
+                num_rows_per_band=1,
+                union_find_parallel_num=1,
+                minhash_batch_size=2,
+                actor_memory=1024**2,
+            )
+
+    def _dataset(self, labels, signatures, uids=None):
+        import ray
+
+        columns = {"label": labels, "_minhash": pa.array(signatures, type=pa.list_(pa.uint32(), 2))}
+        if uids is not None:
+            columns[image_minhash.HashKeys.uid] = pa.array(uids, type=pa.int64())
+        return ray.data.from_arrow(pa.table(columns))
+
+    def _export_labels(self, result, name):
+        directory = Path(self.work_dir, name)
+        result.write_json(str(directory))
+        rows = [json.loads(line) for path in directory.glob("*.json") for line in path.read_text().splitlines()]
+        self.assertTrue(rows)
+        self.assertTrue(all(set(row) == {"label"} for row in rows))
+        return {row["label"] for row in rows}
+
+    @TEST_TAG("ray")
+    def test_reusing_both_variants_preserves_previous_lazy_results(self):
+        for cls in (RayImageBTSMinhashDeduplicator, image_minhash.RayImageBTSMinhashDeduplicatorWithUid):
+            with self.subTest(variant=cls.__name__):
+                op = self._op(cls)
+                uids = [11, 12, 13] if cls is image_minhash.RayImageBTSMinhashDeduplicatorWithUid else None
+                first = op.run(
+                    self._dataset(["first", "first-duplicate", "first-unique"], [[7, 9], [7, 9], [1, 2]], uids)
+                )
+                second = op.run(
+                    self._dataset(["second", "second-duplicate", "second-unique"], [[3, 4], [3, 4], [7, 9]], uids)
+                )
+                self.assertEqual(self._export_labels(second, f"{cls.__name__}-second"), {"second", "second-unique"})
+                self.assertEqual(self._export_labels(first, f"{cls.__name__}-first"), {"first", "first-unique"})
+
+    @TEST_TAG("ray")
+    def test_with_uid_merges_deep_band_chain(self):
+        op = self._op(image_minhash.RayImageBTSMinhashDeduplicatorWithUid)
+        uids = list(range(2999, -1, -1))
+        dataset = self._dataset([str(uid) for uid in uids], [[uid // 2, (uid + 1) // 2] for uid in uids], uids)
+        self.assertEqual(self._export_labels(op.run(dataset), "deep-chain"), {"0"})
 
 
 if __name__ == "__main__":

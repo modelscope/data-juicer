@@ -1,3 +1,4 @@
+import copy
 import os
 import time
 from typing import Optional, Union
@@ -159,11 +160,14 @@ class BTSUnionFind:
         self.set_edge_buffer()
 
     def find(self, x):
-        if x not in self.parent:
-            return x
-        else:
-            self.parent[x] = self.find(self.parent[x])
-            return self.parent[x]
+        root = x
+        while root in self.parent:
+            root = self.parent[root]
+        while x in self.parent:
+            parent = self.parent[x]
+            self.parent[x] = root
+            x = parent
+        return root
 
     def union(self, x, y):
         px = self.find(x)
@@ -266,16 +270,17 @@ class ImageMinHashActor:
 
     def _decode_images(self, samples: dict, image_key: str = "images", image_bytes_key: str = "image_bytes"):
         """
-        Batch decode images using DALI with chunking and resizing for uniform shapes.
-        Uses DALI to read from image bytes if available, otherwise reads from image paths.
+        Decode one image per row using DALI, falling back to Pillow.
+        Raise if neither decoder can read a row; invalid images must not be hashed
+        as ordinary black images.
 
         Returns:
-            torch.Tensor: [N, C, H, W] tensor on GPU with all decoded images
+            torch.Tensor: [N, H, W, C] RGB uint8 tensor on the actor's device.
         """
         import io
 
         import torch
-        from PIL import Image, ImageFile
+        from PIL import Image
 
         paths = samples.get(image_key)
         image_bytes = samples.get(image_bytes_key)
@@ -363,25 +368,16 @@ class ImageMinHashActor:
 
         def decode_images_with_torch():
 
-            ImageFile.LOAD_TRUNCATED_IMAGES = True
-
             fallback_tensors = []
-            for item in batch_data:
+            for row, item in enumerate(batch_data):
                 try:
-                    if isinstance(item, (bytes, bytearray, memoryview)):
-                        img = Image.open(io.BytesIO(item))
-                    else:
-                        img = Image.open(item)
-
-                    img = img.convert("RGB")
-                    img = img.resize((resize_x, resize_y), Image.Resampling.BILINEAR)
-
-                    img_tensor = torch.from_numpy(np.array(img))
+                    source = io.BytesIO(item) if isinstance(item, (bytes, bytearray, memoryview)) else item
+                    with Image.open(source) as image:
+                        image = image.convert("RGB").resize((resize_x, resize_y), Image.Resampling.BILINEAR)
+                        img_tensor = torch.from_numpy(np.array(image))
                     fallback_tensors.append(img_tensor)
-
                 except Exception as inner_e:
-                    logger.debug(f"Disaster recovery failed for an image ({inner_e}). Using black placeholder.")
-                    fallback_tensors.append(torch.zeros((resize_y, resize_x, 3), dtype=torch.uint8))
+                    raise ValueError(f"{OP_NAME} could not decode image at row {row}") from inner_e
 
             torch_tensors = torch.stack(fallback_tensors).to(self.device)
 
@@ -526,9 +522,9 @@ class RayImageBTSMinhashDeduplicator(Deduplicator):
             to return. Default it's 10.
         :param merge_batch_size: batch size for BTS operations. Default
             it's 1000.
-        :param minhash_batch_size: batch size for MinHash computation. If "auto",
-            it will be set to default value on CPU(1024), or auto calculated per
-            available GPU memory and memory_per_sample setting for GPU.
+        :param minhash_batch_size: positive batch size for MinHash computation,
+            honored on both CPU and GPU. If "auto", estimate it from available
+            memory and memory_per_sample, with a device-specific fallback.
         :param memory_per_sample: estimated memory needed per sample in MB.
             Used to calculate batch size based on available GPU memory.
             Default is 25 MB per sample.
@@ -540,12 +536,19 @@ class RayImageBTSMinhashDeduplicator(Deduplicator):
         )
 
         self.memory_per_sample = memory_per_sample
-        if minhash_batch_size == "auto":
+        self._auto_minhash_batch_size = minhash_batch_size == "auto"
+        if self._auto_minhash_batch_size:
             if self.use_cuda():
                 self.minhash_batch_size = 2048
             else:
                 self.minhash_batch_size = 32
         else:
+            if (
+                isinstance(minhash_batch_size, bool)
+                or not isinstance(minhash_batch_size, int)
+                or minhash_batch_size <= 0
+            ):
+                raise ValueError("minhash_batch_size must be 'auto' or a positive integer")
             self.minhash_batch_size = minhash_batch_size
 
         # about deduplication
@@ -711,8 +714,8 @@ class RayImageBTSMinhashDeduplicator(Deduplicator):
             logger.info(f"Setting GPU concurrency to {concurrency} based on available GPUs")
 
             # Get available GPU memory and set batch size
-            gpu_memory = ray_available_gpu_memories()
-            if len(gpu_memory):
+            gpu_memory = ray_available_gpu_memories() if self._auto_minhash_batch_size else []
+            if self._auto_minhash_batch_size and len(gpu_memory):
                 min_memory = min(gpu_memory)
                 # Use 70% of available memory to leave room for overhead
                 safe_memory = min_memory * 0.7
@@ -732,15 +735,16 @@ class RayImageBTSMinhashDeduplicator(Deduplicator):
             logger.info("Using CPU for MinHash computation")
             # Get CPU count for concurrency
             cpu_count = int(ray.cluster_resources().get("CPU", 1))
-            total_cluster_memory = int(ray.cluster_resources().get("memory", 0))
-            safe_memory_total = total_cluster_memory * 0.7
-
             concurrency = max(1, cpu_count // 2)  # Use half of CPUs for workers
-            memory_budget_per_worker = safe_memory_total / concurrency
             logger.info(f"Setting CPU concurrency to {concurrency} based on available CPUs")
-            bytes_per_sample = self.memory_per_sample * 1024 * 1024
-            estimated_batch_size = int(memory_budget_per_worker / bytes_per_sample)
-            batch_size = max(32, min(estimated_batch_size, 1024))
+            batch_size = self.minhash_batch_size
+            if self._auto_minhash_batch_size:
+                total_cluster_memory = int(ray.cluster_resources().get("memory", 0))
+                safe_memory_total = total_cluster_memory * 0.7
+                memory_budget_per_worker = safe_memory_total / concurrency
+                bytes_per_sample = self.memory_per_sample * 1024 * 1024
+                estimated_batch_size = int(memory_budget_per_worker / bytes_per_sample)
+                batch_size = max(32, min(estimated_batch_size, 1024))
             logger.info(f"Using batch size of {batch_size} for CPU MinHash computation")
 
         from ray.data._internal.util import get_compute_strategy
@@ -765,6 +769,13 @@ class RayImageBTSMinhashDeduplicator(Deduplicator):
         )
 
     def run(self, dataset, **kwargs):
+        # Ray results are lazy: each result must retain its own actors even if
+        # the caller invokes this operator again before consuming that result.
+        run_op = copy.copy(self)
+        run_op._actors_initialized = False
+        return run_op._run(dataset, **kwargs)
+
+    def _run(self, dataset, **kwargs):
         self._ensure_actors()
 
         start_time = time.time()
@@ -817,7 +828,7 @@ class RayImageBTSMinhashDeduplicatorWithUid(RayImageBTSMinhashDeduplicator):
     ... (docstring omitted) ...
     """
 
-    def run(self, dataset, **kwargs):
+    def _run(self, dataset, **kwargs):
         self._ensure_actors()
 
         start_time = time.time()
