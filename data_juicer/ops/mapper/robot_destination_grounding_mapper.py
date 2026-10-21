@@ -20,8 +20,8 @@ class RobotDestinationGroundingMapper(Mapper):
         :param model: Served VLM model name. Defaults to VLM_MODEL.
         :param endpoint: OpenAI-compatible VLM endpoint. Defaults to VLM_URL.
         :param output_dir: Directory for episode artifacts.
-        :param args: Additional positional arguments for Mapper.
-        :param kwargs: Additional keyword arguments for Mapper.
+        :param args: Additional positional arguments for the Mapper.
+        :param kwargs: Additional keyword arguments for the Mapper.
         """
         super().__init__(*args, **kwargs)
         self.output_dir = output_dir
