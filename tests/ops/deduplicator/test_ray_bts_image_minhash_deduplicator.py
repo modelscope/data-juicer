@@ -125,9 +125,9 @@ class ImageMinHashRegressionTest(unittest.TestCase):
             np.testing.assert_array_equal(actual.cpu().numpy(), expected)
         return actor
 
-    def _op(self):
+    def _op(self, op_class=RayImageBTSMinhashDeduplicator):
         with patch.object(image_minhash, "prepare_model", return_value="offline-model"):
-            return RayImageBTSMinhashDeduplicator(
+            return op_class(
                 num_permutations=16,
                 num_bands=4,
                 num_rows_per_band=4,
@@ -217,12 +217,21 @@ class ImageMinHashRegressionTest(unittest.TestCase):
         for path, color in zip(paths, colors):
             Image.new("RGB", (11, 7), color).save(path)
         order = [1, 0, 1]
-        nested = [[str(paths[i]), str(paths[1 - i])] for i in order]
+        nested = [[str(paths[i])] for i in order]
         cases = {
             "bytes": {"image_bytes": [paths[i].read_bytes() for i in order]},
+            "byte_lists": pa.table({"image_bytes": [[paths[i].read_bytes()] for i in order]}).to_pydict(),
             "lists": {"images": nested},
             "ndarray": {"images": np.asarray(nested)},
             "ndarray_rows": {"images": [np.asarray(row) for row in nested]},
+            "null_bytes": pa.table({"images": nested, "image_bytes": [None, None, None]}).to_pydict(),
+            "mixed": pa.table(
+                {
+                    "images": [[str(paths[0])], [str(paths[0])], [str(paths[1])]],
+                    "image_bytes": [[paths[1].read_bytes()], None, []],
+                }
+            ).to_pydict(),
+            "null_byte_items": pa.table({"images": nested, "image_bytes": [[None], [], [None]]}).to_pydict(),
         }
         expected = np.broadcast_to(
             np.array([colors[i] for i in order], dtype=np.uint8)[:, None, None, :], (3, 224, 224, 3)
@@ -234,6 +243,100 @@ class ImageMinHashRegressionTest(unittest.TestCase):
                     self.assertEqual(tuple(decoded.shape), (3, 224, 224, 3))
                     self.assertEqual(decoded.dtype, torch.uint8)
                     np.testing.assert_array_equal(decoded.numpy(), expected)
+
+    def test_dali_receives_normalized_sources_in_order(self):
+        actor = self._actor()
+        paths = [Path(self.work_dir, f"{i}.png") for i in range(2)]
+        for i, path in enumerate(paths):
+            Image.new("RGB", (11, 7), (i * 100, 53, 201)).save(path)
+        encoded = [path.read_bytes() for path in paths]
+        cases = {
+            "paths": {"images": [[str(paths[1])], [str(paths[0])]]},
+            "bytes": {"image_bytes": [[encoded[1]], [encoded[0]]]},
+            "mixed": {"images": [[str(paths[0])], [str(paths[0])]], "image_bytes": [[encoded[1]], None]},
+        }
+        for name, samples in cases.items():
+            with self.subTest(source=name):
+                dali, factory, pipe = Mock(), Mock(), Mock()
+                dali.pipeline_def.return_value = lambda function: factory
+                factory.return_value = pipe
+                decoded = torch.zeros((2, 224, 224, 3), dtype=torch.uint8)
+                pipe.run.return_value = [SimpleNamespace(as_tensor=lambda: decoded)]
+                modules = {
+                    "nvidia": SimpleNamespace(dali=dali),
+                    "nvidia.dali": dali,
+                    "nvidia.dali.fn": dali.fn,
+                    "nvidia.dali.types": dali.types,
+                }
+                with patch.dict(sys.modules, modules), patch.object(Image, "open") as fallback:
+                    self.assertIs(actor._decode_images(samples), decoded)
+                fallback.assert_not_called()
+                pipe.build.assert_called_once_with()
+                pipe.run.assert_called_once_with()
+                if name == "paths":
+                    factory.assert_called_once_with(use_bytes=False, paths=[str(paths[1]), str(paths[0])])
+                    pipe.feed_input.assert_not_called()
+                else:
+                    factory.assert_called_once_with(use_bytes=True)
+                    pipe.feed_input.assert_called_once()
+                    source, buffers = pipe.feed_input.call_args.args
+                    self.assertEqual(source, "raw_data")
+                    self.assertEqual([buffer.tobytes() for buffer in buffers], [encoded[1], encoded[0]])
+                    self.assertTrue(all(buffer.dtype == np.uint8 for buffer in buffers))
+
+    def test_multiple_images_are_rejected_before_decoding(self):
+        actor = self._actor()
+        cases = [
+            {"images": [["first", "second"]]},
+            {"images": np.asarray([["first", "second"]])},
+            {"images": [["first"], ["first", "second"]]},
+            {"images": [["first", "second"]], "image_bytes": [[b"image"]]},
+            {"images": [["first"]], "image_bytes": [[b"first", b"second"]]},
+            {"image_bytes": [[b"first", b"second"]]},
+        ]
+        with patch.object(Image, "open") as decode:
+            for samples in cases:
+                with self.subTest(samples=samples):
+                    with self.assertRaisesRegex(ValueError, "exactly one image per sample"):
+                        actor._decode_images(samples)
+            decode.assert_not_called()
+
+    def test_missing_image_is_rejected_before_decoding(self):
+        actor = self._actor()
+        cases = [{"images": [[]]}, {"image_bytes": [None]}, {"images": [None], "image_bytes": [[]]}]
+        for samples in cases:
+            with self.subTest(samples=samples):
+                with self.assertRaisesRegex(ValueError, "Missing image bytes and path"):
+                    actor._decode_images(samples)
+
+    def test_with_uid_converts_arrow_integers_before_union(self):
+        op = self._op(image_minhash.RayImageBTSMinhashDeduplicatorWithUid)
+        graph = image_minhash.BTSUnionFind(256, 1, 0, [], 20, 10)
+        op.union_find_parallel_num = 1
+        op.union_find_list = [SimpleNamespace(add_key_value_pairs=SimpleNamespace(remote=graph.add_key_value_pairs))]
+        table = pa.table(
+            {
+                "_minhash": pa.array([list(range(16))] * 2, type=pa.list_(pa.uint32(), 16)),
+                image_minhash.HashKeys.uid: pa.chunked_array([[11], [7]], type=pa.int64()),
+            }
+        )
+        dataset = Mock()
+
+        def band_batch(function, **kwargs):
+            result = function(table)
+            self.assertNotIn("_minhash", result.column_names)
+            self.assertEqual(result[image_minhash.HashKeys.uid].to_pylist(), [11, 7])
+            return dataset
+
+        dataset.map_batches.side_effect = band_batch
+        with (
+            patch.object(op, "_ensure_actors"),
+            patch.object(op, "_compute_minhash", return_value=dataset),
+            patch.object(op, "merge", side_effect=graph.flush_key_value_pairs),
+            patch.object(image_minhash, "ray"),
+        ):
+            op.run(dataset)
+        self.assertEqual(graph.parent, {11: 7})
 
     def test_compute_minhash_resource_floor_and_shared_permutations(self):
         for use_cuda in (False, True):

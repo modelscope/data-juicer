@@ -4,9 +4,13 @@ A distributed image deduplicator using MinHash LSH and BTS Union-Find on Ray.
 
 This operator implements a scalable near-duplicate image detection algorithm designed for large-scale datasets. It leverages pre-trained Vision Transformer models (e.g., BEiT) to extract discrete visual tokens representing the semantic content of image patches. These tokens are used to compute MinHash signatures, which are then processed via Locality Sensitive Hashing (LSH). Finally, a Balanced Tree Structure (BTS) Union-Find algorithm resolves connected components across distributed Ray workers to filter out duplicate images based on the Jaccard similarity threshold. It supports both CPU and GPU execution, utilizing NVIDIA DALI for accelerated image decoding when available.
 
+Both this operator and its `_with_uid` variant require exactly one image per sample. Image paths and image bytes can each be a scalar or a one-element list. Bytes take precedence, with missing bytes falling back to the path for that sample. Multi-image samples and samples with neither source are rejected instead of silently dropping content.
+
 一个在 Ray 分布式模式下运行的图像 MinHash LSH 去重器。
 
 该算子实现了一种专为大规模数据集设计的可扩展的近似重复图像检测算法。它利用预训练的视觉模型（如 BEiT）提取代表图像块语义内容的离散视觉 token。这些 token 用于计算 MinHash 签名，然后通过局部敏感哈希 (LSH) 进行处理。最后，使用平衡树结构 (BTS) 并查集算法在分布式 Ray worker 间解析连通分量，从而根据 Jaccard 相似度阈值过滤掉重复图像。它支持 CPU 和 GPU 执行，并在可用时利用 NVIDIA DALI 加速图像解码。
+
+该算子及其 `_with_uid` 版本要求每条样本恰好包含一张图片。图片路径和图片字节均支持单值或单元素列表；优先使用字节，缺失时逐样本回退到路径。多图样本及两种来源均缺失的样本会明确报错，不会静默丢弃内容。
 
 Type 算子类型: **deduplicator**
 

@@ -277,28 +277,35 @@ class ImageMinHashActor:
         import torch
         from PIL import Image, ImageFile
 
-        # Determine input source: prefer image_bytes_key, fallback to image_key
-        use_bytes = (
-            image_bytes_key in samples and samples[image_bytes_key] is not None and len(samples[image_bytes_key]) > 0
-        )
-        use_paths = (
-            not use_bytes and image_key in samples and samples[image_key] is not None and len(samples[image_key]) > 0
-        )
-
-        if not use_bytes and not use_paths:
+        paths = samples.get(image_key)
+        image_bytes = samples.get(image_bytes_key)
+        num_rows = len(paths) if paths is not None else len(image_bytes) if image_bytes is not None else 0
+        if not num_rows:
             raise ValueError(f"Neither {image_bytes_key} nor {image_key} found in samples or both are empty")
 
-        resize_x, resize_y = 224, 224
+        def single_image(values, key, row):
+            value = values[row] if values is not None else None
+            if isinstance(value, (list, np.ndarray)):
+                if len(value) > 1:
+                    raise ValueError(
+                        f"{OP_NAME} supports exactly one image per sample; "
+                        f"row {row} has {len(value)} entries in {key}."
+                    )
+                value = value[0] if len(value) else None
+            return value
 
-        if use_bytes:
-            image_bytes_list = samples[image_bytes_key]
-            batch_data = [np.frombuffer(img_bytes, dtype=np.uint8) for img_bytes in image_bytes_list]
-            logger.info("Loading with image bytes")
-        else:
-            batch_data = samples[image_key]
-            if isinstance(batch_data[0], (list, np.ndarray)):
-                batch_data = [item[0] for item in batch_data]
-            logger.info("Loading with image paths")
+        batch_data = []
+        for row in range(num_rows):
+            path = single_image(paths, image_key, row)
+            data = single_image(image_bytes, image_bytes_key, row)
+            if data is not None and not isinstance(data, (bytes, bytearray, memoryview)):
+                raise TypeError(f"{image_bytes_key} must contain image bytes or null at row {row}")
+            if data is None and not path:
+                raise ValueError(f"Missing image bytes and path at row {row}")
+            batch_data.append(data if data is not None else path)
+
+        use_bytes = any(isinstance(item, (bytes, bytearray, memoryview)) for item in batch_data)
+        resize_x, resize_y = 224, 224
 
         def _decode_image_with_dali():
             import nvidia.dali as dali
@@ -327,9 +334,15 @@ class ImageMinHashActor:
                 return images
 
             if use_bytes:
+                raw_data = []
+                for item in batch_data:
+                    if not isinstance(item, (bytes, bytearray, memoryview)):
+                        with open(item, "rb") as image_file:
+                            item = image_file.read()
+                    raw_data.append(np.frombuffer(item, dtype=np.uint8))
                 pipe = decode_pipeline(use_bytes=use_bytes)
                 pipe.build()
-                pipe.feed_input("raw_data", batch_data)
+                pipe.feed_input("raw_data", raw_data)
             else:
                 pipe = decode_pipeline(use_bytes=use_bytes, paths=batch_data)
                 pipe.build()
@@ -355,12 +368,10 @@ class ImageMinHashActor:
             fallback_tensors = []
             for item in batch_data:
                 try:
-                    if use_bytes:
-                        img_bytes = item.tobytes() if isinstance(item, np.ndarray) else item
-                        img = Image.open(io.BytesIO(img_bytes))
+                    if isinstance(item, (bytes, bytearray, memoryview)):
+                        img = Image.open(io.BytesIO(item))
                     else:
-                        path = item[0] if isinstance(item, list) else item
-                        img = Image.open(path)
+                        img = Image.open(item)
 
                     img = img.convert("RGB")
                     img = img.resize((resize_x, resize_y), Image.Resampling.BILINEAR)
@@ -816,7 +827,7 @@ class RayImageBTSMinhashDeduplicatorWithUid(RayImageBTSMinhashDeduplicator):
             if HashKeys.uid not in table.column_names:
                 raise ValueError(f"Dataset missing required column: {HashKeys.uid} for {OP_NAME}_with_uid operator.")
 
-            self.band_minhash(table["_minhash"], table[HashKeys.uid])
+            self.band_minhash(table["_minhash"], table[HashKeys.uid].to_pylist())
 
             return table.drop_columns(["_minhash"])
 
