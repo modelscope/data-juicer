@@ -150,6 +150,7 @@ dev = [
     "toml",  # for yapf configuration
     "pytest",  # testing framework
     "pytest-cov",  # coverage reporting
+    "yacs>=0.1.8",  # configuration nodes used by HaWoR CPU tests
     "build",  # package building
     "black>=25.1.0",
     "flake8-black",
