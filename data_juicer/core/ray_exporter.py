@@ -25,6 +25,7 @@ class RayExporter:
         "tfrecords",
         "webdataset",
         "lance",
+        "iceberg",
         # 'images',
         # 'numpy',
     }
@@ -58,6 +59,12 @@ class RayExporter:
         :param encryption_key_path: path to a file containing the Fernet key.
             Falls back to the ``DJ_ENCRYPTION_KEY`` environment variable when
             ``None``. Only used when ``encrypt_before_export`` is True.
+        :param kwargs: For Iceberg, table_identifier and catalog_kwargs are
+            required. mode defaults to "overwrite" (replace the entire existing
+            table on every run); "append" adds rows, including on repeated runs.
+            export_path must be a local artifact anchor, not the table address.
+            Missing tables, schema evolution, sharding and file encryption are
+            not supported. Requires Ray >=2.52.0.
         """
         self.export_path = export_path
         self.export_shard_size = export_shard_size
@@ -70,6 +77,16 @@ class RayExporter:
                 f"for now. Only support {self._SUPPORTED_FORMATS}. Please check export_type or export_path."
             )
         self.export_extra_args = kwargs if kwargs is not None else {}
+        self.iceberg_config = None
+        if self.export_format == "iceberg":
+            import ray
+            from packaging.version import Version
+
+            from data_juicer.utils.iceberg_utils import iceberg_export_config
+
+            if Version(ray.__version__) < Version("2.52.0"):
+                raise RuntimeError("Iceberg writing in Ray mode requires Ray >=2.52.0")
+            self.iceberg_config = iceberg_export_config(export_path, export_shard_size, encrypt_before_export, kwargs)
 
         # Set up encryption for local export
         self.encrypt_before_export = encrypt_before_export
@@ -152,8 +169,20 @@ class RayExporter:
         :param columns: the columns to export.
         :return:
         """
-        # Handle empty dataset case - Ray returns None for columns() on empty datasets
-        # Check if dataset is empty by calling columns() regardless of columns parameter
+        if self.export_format == "iceberg":
+            dataset = dataset.materialize()
+            cols = dataset.columns()
+            extra_fields = set()
+            if not self.keep_stats_in_res_ds:
+                extra_fields.update({Fields.stats, Fields.meta})
+            if not self.keep_hashes_in_res_ds:
+                extra_fields.update(
+                    {HashKeys.hash, HashKeys.minhash, HashKeys.simhash, HashKeys.imagehash, HashKeys.videohash}
+                )
+            removed = extra_fields.intersection(cols or [])
+            if removed:
+                dataset = dataset.drop_columns(list(removed))
+            return self.write_iceberg(dataset, export_path, **self.iceberg_config)
         cols = dataset.columns()
         if cols is None:
             # Empty dataset with unknown schema - create an empty file
@@ -306,6 +335,30 @@ class RayExporter:
             filtered_kwargs["filesystem"] = export_extra_args["filesystem"]
         return write_method(export_path, **filtered_kwargs)
 
+    @staticmethod
+    def write_iceberg(dataset, export_path, table_identifier, catalog_kwargs, mode="overwrite"):
+        """Write atomically; worker validation failures may leave uncommitted files."""
+        from pyiceberg.expressions import AlwaysTrue
+
+        from data_juicer.utils.iceberg_utils import (
+            align_iceberg_schema,
+            iceberg_datasink,
+            load_iceberg_table,
+            validate_iceberg_schema,
+        )
+
+        if mode not in ("append", "overwrite"):
+            raise ValueError("Iceberg export mode must be append or overwrite")
+        table = load_iceberg_table(table_identifier, catalog_kwargs)
+        schema = dataset.schema()
+        if schema is not None:
+            validate_iceberg_schema(align_iceberg_schema(schema.base_schema, table), table)
+        if dataset.count() == 0:
+            if mode == "overwrite":
+                table.delete(delete_filter=AlwaysTrue())
+            return
+        return dataset.write_datasink(iceberg_datasink(table_identifier, catalog_kwargs, mode))
+
     # suffix to export method
     @staticmethod
     def _router():
@@ -322,4 +375,5 @@ class RayExporter:
             "csv": RayExporter.write_others,
             "tfrecords": RayExporter.write_others,
             "lance": RayExporter.write_others,
+            "iceberg": RayExporter.write_iceberg,
         }

@@ -86,7 +86,7 @@ export PYICEBERG_CATALOG__PRODUCTION__S3__REGION=us-east-1
 
 PyIceberg 也支持 `~/.pyiceberg.yaml`。如果直接在菜谱中填写 catalog 配置，Data-Juicer 会对日志中的凭证类字段脱敏；使用环境变量或 PyIceberg 配置文件则可以避免将凭证保存在菜谱本身。
 
-默认执行器会将选定的表扫描结果物化为本地数据集。Ray 模式使用 Ray 原生 Iceberg reader，保留分布式读取。在 Ray 2.52 中，没有数据文件的空表会返回无法推断 schema 的空数据集。两种模式都不会写回源表。
+默认执行器会将选定的表扫描结果物化为本地数据集。Ray 模式使用 Ray 原生 Iceberg reader，保留分布式读取。在 Ray 2.52 中，没有数据文件的空表会返回无法推断 schema 的空数据集。读取不会修改源表。若需将处理结果写入已有 Iceberg 表，请配置 [Iceberg 导出](Export_ZH.md#apache-iceberg-表)。
 
 完整处理菜谱参见 [demos/process_iceberg/config.yaml](../demos/process_iceberg/config.yaml)。
 

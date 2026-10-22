@@ -86,7 +86,7 @@ export PYICEBERG_CATALOG__PRODUCTION__S3__REGION=us-east-1
 
 PyIceberg also supports `~/.pyiceberg.yaml`. Data-Juicer redacts credential-like fields if a catalog configuration is placed directly in the recipe, but environment variables or the PyIceberg configuration file avoid storing credentials in the recipe itself.
 
-The default executor materializes the selected table scan into a local dataset. Ray mode uses Ray's native Iceberg reader and keeps the scan distributed. In Ray 2.52, a table with no data files produces an empty dataset without an inferred schema. Neither mode writes back to the source table.
+The default executor materializes the selected table scan into a local dataset. Ray mode uses Ray's native Iceberg reader and keeps the scan distributed. In Ray 2.52, a table with no data files produces an empty dataset without an inferred schema. Reading does not modify the source table. To write processing results to an existing Iceberg table, configure [Iceberg export](Export.md#apache-iceberg-tables).
 
 See [demos/process_iceberg/config.yaml](../demos/process_iceberg/config.yaml) for a complete processing recipe.
 
