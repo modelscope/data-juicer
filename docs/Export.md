@@ -14,7 +14,7 @@ Data-Juicer exports via `Exporter` (default mode) or `RayExporter` (Ray mode). T
 
 ## Apache Iceberg tables
 
-Both default and Ray modes can write to an existing Iceberg table. Install `py-data-juicer[iceberg]`; Ray mode also needs the distributed extra and Ray >=2.52 (validated with Ray 2.52; incompatible Ray Iceberg sink internals fail before writing). Configure the named PyIceberg catalog as described in [Dataset Configuration](DatasetCfg.md#apache-iceberg-table), keeping credentials outside the recipe.
+Both default and Ray modes can write to an existing Iceberg table. Install `py-data-juicer[iceberg]`; Ray mode also needs the distributed extra and Ray >=2.53. Configure the named PyIceberg catalog as described in [Dataset Configuration](DatasetCfg.md#apache-iceberg-table), keeping credentials outside the recipe.
 
 ```yaml
 export_type: iceberg
@@ -33,7 +33,7 @@ An explicit `catalog_kwargs.name` is required for writing. The target table and 
 - `overwrite` (default) replaces all current rows with this run's result. An empty result clears the target table.
 - `append` adds this run's rows to existing rows. Rerunning adds them again; an empty result makes no change.
 
-`export_path` is required and must be local, even when the table data is stored on S3/OSS. It is not where the table data is written. In default mode, exported statistics use a separate `_stats.jsonl` artifact; the table location comes from the catalog. File encryption and `export_shard_size > 0` are not supported for Iceberg. Ray materializes the result once, writes data files in parallel, and validates worker schemas without committing schema changes. A failed write can leave uncommitted data files in storage; they are not part of the table's committed snapshot.
+`export_path` is required and must be local, even when the table data is stored on S3/OSS. It is not where the table data is written. In default mode, exported statistics use a separate `_stats.jsonl` artifact; the table location comes from the catalog. File encryption and `export_shard_size > 0` are not supported for Iceberg. Ray materializes the result once, validates and aligns it to the existing table schema, then uses Ray's public `Dataset.write_iceberg()` API to write data files in parallel without schema changes. A failed write can leave uncommitted data files in storage; they are not part of the table's committed snapshot.
 
 ## Configuration
 

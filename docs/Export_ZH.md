@@ -14,7 +14,7 @@ Data-Juicer 通过 `Exporter`（默认模式）或 `RayExporter`（Ray 模式）
 
 ## Apache Iceberg 表
 
-默认模式和 Ray 模式都可以写入已有的 Iceberg 表。安装 `py-data-juicer[iceberg]`；Ray 模式还需要 distributed 扩展及 Ray >=2.52（已在 Ray 2.52 验证；如 Ray Iceberg sink 内部接口不兼容，会在写入前报错）。按[数据集配置](DatasetCfg_ZH.md#apache-iceberg-表)设置命名 PyIceberg catalog，凭证不要写在菜谱中。
+默认模式和 Ray 模式都可以写入已有的 Iceberg 表。安装 `py-data-juicer[iceberg]`；Ray 模式还需要 distributed 扩展及 Ray >=2.53。按[数据集配置](DatasetCfg_ZH.md#apache-iceberg-表)设置命名 PyIceberg catalog，凭证不要写在菜谱中。
 
 ```yaml
 export_type: iceberg
@@ -33,7 +33,7 @@ keep_hashes_in_res_ds: false
 - `overwrite`（默认）：用本次处理结果替换表中全部现有行；空结果会清空目标表。
 - `append`：把本次结果追加到已有行后面；重跑会再次追加，空结果不改变目标表。
 
-即使表数据放在 S3/OSS，`export_path` 也必须填写本地路径，它不是表数据的写入位置。默认模式下，统计信息会写入独立的 `_stats.jsonl` 文件；表数据位置由 catalog 决定。Iceberg 不支持文件加密及 `export_shard_size > 0`。Ray 将结果物化一次，再并行写入数据文件，并在 worker 校验字段结构，不提交字段结构变更。失败的写入可能在存储中留下尚未提交的数据文件，但这些文件不属于表的已提交快照。
+即使表数据放在 S3/OSS，`export_path` 也必须填写本地路径，它不是表数据的写入位置。默认模式下，统计信息会写入独立的 `_stats.jsonl` 文件；表数据位置由 catalog 决定。Iceberg 不支持文件加密及 `export_shard_size > 0`。Ray 将结果物化一次，按已有表结构完成校验和对齐，然后通过 Ray 公共的 `Dataset.write_iceberg()` API 并行写入数据文件，不提交字段结构变更。失败的写入可能在存储中留下尚未提交的数据文件，但这些文件不属于表的已提交快照。
 
 ## 配置
 

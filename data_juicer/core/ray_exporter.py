@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from functools import partial
 from pathlib import Path
 from urllib.parse import urlparse
@@ -64,7 +65,7 @@ class RayExporter:
             table on every run); "append" adds rows, including on repeated runs.
             export_path must be a local artifact anchor, not the table address.
             Missing tables, schema evolution, sharding and file encryption are
-            not supported. Requires Ray >=2.52.0.
+            not supported. Requires Ray >=2.53.0.
         """
         self.export_path = export_path
         self.export_shard_size = export_shard_size
@@ -84,8 +85,8 @@ class RayExporter:
 
             from data_juicer.utils.iceberg_utils import iceberg_export_config
 
-            if Version(ray.__version__) < Version("2.52.0"):
-                raise RuntimeError("Iceberg writing in Ray mode requires Ray >=2.52.0")
+            if Version(ray.__version__) < Version("2.53.0"):
+                raise RuntimeError("Iceberg writing in Ray mode requires Ray >=2.53.0")
             self.iceberg_config = iceberg_export_config(export_path, export_shard_size, encrypt_before_export, kwargs)
 
         # Set up encryption for local export
@@ -170,19 +171,19 @@ class RayExporter:
         :return:
         """
         if self.export_format == "iceberg":
-            dataset = dataset.materialize()
-            cols = dataset.columns()
-            extra_fields = set()
+            excluded_fields = set()
             if not self.keep_stats_in_res_ds:
-                extra_fields.update({Fields.stats, Fields.meta})
+                excluded_fields.update({Fields.stats, Fields.meta})
             if not self.keep_hashes_in_res_ds:
-                extra_fields.update(
+                excluded_fields.update(
                     {HashKeys.hash, HashKeys.minhash, HashKeys.simhash, HashKeys.imagehash, HashKeys.videohash}
                 )
-            removed = extra_fields.intersection(cols or [])
-            if removed:
-                dataset = dataset.drop_columns(list(removed))
-            return self.write_iceberg(dataset, export_path, **self.iceberg_config)
+            return self.write_iceberg(
+                dataset,
+                export_path,
+                excluded_fields=excluded_fields,
+                **self.iceberg_config,
+            )
         cols = dataset.columns()
         if cols is None:
             # Empty dataset with unknown schema - create an empty file
@@ -336,13 +337,23 @@ class RayExporter:
         return write_method(export_path, **filtered_kwargs)
 
     @staticmethod
-    def write_iceberg(dataset, export_path, table_identifier, catalog_kwargs, mode="overwrite"):
+    def write_iceberg(
+        dataset,
+        export_path,
+        table_identifier,
+        catalog_kwargs,
+        mode="overwrite",
+        excluded_fields=(),
+    ):
         """Write atomically; worker validation failures may leave uncommitted files."""
+        import pyarrow as pa
         from pyiceberg.expressions import AlwaysTrue
+        from ray.data import SaveMode
 
         from data_juicer.utils.iceberg_utils import (
             align_iceberg_schema,
-            iceberg_datasink,
+            cast_iceberg_batch,
+            iceberg_arrow_schema,
             load_iceberg_table,
             validate_iceberg_schema,
         )
@@ -350,14 +361,42 @@ class RayExporter:
         if mode not in ("append", "overwrite"):
             raise ValueError("Iceberg export mode must be append or overwrite")
         table = load_iceberg_table(table_identifier, catalog_kwargs)
-        schema = dataset.schema()
-        if schema is not None:
-            validate_iceberg_schema(align_iceberg_schema(schema.base_schema, table), table)
+        excluded_fields = set(excluded_fields)
+        source_dataset = dataset
+
+        def validate_source_schema(schema):
+            if schema is None:
+                return
+            source_schema = schema.base_schema
+            source_schema = pa.schema(
+                [field for field in source_schema if field.name not in excluded_fields],
+                metadata=source_schema.metadata,
+            )
+            validate_iceberg_schema(align_iceberg_schema(source_schema, table), table)
+
+        validate_source_schema(dataset.schema(fetch_if_missing=False))
+        target_schema = iceberg_arrow_schema(table)
+        dataset = dataset.map_batches(
+            cast_iceberg_batch,
+            fn_kwargs={
+                "schema": target_schema,
+                "table_schema": table.schema(),
+                "format_version": table.metadata.format_version,
+                "excluded_fields": tuple(excluded_fields),
+            },
+            batch_format="pyarrow",
+            batch_size=None,
+        ).materialize()
         if dataset.count() == 0:
+            validate_source_schema(source_dataset.schema())
             if mode == "overwrite":
                 table.delete(delete_filter=AlwaysTrue())
             return
-        return dataset.write_datasink(iceberg_datasink(table_identifier, catalog_kwargs, mode))
+        return dataset.write_iceberg(
+            table_identifier=table_identifier,
+            catalog_kwargs=deepcopy(catalog_kwargs),
+            mode=SaveMode.APPEND if mode == "append" else SaveMode.OVERWRITE,
+        )
 
     # suffix to export method
     @staticmethod

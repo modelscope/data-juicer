@@ -62,19 +62,26 @@ def load_iceberg_table(table_identifier, catalog_kwargs):
 
 
 def validate_iceberg_schema(schema, table):
-    """Use PyIceberg's writer compatibility check before any table mutation."""
+    """Reject incompatible fields and any automatic schema evolution."""
     from pyiceberg.io.pyarrow import _check_pyarrow_schema_compatible
 
     _check_pyarrow_schema_compatible(table.schema(), schema, format_version=table.metadata.format_version)
+    update = table.update_schema().union_by_name(schema)
+    if update._apply() != table.schema():
+        raise ValueError("Iceberg export does not support automatic schema evolution")
 
 
-def align_iceberg_schema(schema, table):
+def _align_iceberg_schema(schema, table_schema):
     """Restore top-level required flags that Arrow conversions drop."""
     import pyarrow as pa
 
-    required = {field.name for field in table.schema().fields if field.required}
+    required = {field.name for field in table_schema.fields if field.required}
     fields = [field.with_nullable(False) if field.name in required else field for field in schema]
     return pa.schema(fields, metadata=schema.metadata)
+
+
+def align_iceberg_schema(schema, table):
+    return _align_iceberg_schema(schema, table.schema())
 
 
 def align_iceberg_nullability(arrow, table):
@@ -88,54 +95,25 @@ def align_iceberg_nullability(arrow, table):
     return arrow.cast(schema)
 
 
-def iceberg_datasink(table_identifier, catalog_kwargs, mode):
-    """Retain Ray's atomic data commit while forbidding schema commits."""
-    from ray.data._internal.datasource.iceberg_datasink import IcebergDatasink
-    from ray.data._internal.savemode import SaveMode
+def iceberg_arrow_schema(table):
+    """Return the table's exact Arrow schema for Ray worker batches."""
+    from pyiceberg.io.pyarrow import schema_to_pyarrow
 
-    _validate_catalog_name(catalog_kwargs)
-    if mode not in ("append", "overwrite"):
-        raise ValueError("Iceberg export mode must be append or overwrite")
-    required_methods = ("write", "on_write_start", "on_write_complete", "_reload_table", "_update_schema")
-    if any(not callable(getattr(IcebergDatasink, name, None)) for name in required_methods):
-        raise RuntimeError("This Ray IcebergDatasink API is unsupported; use a Ray 2.52-compatible version")
+    return schema_to_pyarrow(table.schema())
 
-    class FixedSchemaIcebergDatasink(IcebergDatasink):
-        """Validate fixed schemas and isolate native Parquet file names."""
 
-        def write(self, blocks, ctx):
-            import uuid
+def cast_iceberg_batch(batch, schema, table_schema, format_version, excluded_fields):
+    """Validate and cast one Ray Arrow batch to the target schema."""
+    from pyiceberg.io.pyarrow import _check_pyarrow_schema_compatible
 
-            from ray.data.block import BlockAccessor
-
-            # Native write resets PyIceberg's file counter for every block.
-            # A fresh invocation UUID also isolates retries of the same task.
-            attempt_uuid = uuid.uuid4()
-            shared_uuid = self._write_uuid
-
-            def unique_blocks():
-                for block_index, block in enumerate(blocks):
-                    self._write_uuid = uuid.uuid5(attempt_uuid, str(block_index))
-                    yield align_iceberg_nullability(BlockAccessor.for_block(block).to_arrow(), self._table)
-
-            try:
-                return super().write(unique_blocks(), ctx)
-            finally:
-                # Keep the driver's shared UUID and native commit lifecycle intact.
-                self._write_uuid = shared_uuid
-
-        def _update_schema(self, incoming_schema):
-            self._reload_table()
-            validate_iceberg_schema(incoming_schema, self._table)
-            update = self._table.update_schema().union_by_name(incoming_schema)
-            if update._apply() != self._table.schema():
-                raise ValueError("Iceberg export does not support automatic schema evolution")
-
-    sink = FixedSchemaIcebergDatasink(
-        table_identifier=table_identifier,
-        catalog_kwargs=deepcopy(catalog_kwargs),
-        mode=SaveMode.APPEND if mode == "append" else SaveMode.OVERWRITE,
-    )
-    if any(not hasattr(sink, name) for name in ("_table", "_write_uuid")):
-        raise RuntimeError("This Ray IcebergDatasink state API is unsupported; use a Ray 2.52-compatible version")
-    return sink
+    excluded_fields = set(excluded_fields)
+    batch = batch.select([name for name in batch.column_names if name not in excluded_fields])
+    aligned_schema = _align_iceberg_schema(batch.schema, table_schema)
+    _check_pyarrow_schema_compatible(table_schema, aligned_schema, format_version=format_version)
+    if set(batch.column_names) != set(schema.names) or len(batch.column_names) != len(schema.names):
+        raise ValueError(f"Iceberg schema fields do not match: {batch.column_names} != {schema.names}")
+    batch = batch.select(schema.names)
+    for field in schema:
+        if not field.nullable and batch.column(field.name).null_count:
+            raise ValueError(f"Iceberg required column {field.name} contains null values")
+    return batch.cast(schema)

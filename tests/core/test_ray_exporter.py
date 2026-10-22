@@ -520,6 +520,12 @@ class RayExporterEncryptTest(DataJuicerTestCaseBase):
 
 
 class RayIcebergExporterConfigTest(IcebergWriterFixture, unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        version = patch("ray.__version__", "2.53.0")
+        version.start()
+        self.addCleanup(version.stop)
+
     def test_invalid_configuration_and_old_ray(self):
         invalid = [
             {"mode": "upsert"}, {"mode": None}, {"table_identifier": ""}, {"catalog_kwargs": None},
@@ -539,30 +545,28 @@ class RayIcebergExporterConfigTest(IcebergWriterFixture, unittest.TestCase):
                     RayExporter(**dict(self.options(), **changes))
             key_loader.assert_not_called()
             filesystem.assert_not_called()
-        with patch("ray.__version__", "2.51.0"), self.assertRaisesRegex(RuntimeError, "Ray >=2.52.0"):
+        with patch("ray.__version__", "2.52.0"), self.assertRaisesRegex(RuntimeError, "Ray >=2.53.0"):
             RayExporter(**self.options())
         writer = RayExporter(**self.options())
         self.assertEqual(writer.iceberg_config["mode"], "overwrite")
         self.catalog_kwargs["warehouse"] = "changed-after-construction"
         self.assertNotEqual(writer.iceberg_config["catalog_kwargs"]["warehouse"], self.catalog_kwargs["warehouse"])
 
-    def test_materialize_once_before_column_probe(self):
+    def test_forwards_excluded_fields_without_preexecution(self):
         source = MagicMock()
-        cached = source.materialize.return_value
-
-        def columns():
-            source.materialize.assert_called_once_with()
-            return ["id", "text", Fields.stats]
-
-        cached.columns.side_effect = columns
         writer = RayExporter(**self.options(keep_stats_in_res_ds=False))
         with patch.object(writer, "write_iceberg") as write:
             writer.export(source, columns=["stale"])
-        cached.columns.assert_called_once_with()
-        cached.drop_columns.assert_called_once_with([Fields.stats])
-        write.assert_called_once_with(cached.drop_columns.return_value, self.anchor, **writer.iceberg_config)
+        write.assert_called_once()
+        self.assertEqual(write.call_args.args, (source, self.anchor))
+        self.assertSetEqual(
+            write.call_args.kwargs.pop("excluded_fields"),
+            {Fields.stats, Fields.meta, HashKeys.hash, HashKeys.minhash,
+             HashKeys.simhash, HashKeys.imagehash, HashKeys.videohash},
+        )
+        self.assertEqual(write.call_args.kwargs, writer.iceberg_config)
+        source.materialize.assert_not_called()
         source.columns.assert_not_called()
-        cached.materialize.assert_not_called()
 
     def test_windows_artifact_constructor(self):
         writer = RayExporter(**dict(self.options(), export_path="C:/tmp/result.jsonl"))
@@ -587,76 +591,11 @@ class RayIcebergExporterConfigTest(IcebergWriterFixture, unittest.TestCase):
             executor = RayExecutor(cfg)
         self.assertFalse(executor.exporter.keep_stats_in_res_ds)
         source = MagicMock()
-        source.materialize.return_value.columns.return_value = ["id", "text", Fields.stats, Fields.meta]
-        with patch.object(executor.exporter, "write_iceberg"):
+        with patch.object(executor.exporter, "write_iceberg") as write:
             executor.exporter.export(source)
-        self.assertCountEqual(source.materialize.return_value.drop_columns.call_args.args[0],
-                              [Fields.stats, Fields.meta])
-
-    def test_native_file_collision_and_isolated_attempts(self):
-        import pyarrow as pa
-        import pyarrow.parquet as pq
-        from ray.data._internal.datasource.iceberg_datasink import IcebergDatasink
-        from ray.data._internal.execution.interfaces import TaskContext
-        from data_juicer.utils.iceberg_utils import iceberg_datasink
-
-        sink = iceberg_datasink(self.identifier, self.catalog_kwargs, "append")
-        sink.on_write_start()
-        shared_uuid = sink._write_uuid
-        blocks = [pa.Table.from_pylist([row], schema=self.schema) for row in self.rows]
-        ctx = TaskContext(task_idx=0, op_name="iceberg-test")
-        location = self.table.metadata_location
-        # Reproduce Ray 2.52's native counter reset without schema commits.
-        broken = IcebergDatasink.write(sink, iter(blocks), ctx)
-        self.assertEqual(len(broken), 2)
-        self.assertEqual(len({f.file_path for f in broken}), 1)
-        self.assertEqual(pq.read_table(broken[0].file_path).to_pylist(), self.rows[-1:])
-        first = sink.write(iter(blocks), ctx)
-        retry = sink.write(iter(blocks), ctx)
-        other_task = sink.write(iter(blocks), TaskContext(task_idx=1, op_name="iceberg-test"))
-        files = first + retry + other_task
-        self.assertEqual(len({f.file_path for f in files}), 6)
-        self.assertCountEqual([row for f in files for row in pq.read_table(f.file_path).to_pylist()],
-                              self.rows * 3)
-        self.assertEqual(sink._write_uuid, shared_uuid)
-        bad = pa.table({"id": [3], "text": ["bad"], "extra": [1]})
-        with self.assertRaisesRegex(ValueError, "Schema mismatch"):
-            sink.write(iter([blocks[0], bad]), ctx)
-        self.assertEqual(sink._write_uuid, shared_uuid)
-        self.assertEqual(self.table.refresh().metadata_location, location)
-        self.assertEqual(self.read_rows(), self.initial)
-
-    def test_sink_worker_validation_never_commits_schema(self):
-        import pyarrow as pa
-        from ray.data._internal.datasource.iceberg_datasink import IcebergDatasink
-        from ray.data._internal.savemode import SaveMode
-        from data_juicer.utils.iceberg_utils import iceberg_datasink
-
-        native_update = IcebergDatasink._update_schema
-        before = self.snapshot()
-        location = self.table.metadata_location
-        for mode, expected in (("append", SaveMode.APPEND), ("overwrite", SaveMode.OVERWRITE)):
-            sink = iceberg_datasink(self.identifier, self.catalog_kwargs, mode)
-            self.assertIsInstance(sink, IcebergDatasink)
-            self.assertEqual(sink._mode, expected)
-            sink._update_schema(self.schema)
-            documented = pa.schema([pa.field("id", pa.int64(), metadata={b"doc": b"new doc"}),
-                                    ("text", pa.string())])
-            with self.assertRaisesRegex(ValueError, "automatic schema evolution"):
-                sink._update_schema(documented)
-            self.assertEqual(self.snapshot(), before)
-            self.assertEqual(self.table.metadata_location, location)
-        self.assertIs(IcebergDatasink._update_schema, native_update)
-        self.assertEqual(self.catalog_kwargs["name"], "local_writer_test")
-
-    def test_sink_rejects_incompatible_ray_internals(self):
-        from ray.data._internal.datasource.iceberg_datasink import IcebergDatasink
-        from data_juicer.utils.iceberg_utils import iceberg_datasink
-
-        with patch.object(IcebergDatasink, "_reload_table", None):
-            with self.assertRaisesRegex(RuntimeError, "IcebergDatasink API is unsupported"):
-                iceberg_datasink(self.identifier, self.catalog_kwargs, "append")
-
+        self.assertEqual(write.call_args.args, (source, self.anchor))
+        self.assertTrue({Fields.stats, Fields.meta}.issubset(write.call_args.kwargs["excluded_fields"]))
+        source.materialize.assert_not_called()
 
 class RayIcebergExporterTest(IcebergWriterFixture, unittest.TestCase):
     @classmethod
@@ -664,8 +603,8 @@ class RayIcebergExporterTest(IcebergWriterFixture, unittest.TestCase):
         import ray
         from packaging.version import Version
 
-        if Version(ray.__version__) < Version("2.52.0"):
-            raise unittest.SkipTest("Iceberg writing requires Ray >=2.52.0")
+        if Version(ray.__version__) < Version("2.53.0"):
+            raise unittest.SkipTest("Iceberg writing requires Ray >=2.53.0")
         cls.owns_ray = not ray.is_initialized()
         if cls.owns_ray:
             # Isolated local instance; never stop another user's Ray cluster.
@@ -740,10 +679,19 @@ class RayIcebergExporterTest(IcebergWriterFixture, unittest.TestCase):
         self.assertEqual(table.refresh().current_snapshot().snapshot_id, snapshot)
 
     @TEST_TAG("ray")
+    def test_reordered_columns_follow_target_schema(self):
+        import pyarrow as pa
+        import ray
+
+        arrow = pa.Table.from_pylist(self.rows, schema=self.schema).select(["text", "id"])
+        RayExporter(**self.options()).export(ray.data.from_arrow(arrow))
+        self.assertCountEqual(self.read_rows(), self.rows)
+
+    @TEST_TAG("ray")
     def test_multiblock_two_workers_multiset_and_file_paths(self):
         from collections import Counter
+
         import pyarrow as pa
-        import pyarrow.parquet as pq
         import ray
 
         @ray.remote(num_cpus=0)
@@ -759,78 +707,51 @@ class RayIcebergExporterTest(IcebergWriterFixture, unittest.TestCase):
 
         counter = ExecutionCounter.remote()
         self.addCleanup(ray.kill, counter)
-        native_write = ray.data.Dataset.write_datasink
         committed = []
 
         def transform(batch):
             ray.get(counter.increment.remote())
             return batch
 
-        def write(dataset, sink):
-            original_complete = sink.on_write_complete
-            native_state = type(sink).__getstate__
-
-            def state(obj):
-                result = native_state(obj)
-                result.pop("on_write_complete", None)  # Driver-only assertions.
-                return result
-
-            def complete(result):
-                self.assertEqual(result.num_rows, 1024)
-                self.assertEqual(len(result.write_returns), 2)
-                self.assertEqual([len(files) for files in result.write_returns], [4, 4])
-                files = [f for group in result.write_returns for f in group]
-                paths = {f.file_path for f in files}
-                self.assertEqual(len(paths), 8)
-                physical = [row for f in files for row in pq.read_table(f.file_path).to_pylist()]
-                self.assertEqual(Counter((r["id"], r["text"]) for r in physical),
-                                 Counter((r["id"], r["text"]) for r in rows))
-                original_complete(result)
-                committed.append(paths)
-
-            sink.on_write_complete = complete
-            # Only this locally-created subclass: force four blocks per native task.
-            with patch.object(type(sink), "min_rows_per_write", new=property(lambda obj: 512)), \
-                    patch.object(type(sink), "__getstate__", new=state):
-                return native_write(dataset, sink, concurrency=2)
-
         for mode in ("overwrite", "append"):
-            # Overwrite covers unique IDs; append covers legitimate repeated rows/IDs.
             ids = [i if mode == "overwrite" else i // 2 for i in range(1024)]
             rows = [{"id": i, "text": f"row-{i}"} for i in ids]
             arrow = pa.Table.from_pylist(rows, schema=self.schema)
             self.table.overwrite(pa.Table.from_pylist(self.initial, schema=self.schema))
-            initial_paths = {task.file.file_path for task in self.table.scan().plan_files()}
+            previous_paths = {task.file.file_path for task in self.table.scan().plan_files()}
             writer = RayExporter(**self.options(mode=mode))
             for run in range(2):
                 ds = ray.data.from_arrow([arrow.slice(i * 128, 128) for i in range(8)])
                 ds = ds.map_batches(transform, batch_format="pyarrow", batch_size=None)
                 before = ray.get(counter.count.remote())
-                with patch.object(ray.data.Dataset, "write_datasink", autospec=True, side_effect=write):
-                    writer.export(ds)
+                writer.export(ds)
                 self.assertEqual(ray.get(counter.count.remote()) - before, 8)
                 expected = self.initial + rows * (run + 1) if mode == "append" else rows
                 actual = self.read_rows()
-                self.assertEqual(Counter((r["id"], r["text"]) for r in actual),
-                                 Counter((r["id"], r["text"]) for r in expected))
-                self.assertEqual(len({r["id"] for r in actual}), 1024 if mode == "overwrite" else 512)
+                self.assertEqual(
+                    Counter((row["id"], row["text"]) for row in actual),
+                    Counter((row["id"], row["text"]) for row in expected),
+                )
+                self.assertEqual(len({row["id"] for row in actual}), 1024 if mode == "overwrite" else 512)
                 self.assertEqual(len(actual), 1024 if mode == "overwrite" else 1 + 1024 * (run + 1))
-                tasks = list(self.table.scan().plan_files())
-                active_paths = [task.file.file_path for task in tasks]
-                self.assertEqual(len(active_paths), len(set(active_paths)))
-                expected_paths = set.union(*committed[-(run + 1):]) if mode == "append" else committed[-1]
+                active_paths = {task.file.file_path for task in self.table.scan().plan_files()}
+                new_paths = active_paths - previous_paths
+                self.assertEqual(len(new_paths), 8)
+                self.assertEqual(len(active_paths), len(list(self.table.scan().plan_files())))
                 if mode == "append":
-                    expected_paths |= initial_paths
-                self.assertEqual(set(active_paths), expected_paths)
+                    self.assertEqual(active_paths, previous_paths | new_paths)
+                else:
+                    self.assertEqual(active_paths, new_paths)
+                committed.append(new_paths)
+                previous_paths = active_paths
         self.assertEqual(len(set.union(*committed)), 32)
         self.assertFalse(os.path.exists(self.anchor))
 
     @TEST_TAG("ray")
-    def test_cached_execution_and_custom_native_datasink(self):
+    def test_cached_execution_and_public_iceberg_api(self):
         import pyarrow as pa
         import ray
-        from ray.data._internal.datasource.iceberg_datasink import IcebergDatasink
-        from ray.data._internal.savemode import SaveMode
+        from ray.data import SaveMode
 
         @ray.remote(num_cpus=0)
         class Counter:
@@ -853,19 +774,55 @@ class RayIcebergExporterTest(IcebergWriterFixture, unittest.TestCase):
 
         arrow = pa.Table.from_pylist(self.rows, schema=self.schema)
         ds = ray.data.from_arrow(arrow).map_batches(transform, batch_format="pyarrow", batch_size=None)
-        native_write = ray.data.Dataset.write_datasink
+        native_write = ray.data.Dataset.write_iceberg
 
-        def write(dataset, sink):
-            self.assertIsInstance(sink, IcebergDatasink)
-            self.assertIsNot(type(sink), IcebergDatasink)
-            self.assertEqual(sink._mode, SaveMode.OVERWRITE)
-            return native_write(dataset, sink)
+        def write(dataset, **kwargs):
+            self.assertEqual(kwargs["table_identifier"], self.identifier)
+            self.assertEqual(kwargs["mode"], SaveMode.OVERWRITE)
+            self.assertEqual(kwargs["catalog_kwargs"], self.catalog_kwargs)
+            return native_write(dataset, **kwargs)
 
-        with patch.object(ray.data.Dataset, "write_datasink", autospec=True, side_effect=write) as routed:
+        with patch.object(ray.data.Dataset, "write_iceberg", autospec=True, side_effect=write) as routed:
             RayExporter(**self.options()).export(ds)
         routed.assert_called_once()
         self.assertEqual(ray.get(counter.count.remote()), 1)
         self.assertCountEqual(self.read_rows(), [{"id": 1, "text": row["text"]} for row in self.rows])
+
+    @TEST_TAG("ray")
+    def test_public_write_single_commit_and_failure_atomicity(self):
+        import pyarrow as pa
+        import ray
+        from pyiceberg.catalog.sql import SqlCatalog
+
+        dataset = ray.data.from_arrow(pa.Table.from_pylist(self.rows, schema=self.schema)).repartition(2)
+        writer = RayExporter(**self.options())
+        native_commit = SqlCatalog.commit_table
+        commits = []
+
+        def record(catalog, *args, **kwargs):
+            commits.append(True)
+            return native_commit(catalog, *args, **kwargs)
+
+        with patch.object(SqlCatalog, "commit_table", record):
+            writer.export(dataset)
+        self.assertEqual(len(commits), 1)
+        self.assertEqual(self.read_rows(), self.rows)
+
+        snapshot = self.snapshot()
+        location = self.table.metadata_location
+        content = self.read_rows()
+        failed_commits = []
+
+        def fail(*args, **kwargs):
+            failed_commits.append(True)
+            raise RuntimeError("INJECTED_COMMIT_FAILURE")
+
+        with patch.object(SqlCatalog, "commit_table", fail), self.assertRaises(Exception):
+            writer.export(dataset)
+        self.assertEqual(len(failed_commits), 1)
+        self.assertEqual(self.snapshot(), snapshot)
+        self.assertEqual(self.table.metadata_location, location)
+        self.assertEqual(self.read_rows(), content)
 
     @TEST_TAG("ray")
     def test_stats_hashes_use_actual_columns(self):
@@ -934,17 +891,7 @@ class RayIcebergExporterTest(IcebergWriterFixture, unittest.TestCase):
             pa.Table.from_pylist(self.rows, schema=self.schema),
             pa.table({"id": [3], "text": ["bad"], "extra": [2]}),
         ])
-        native_write = ray.data.Dataset.write_datasink
-
-        def serial_write(dataset, sink):
-            # A failing block cancels sibling tasks. Interrupting a sibling's
-            # first SQLAlchemy import leaves cached submodules without their
-            # parent attributes and poisons that worker for subsequent tests.
-            # Still validate the later block, but without an importing sibling.
-            return native_write(dataset, sink, concurrency=1)
-
-        with patch.object(ray.data.Dataset, "write_datasink", autospec=True, side_effect=serial_write), \
-                self.assertRaisesRegex(ValueError, "more columns: extra"):
+        with self.assertRaisesRegex(Exception, "more columns: extra"):
             writer.export(mixed)
         self.assertEqual(self.snapshot(), before)
         self.assertEqual(self.table.metadata_location, location)
