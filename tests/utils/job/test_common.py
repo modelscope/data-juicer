@@ -223,10 +223,13 @@ class GetPartitionStatusTest(DataJuicerTestCaseBase):
                     "operation_name": "filter_a",
                     "operation_idx": 0,
                     "timestamp": 3.0,
-                    "duration": 1.0,
-                    "input_rows": 100,
-                    "output_rows": 80,
-                    "performance_metrics": {"throughput": 100, "reduction_ratio": 0.2},
+                    "metadata": {
+                        "duration_seconds": 1.0,
+                        "input_rows": 100,
+                        "output_rows": 80,
+                        "throughput_rows_per_second": 100,
+                        "reduction_ratio": 0.2,
+                    },
                 },
                 {"event_type": "partition_complete", "partition_id": 0, "timestamp": 4.0},
             ]
@@ -239,6 +242,38 @@ class GetPartitionStatusTest(DataJuicerTestCaseBase):
             self.assertEqual(status[0]["status"], "completed")
             self.assertEqual(len(status[0]["completed_ops"]), 1)
             self.assertIsNone(status[0]["current_op"])
+            self.assertEqual(
+                status[0]["completed_ops"][0],
+                {
+                    "name": "filter_a",
+                    "idx": 0,
+                    "duration": 1.0,
+                    "input_rows": 100,
+                    "output_rows": 80,
+                    "throughput": 100,
+                    "reduction_ratio": 0.2,
+                },
+            )
+
+    def test_missing_metrics_default_to_zero(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for extra in [{}, {"metadata": None}, {"metadata": {}}]:
+                with self.subTest(extra=extra):
+                    event = {"event_type": "op_complete", "partition_id": 0, "timestamp": 1.0, **extra}
+                    (Path(tmpdir) / "events.jsonl").write_text(json.dumps(event) + "\n")
+                    status = JobUtils("test", work_dir=tmpdir).get_partition_status()
+                    self.assertEqual(
+                        status[0]["completed_ops"][0],
+                        {
+                            "name": "Unknown",
+                            "idx": 0,
+                            "duration": 0,
+                            "input_rows": 0,
+                            "output_rows": 0,
+                            "throughput": 0,
+                            "reduction_ratio": 0,
+                        },
+                    )
 
     def test_checkpoint_tracked(self):
         with tempfile.TemporaryDirectory() as tmpdir:
