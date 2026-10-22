@@ -72,8 +72,8 @@ blocks would skew partitions even when there are enough of them. A partition
 count larger than the row count fails the job before any actor starts.
 
 Partitions only apply when no operator is checkpointed. A checkpointed run streams the
-whole dataset through one Ray Data plan instead and forms its recovery units
-when it commits (see [Checkpointing](#checkpointing)), so `partition.mode` and
+whole dataset through one Ray Data plan instead and forms its recovery commits
+as batches finish (see [Checkpointing](#checkpointing)), so `partition.mode` and
 `num_of_partitions` do not affect it.
 
 The automatic actor planner starts with one actor per profiled GPU stage and
@@ -204,12 +204,12 @@ checkpoint_dir: s3://bucket/jobs/my_job   # Optional; defaults to <work_dir>/che
 Every leading Mapper/Filter of the recipe is a save point. Data stays on Ray
 Data: operators read and write blocks through the object store as in an
 uncheckpointed run, and each worker writes a copy of its output batch to
-`checkpoint_dir` as a side effect before passing the batch on. A recovery unit
-is formed at that moment rather than when the input is read: one commit records
-which input rows the batch consumed and which Parquet files it produced, so a
-Mapper that expands rows or a Filter that drops all of them is still recorded
-exactly. Checkpointed stages pass `batch_size=None` to Ray, so small blocks are
-not combined to reach `partition.size`. Each Ray block is split into commits
+`checkpoint_dir` as a side effect before passing the batch on. A commit is
+formed at that moment rather than when the input is read: it records which input
+rows the batch consumed and which Parquet files it produced, so a Mapper that
+expands rows or a Filter that drops all of them is still recorded exactly.
+Checkpointed stages pass `batch_size=None` to Ray, so small blocks are not
+combined to reach `partition.size`. Each Ray block is split into commits
 of at most `partition.size` input rows, without changing the operator's internal
 inference `batch_size`. Without `partition.size`, the limit is derived from
 preflight throughput (about 30 seconds of work, between 64 and 2048 rows) and

@@ -65,7 +65,7 @@ partition:
 
 分区按精确行号边界切分，各分区行数最多相差一行。这里特意没有使用 Ray 的 `Dataset.split(n)`：它按整块（block）分配，当数据块数少于 `num_of_partitions` 时会产生空的尾部分区（单块 10 行切 4 份会得到 `[10, 0, 0, 0]`），块大小不均时即使块数足够也会造成分区严重倾斜。当分区数超过总行数时，会在任何 Actor 启动前直接报错。
 
-分区只在没有算子被检查点覆盖时生效。启用检查点的运行会把整个数据集放进同一个 Ray Data 计划流式处理，恢复单元在提交时才形成（见[检查点](#检查点)），因此 `partition.mode` 和 `num_of_partitions` 不影响它。
+分区只在没有算子被检查点覆盖时生效。启用检查点的运行会把整个数据集放进同一个 Ray Data 计划流式处理，恢复提交在 batch 完成时才形成（见[检查点](#检查点)），因此 `partition.mode` 和 `num_of_partitions` 不影响它。
 
 自动 Actor 规划先给每个待规划 GPU 阶段分配一个 Actor，然后反复给当前 pipeline 瓶颈阶段增加 Actor。每次增加都必须同时满足集群 CPU、Ray GPU 调度份额、每张卡的实测显存份额、每卡 Actor 上限以及有效 batch 数上限。若连“每阶段一个 Actor”的最低方案都无法放入集群，会在正式任务启动前直接报错，不会通过增加分区或超配显存来规避。
 
@@ -114,7 +114,7 @@ partition:
 checkpoint_dir: s3://bucket/jobs/my_job   # 可选；默认 <work_dir>/checkpoints
 ```
 
-recipe 开头连续的每个 Mapper/Filter 都是保存点。数据始终留在 Ray Data 上：算子像不加检查点时一样经 object store 读写 block，每个 worker 在把输出 batch 往下游传之前，顺带把一份副本写到 `checkpoint_dir`。恢复单元在这一刻形成，而不是在读入数据时预先切好：一次提交记录这个 batch 消费了哪些输入行、产出了哪些 Parquet 文件，因此 Mapper 扩行或 Filter 全部过滤都能被准确记录。被检查点覆盖的阶段向 Ray 传入 `batch_size=None`，不会为凑满 `partition.size` 合并小 block；每个 Ray block 内切为最多 `partition.size` 输入行的提交，算子内部推理的 `batch_size` 不变。未设置 `partition.size` 时，该上限按 preflight 吞吐取约 30 秒的工作量（限制在 64–2048 行），没有吞吐数据时为 512。
+recipe 开头连续的每个 Mapper/Filter 都是保存点。数据始终留在 Ray Data 上：算子像不加检查点时一样经 object store 读写 block，每个 worker 在把输出 batch 往下游传之前，顺带把一份副本写到 `checkpoint_dir`。恢复提交在这一刻形成，而不是在读入数据时预先切好：一次提交记录这个 batch 消费了哪些输入行、产出了哪些 Parquet 文件，因此 Mapper 扩行或 Filter 全部过滤都能被准确记录。被检查点覆盖的阶段向 Ray 传入 `batch_size=None`，不会为凑满 `partition.size` 合并小 block；每个 Ray block 内切为最多 `partition.size` 输入行的提交，算子内部推理的 `batch_size` 不变。未设置 `partition.size` 时，该上限按 preflight 吞吐取约 30 秒的工作量（限制在 64–2048 行），没有吞吐数据时为 512。
 
 遇到第一个 Deduplicator、`Pipeline` 或其他需要一次看到全部数据的算子时，检查点前缀结束。该算子及其后的所有算子在合并后的输出上原样运行、不保存检查点，并会打印告警指出是哪个算子。
 
