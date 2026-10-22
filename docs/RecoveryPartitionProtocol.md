@@ -75,9 +75,17 @@ rejected because they do not provide that guarantee here.
 `run.json` records the protocol version, an order-sensitive fingerprint of the
 input computed on Ray workers, the row count, the Arrow schema, a hash of the
 checkpointed operators' configuration, and the stage count. The input is not
-copied. A new run fails if commits already exist; a resume fails if the input,
-its order or the operator configuration changed, or if commits exist without
-`run.json`. The commit size is not part of the identity.
+copied. A new run fails if commits already exist; a resume fails if the recorded
+fingerprint, row count, schema or operator configuration does not match, or if
+commits exist without `run.json`. The commit size is not part of the identity.
+
+The caller must keep source-row identity and read order stable: source offset
+`i` must still identify the same logical record on resume. The input fingerprint
+is an additional diagnostic guard, not a dataset version or a guarantee of
+byte-for-byte content equality. Non-JSON values use their string representation
+(which can omit tensor elements), and referenced media or model files are not
+hashed. Payload consistency is the caller's responsibility; changing the logical
+dataset requires a new job ID/checkpoint directory.
 
 ## Resume
 

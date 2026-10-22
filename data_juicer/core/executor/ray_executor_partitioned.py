@@ -32,6 +32,7 @@ from data_juicer.core.data.dataset_builder import (
 from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.core.elasticjuicer.stage_identity import (
     assign_stage_identities,
+    operator_fingerprint,
     stamped_stage_identity,
 )
 from data_juicer.core.executor import ExecutorBase
@@ -39,6 +40,7 @@ from data_juicer.core.executor.dag_execution_mixin import DAGExecutionMixin
 from data_juicer.core.executor.event_logging_mixin import EventLoggingMixin, EventType
 from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.ops import Filter, Mapper, load_ops
+from data_juicer.ops.base_op import OP
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.ckpt_utils import RayCheckpointManager
 from data_juicer.utils.config_utils import ConfigAccessor
@@ -54,6 +56,13 @@ _DEFAULT_MAX_GPU_WORKERS_PER_DEVICE = 5
 _DEFAULT_GPU_PROBE_WARMUP_BATCHES = 1
 _DEFAULT_GPU_PROBE_STEADY_BATCHES = 3
 _DEFAULT_GPU_PROBE_SAMPLE_SEED = 42
+
+
+def _checkpoint_config_value(value):
+    """Serialize nested operators without their process-specific object addresses."""
+    if isinstance(value, OP):
+        return {"operator_fingerprint": operator_fingerprint(value)}
+    return str(value)
 
 
 class TempDirManager:
@@ -1010,7 +1019,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             for op in ops
         ]
         config_hash = hashlib.sha256(
-            json.dumps(config_payload, sort_keys=True, default=str, ensure_ascii=False).encode("utf-8")
+            json.dumps(config_payload, sort_keys=True, default=_checkpoint_config_value, ensure_ascii=False).encode(
+                "utf-8"
+            )
         ).hexdigest()
         source_rows, source = open_run(
             store, dataset.data, config_fingerprint=config_hash, stage_count=len(ops), resuming=resuming

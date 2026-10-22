@@ -21,6 +21,11 @@ _OFFSET_COLUMN = "__dj_partition_offset__"
 
 
 def _canonical_row_bytes(row) -> bytes:
+    """Encode an input row for a diagnostic fingerprint, not a dataset version.
+
+    Non-JSON values use their display representation, which need not include
+    every tensor element or the contents of externally referenced files.
+    """
     try:
         serialized = json.dumps(row, sort_keys=True, default=str, separators=(",", ":"), ensure_ascii=False)
     except Exception:
@@ -100,8 +105,10 @@ def _scan(dataset):
 def open_run(store, dataset, *, config_fingerprint: str, stage_count: int, resuming: bool):
     """Record or verify the run identity; return ``(source_rows, materialized_input)``.
 
-    A resumed run must read the same rows in the same order and run the same
-    operator config, because commits name input rows by their offset.
+    The caller must preserve logical row identity and read order, because
+    commits name source rows by offset. The input fingerprint catches common
+    accidental changes; it does not prove that arbitrary payloads are unchanged.
+    The checkpointed operator configuration must also remain compatible.
     """
     recorded = store.get(RUN_KEY)
     if recorded is not None and not resuming:

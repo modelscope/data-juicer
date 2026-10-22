@@ -287,9 +287,18 @@ strict resume in the following order:
 7. only then remove the export files that the interrupted runs left behind.
 
 `partition.size` is not part of the identity and may change on resume. If the
-input, its order or the checkpointed operators changed, explicit resume stops
-with an error and leaves the existing checkpoints unchanged. Starting a new run
-with the ID of an existing checkpoint is rejected rather than mixed with it.
+recorded input fingerprint, row count, schema or checkpointed operator
+configuration does not match, explicit resume stops with an error and leaves
+the existing checkpoints unchanged. Starting a new run with the ID of an
+existing checkpoint is rejected rather than mixed with it.
+
+The caller must preserve source-row identity and read order: the same source
+offset must still refer to the same logical record. The fingerprint is an
+additional diagnostic guard, not a guarantee that every payload byte is
+unchanged. Non-JSON values use their display representation, which can omit
+tensor elements; contents of referenced media or model files are not hashed.
+Keep payload consistency under your own dataset/version management and start
+a new job when the logical input changes.
 
 The export is written while the operators run, so an interrupted job usually
 leaves a partial export behind. A resumed job writes the complete export under
