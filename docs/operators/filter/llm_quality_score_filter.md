@@ -2,11 +2,11 @@
 
 Filter to keep samples with a high quality score estimated by a language model.
 
-This operator uses a language model to evaluate the quality of each sample across multiple dimensions, including accuracy, grammar, informativeness, and coherence. The default prompt requests a numerical score for each dimension on a 1-5 scale, where 1 is the lowest and 5 is the highest. The stored `llm_quality_score` is `mean(selected scores) / 5`, using the dimensions selected by `dim_required_keys` (all four default dimensions when omitted). Scores on the standard 1-5 scale therefore produce quality scores in 0.2-1.0, not the full 0-1 range. Both `min_score` and `max_score` apply to this divided score: to require an average of at least 4.5, set `min_score: 0.9`, not `4.5`. Custom prompts still use the same divisor; their scores are not guaranteed to be clamped to this range or calibrated to the standard scale. The evaluation results are cached in the 'llm_quality_score' and 'llm_quality_record' fields. Important flags and tags from the LLM's analysis may also be stored in the sample's stats.
+This operator uses a language model to evaluate accuracy, grammar, informativeness, and coherence. The default prompt requests a score from 1 to 5 for each dimension. The stored `llm_quality_score` is the average of the dimensions selected by `dim_required_keys`, divided by 5; all four dimensions are used by default. Ratings from 1 to 5 yield quality scores from 0.2 to 1.0. Both `min_score` and `max_score` use this normalized scale. For example, an average rating of 4.5 corresponds to `min_score: 0.9`. Custom prompts use the same formula, so their rating scale determines the resulting score range. Scores are used directly, with no clamping or automatic calibration across scales. Evaluation results are cached in 'llm_quality_score' and 'llm_quality_record'; flags and tags may also be stored in the sample's stats.
 
 用于保留由语言模型估计出高质量分数的样本的过滤器。
 
-该算子使用语言模型评估每个样本在多个维度上的质量，包括准确性、语法、信息量和连贯性。默认提示词要求LLM为每个维度提供1-5分的数值评分，其中1分最低，5分最高。存储的`llm_quality_score`为所选维度评分的平均值除以5，即`mean(selected scores) / 5`；维度由`dim_required_keys`选择，省略时使用默认的全部四个维度。因此，标准1-5分对应的质量分数范围为0.2-1.0，而非完整的0-1范围。`min_score`和`max_score`均作用于除以5后的分数：若要求平均评分至少为4.5，应设置`min_score: 0.9`，而不是`4.5`。自定义提示词仍使用相同的除数，其评分不保证被截断到上述范围，也不保证与标准评分尺度校准一致。评估结果缓存在'llm_quality_score'和'llm_quality_record'字段中。LLM分析的重要标志和标签也可能存储在样本的stats中。
+该算子使用语言模型评估样本的准确性、语法、信息量和连贯性。默认提示词要求每个维度按1-5分评分。`llm_quality_score`取`dim_required_keys`所选维度的平均分，再除以5；默认使用全部四个维度。1-5分对应的质量分数范围为0.2-1.0，`min_score`和`max_score`均使用这一归一化尺度。例如，平均评分4.5对应`min_score: 0.9`。自定义提示词也使用相同公式，最终分数范围取决于其评分尺度。计算结果直接用于过滤，不做截断或跨尺度自动校准。评估结果缓存在'llm_quality_score'和'llm_quality_record'字段中，标志和标签也可能存储在样本的stats中。
 
 Type 算子类型: **filter**
 
