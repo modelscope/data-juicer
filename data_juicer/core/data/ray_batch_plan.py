@@ -120,13 +120,17 @@ class BatchPlanWorker:
             )
 
             batch_size, tables = _compute_auto_batch_size(tables)
+        zero_copy_batch = options.get("zero_copy_batch", True)
         batches = batch_blocks(
             iter(tables),
             batch_size=batch_size,
             batch_format=options.get("batch_format", "default"),
-            ensure_copy=not options.get("zero_copy_batch", True) and batch_size is not None,
+            ensure_copy=not zero_copy_batch,
         )
         for batch in batches:
+            # Arrow-to-NumPy conversion can recreate read-only views after the block copy.
+            if not zero_copy_batch and isinstance(batch, dict):
+                batch = {key: column if column.flags.writeable else column.copy() for key, column in batch.items()}
             if index not in self.functions:
                 function = step.function
                 if isinstance(function, type):

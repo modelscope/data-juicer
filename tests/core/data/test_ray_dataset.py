@@ -686,11 +686,50 @@ class RayBatchExecutionTest(unittest.TestCase):
             batch["value"] += 1
             return batch
 
-        table = pa.table({"value": np.arange(3)})
-        plan = RayBatchPlan().map_batches(mutate, batch_size=2, batch_format="numpy", zero_copy_batch=False)
-        result = [row for block in BatchPlanWorker(plan).process_partition([table]) for row in block.to_pylist()]
-        self.assertEqual(result, [{"value": 1}, {"value": 2}, {"value": 3}])
-        self.assertEqual(table["value"].to_pylist(), [0, 1, 2])
+        for batch_size in (2, None):
+            with self.subTest(batch_size=batch_size):
+                table = pa.table({"value": np.arange(3)})
+                plan = RayBatchPlan().map_batches(
+                    mutate, batch_size=batch_size, batch_format="numpy", zero_copy_batch=False
+                )
+                result = [
+                    row for block in BatchPlanWorker(plan).process_partition([table]) for row in block.to_pylist()
+                ]
+                self.assertEqual(result, [{"value": 1}, {"value": 2}, {"value": 3}])
+                self.assertEqual(table["value"].to_pylist(), [0, 1, 2])
+
+    def test_partition_batches_copy_only_readonly_numpy_columns(self):
+        import numpy as np
+        import pyarrow as pa
+
+        from data_juicer.core.data.ray_batch_plan import BatchPlanWorker, RayBatchPlan
+
+        for zero_copy_batch in (False, True):
+            with self.subTest(zero_copy_batch=zero_copy_batch):
+                readonly = np.arange(3)
+                readonly.flags.writeable = False
+                writable = np.arange(3)
+                batch = {"readonly": readonly, "writable": writable}
+
+                def inspect_batch(output):
+                    self.assertIs(output["writable"], writable)
+                    if zero_copy_batch:
+                        self.assertIs(output, batch)
+                        self.assertIs(output["readonly"], readonly)
+                        self.assertFalse(output["readonly"].flags.writeable)
+                    else:
+                        self.assertTrue(output["readonly"].flags.writeable)
+                        self.assertFalse(np.shares_memory(output["readonly"], readonly))
+                        np.testing.assert_array_equal(output["readonly"], readonly)
+                    return output
+
+                plan = RayBatchPlan().map_batches(
+                    inspect_batch, batch_size=2, batch_format="numpy", zero_copy_batch=zero_copy_batch
+                )
+                with patch("data_juicer.core.data.ray_batch_plan.batch_blocks", return_value=iter([batch])) as batching:
+                    list(BatchPlanWorker(plan).process_partition([pa.table({"value": np.arange(3)})]))
+                self.assertEqual(batching.call_args.kwargs["ensure_copy"], not zero_copy_batch)
+                self.assertFalse(readonly.flags.writeable)
 
     def test_partition_worker_rejects_global_barrier(self):
         from data_juicer.core.data.ray_batch_plan import BatchPlanWorker, RayBatchPlan
