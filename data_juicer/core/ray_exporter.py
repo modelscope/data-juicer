@@ -291,7 +291,9 @@ class RayExporter:
         if attempt is not None:
             self._complete_attempt(attempt, export_path_for_checks)
 
-        if probe_after_write and not is_remote_path(export_path_for_checks):
+        # Checkpoint exports are directories, including empty ones: a later
+        # resume must be able to enumerate and write a new export attempt.
+        if attempt is None and probe_after_write and not is_remote_path(export_path_for_checks):
             if os.path.isdir(export_path_for_checks) and not os.listdir(export_path_for_checks):
                 logger.warning(f"Dataset is empty, creating empty export file at {export_path_for_checks}")
                 os.rmdir(export_path_for_checks)

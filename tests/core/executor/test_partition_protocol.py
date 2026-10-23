@@ -5,6 +5,7 @@ import threading
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 import pyarrow as pa
 
@@ -98,6 +99,25 @@ class PartitionProtocolTest(unittest.TestCase):
         table = with_keys(pa.table({"v": list("abcde")}), 7)
         self.assertEqual(table[SEQ_COLUMN].to_pylist(), [7] * 5)
         self.assertEqual(select_ranges(table, [(0, 1), (3, 5)])["v"].to_pylist(), ["a", "d", "e"])
+
+    def test_failed_table_write_removes_only_this_calls_files(self):
+        store = LocalStore(str(self.tmp_path))
+        retained = write_tables(store, [pa.table({"committed": [1]})])
+        put = store.put
+        calls = []
+
+        def fail_second_write(key, data):
+            put(key, data)
+            calls.append(key)
+            if len(calls) == 2:
+                raise OSError("injected data write failure")
+
+        with patch.object(store, "put", side_effect=fail_second_write):
+            with self.assertRaisesRegex(OSError, "injected data write failure"):
+                write_tables(store, [pa.table({"a": [1]}), pa.table({"b": [2]})])
+        self.assertEqual(len(calls), 2)
+        self.assertTrue(all(store.get(key) is None for key in calls))
+        self.assertEqual(list(read_tables(store, retained))[0].to_pylist(), [{"committed": 1}])
 
     def test_exact_duplicate_returns_winner_and_partial_overlap_fails(self):
         store = LocalStore(str(self.tmp_path))

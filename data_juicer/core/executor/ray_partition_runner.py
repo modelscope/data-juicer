@@ -23,10 +23,12 @@ from data_juicer.core.executor.partition_protocol import (
     SEQ_COLUMN,
     SOURCE_SEQ,
     CommitLog,
+    LocalStore,
     OutputFile,
     ProtocolError,
     commit_key,
     concat_outputs,
+    discard_files,
     key_ranges,
     open_export_attempt,
     read_tables,
@@ -71,6 +73,17 @@ class _CommitCoordinator:
             with self.condition:
                 self.failure = error
                 self.condition.notify_all()
+            # A synchronous local write that returned with no manifest cannot
+            # publish later. Remote write failures can be ambiguous; retain
+            # their files. Never scan other attempts' data directories.
+            if isinstance(self.store, LocalStore):
+                try:
+                    if self.store.get(commit_key(commit.stage, commit.seq)) is None:
+                        discard_files(self.store, (item.key for item in (*files, *stats_files)))
+                except Exception as cleanup_error:
+                    from loguru import logger
+
+                    logger.warning(f"Could not check failed checkpoint publication: {cleanup_error}")
             raise
         with self.condition:
             self.durable.add(commit.seq)
@@ -121,11 +134,18 @@ def _commit_slice(context, worker, batch, consumed):
         return tables
 
     data = batch.drop_columns(list(KEY_COLUMNS))
-    outputs = [table for table in worker.process_partition([data], write_stats=write_stats) if table.num_rows]
-    files = write_tables(context.store, outputs)
+    try:
+        outputs = [table for table in worker.process_partition([data], write_stats=write_stats) if table.num_rows]
+        files = write_tables(context.store, outputs)
+    except BaseException:
+        # The commit RPC has not started, so these stats cannot be referenced.
+        discard_files(context.store, (item.key for item in stats_files))
+        raise
     commit = ray.get(context.coordinator.commit.remote(context.stage, consumed, files, stats_files))
-    if commit.files != files:
+    if commit.files != files or commit.stats_files != stats_files:
         # A concurrent attempt won; consumers may already hold its output.
+        winning_keys = {item.key for item in (*commit.files, *commit.stats_files)}
+        discard_files(context.store, (item.key for item in (*files, *stats_files) if item.key not in winning_keys))
         outputs = list(read_tables(context.store, commit.files))
     return commit, outputs
 

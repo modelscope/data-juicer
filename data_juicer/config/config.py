@@ -927,8 +927,9 @@ def init_configs(args: Optional[List[str]] = None, allow_auto: bool = False, loa
 
     apply_stdlib_json_patch_for_datasets()
 
-    if args is None:
-        args = sys.argv[1:]
+    # Keep the exact invocation, including an explicitly empty argument list.
+    # Embedded callers need not share the host application's sys.argv.
+    args = list(sys.argv[1:] if args is None else args)
     with timing_context("Total config initialization time"):
         with timing_context("Initializing parser"):
             parser = build_base_parser()
@@ -976,6 +977,7 @@ def init_configs(args: Optional[List[str]] = None, allow_auto: bool = False, loa
             # Parse all arguments
             with timing_context("Parsing arguments"):
                 cfg = parser.parse_args(args=args)
+                cfg._original_args = list(args)
 
                 if cfg.executor_type == "ray":
                     os.environ[RAY_JOB_ENV_VAR] = "1"
@@ -997,18 +999,16 @@ def init_configs(args: Optional[List[str]] = None, allow_auto: bool = False, loa
         with timing_context("Updating operator process"):
             cfg = update_op_process(cfg, parser, used_ops)
 
-        # Validate config for resumption if job_id is provided
-        if not load_configs_only and hasattr(cfg, "job_id") and cfg.job_id:
-            # Check if this is a resumption attempt by looking for existing job directory
-            if cfg.work_dir and os.path.exists(cfg.work_dir):
+        # A new job's directory already exists at this point, but has no
+        # backup yet. Validate resumes and existing jobs before changing backups.
+        if not load_configs_only:
+            cfg._same_yaml_config = True
+            if getattr(cfg, "_resume_requested", False) or os.path.isfile(os.path.join(cfg.work_dir, "cli.yaml")):
                 logger.info(f"🔍 Checking for job resumption: {cfg.job_id}")
                 cfg._same_yaml_config = validate_config_for_resumption(cfg, cfg.work_dir, args)
-            else:
-                # New job, set flag to True
-                cfg._same_yaml_config = True
 
         # copy the config file into the work directory
-        if not load_configs_only:
+        if not load_configs_only and getattr(cfg, "_same_yaml_config", True):
             config_backup(cfg)
 
         # show the final config tables before the process started
@@ -1484,15 +1484,11 @@ def save_cli_arguments(cfg: Namespace):
 
     # Get the original CLI arguments if available
     original_args = getattr(cfg, "_original_args", None)
-    if not original_args:
+    if original_args is None:
         # Try to reconstruct from sys.argv if available
         import sys
 
         original_args = sys.argv[1:] if len(sys.argv) > 1 else []
-
-    if not original_args:
-        logger.warning("No CLI arguments available to save")
-        return
 
     # Create cli.yaml in work directory
     cli_path = os.path.join(cfg.work_dir, "cli.yaml")
@@ -1564,7 +1560,7 @@ def validate_config_for_resumption(cfg: Namespace, work_dir: str, original_args:
 
         # Get current CLI arguments from the original args passed to init_configs
         current_cli_args = original_args
-        if not current_cli_args:
+        if current_cli_args is None:
             # Fallback: try to get from sys.argv
             import sys
 

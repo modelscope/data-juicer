@@ -70,6 +70,16 @@ must be resumed.
 services such as MinIO implement as a conditional create. Other URI schemes are
 rejected because they do not provide that guarantee here.
 
+Cleanup removes only files owned by the failed attempt: partial table writes,
+statistics written before an operator fails, and files of a losing duplicate
+attempt. If a synchronous POSIX manifest write fails and the coordinator
+confirms that its manifest is absent, it also removes that attempt's data and
+statistics. If the manifest exists, or a remote write's outcome is ambiguous,
+the files are retained. Cleanup never scans and deletes all unreferenced files:
+another worker could still publish a reference to one. Process termination
+and ambiguous remote failures can therefore leave orphan files; automatic
+reclamation of those files requires a separate ownership/fencing protocol.
+
 ## Run identity
 
 `run.json` records the protocol version, an order-sensitive fingerprint of the
@@ -121,6 +131,10 @@ A failed resume therefore never leaves less exported output than it found.
 Files in the export directory that no attempt of the job wrote are kept, with a
 warning. Formats that Ray does not write as named files (Lance) cannot replace
 a partial export; resume stops until it is removed.
+
+An empty checkpoint export remains a directory, so a later attempt can write
+to the same destination. Ordinary empty exports retain their existing empty
+file behavior.
 
 When `export_shard_size` is set, the exporter materializes its final input once
 and reuses it for exact size/row counting and writing. When an API caller asks

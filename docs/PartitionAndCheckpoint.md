@@ -237,6 +237,13 @@ are rejected at startup.
 Checkpoints are kept after the job finishes so that it can be resumed. The
 executor cleans up its temporary working files when the run exits.
 
+Checkpoint cleanup removes only files owned by an attempt that are proven not
+to be committed. A process kill or ambiguous remote write can still leave
+orphan files; there is no automatic sweep of all unreferenced files, because
+another worker could still be writing or committing them. See
+[RecoveryPartitionProtocol.md](RecoveryPartitionProtocol.md#storage) for the
+cleanup boundaries. Empty checkpoint exports remain directories for resumption.
+
 ## Usage
 
 ### Running Jobs

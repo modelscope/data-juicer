@@ -99,6 +99,9 @@ class LocalStore:
         except FileNotFoundError:
             return None
 
+    def delete(self, key: str) -> None:
+        Path(self.root, key).unlink(missing_ok=True)
+
     def list(self, directory: str) -> List[str]:
         try:
             names = os.listdir(Path(self.root, directory))
@@ -144,6 +147,9 @@ class S3Store:
 
     def put(self, key: str, data: bytes) -> None:
         self.client.put_object(Bucket=self.bucket, Key=self._key(key), Body=data)
+
+    def delete(self, key: str) -> None:
+        self.client.delete_object(Bucket=self.bucket, Key=self._key(key))
 
     def put_if_absent(self, key: str, data: bytes) -> bool:
         from botocore.exceptions import ClientError
@@ -322,15 +328,33 @@ def write_tables(store, tables: Iterable[pa.Table], kind: str = "part") -> Tuple
     directory = f"{DATA_DIR}/{uuid.uuid4().hex}"
     nonempty = (table for table in tables if table.num_rows)
     files = []
-    for index, (_, group) in enumerate(groupby(nonempty, key=lambda table: table.schema.serialize().to_pybytes())):
-        table = pa.concat_tables(list(group))
-        sink = pa.BufferOutputStream()
-        pq.write_table(table, sink)
-        data = sink.getvalue().to_pybytes()
-        key = f"{directory}/{kind}-{index:05d}.parquet"
-        store.put(key, data)
-        files.append(OutputFile(key, table.num_rows, hashlib.sha256(data).hexdigest()))
+    owned = []
+    try:
+        for index, (_, group) in enumerate(groupby(nonempty, key=lambda table: table.schema.serialize().to_pybytes())):
+            table = pa.concat_tables(list(group))
+            sink = pa.BufferOutputStream()
+            pq.write_table(table, sink)
+            data = sink.getvalue().to_pybytes()
+            key = f"{directory}/{kind}-{index:05d}.parquet"
+            owned.append(key)
+            store.put(key, data)
+            files.append(OutputFile(key, table.num_rows, hashlib.sha256(data).hexdigest()))
+    except BaseException:
+        # No manifest can reference these files: they have not left this call.
+        discard_files(store, owned)
+        raise
     return tuple(files)
+
+
+def discard_files(store, keys) -> None:
+    """Best-effort removal of explicitly owned, proven-unpublished files only."""
+    from loguru import logger
+
+    for key in keys:
+        try:
+            store.delete(key)
+        except Exception as error:
+            logger.warning(f"Could not remove uncommitted checkpoint file {key}: {error}")
 
 
 def read_tables(store, files: Sequence[OutputFile]) -> Iterable[pa.Table]:

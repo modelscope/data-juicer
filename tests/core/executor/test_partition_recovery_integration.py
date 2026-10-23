@@ -8,6 +8,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+import pyarrow as pa
 import ray
 import yaml
 from jsonargparse import Namespace
@@ -17,9 +18,13 @@ from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.core.executor import ray_partition_runner
 from data_juicer.core.executor.partition_protocol import (
     COMMIT_DIR,
+    SOURCE_SEQ,
     Commit,
     LocalStore,
     ProtocolError,
+    commit_key,
+    with_keys,
+    write_tables,
 )
 from data_juicer.core.executor.ray_executor_partitioned import PartitionedRayExecutor
 from data_juicer.ops.base_op import Mapper
@@ -127,6 +132,38 @@ class ExitAfterFirstCommitActor(ray_partition_runner.CheckpointStageActor):
             except FileExistsError:
                 continue
             os._exit(86)
+
+
+class FailedPublicationStore(LocalStore):
+    def __init__(self, root, published=False):
+        super().__init__(root)
+        self.published = published
+
+    def put_if_absent(self, key, data):
+        if key.startswith(COMMIT_DIR + "/"):
+            if self.published:
+                super().put_if_absent(key, data)
+            raise OSError("injected manifest failure")
+        return super().put_if_absent(key, data)
+
+
+class AmbiguousPublicationStore:
+    """Remote-like failures do not prove that a write cannot still publish."""
+
+    def __init__(self, root):
+        self.delegate = FailedPublicationStore(root)
+
+    def get(self, key):
+        return self.delegate.get(key)
+
+    def list(self, key):
+        return self.delegate.list(key)
+
+    def put_if_absent(self, key, data):
+        return self.delegate.put_if_absent(key, data)
+
+    def delete(self, key):
+        return self.delegate.delete(key)
 
 
 def exit_after_first_commit_task(batch, context, plan):
@@ -601,6 +638,84 @@ class PartitionRecoveryIntegrationTest(unittest.TestCase):
     @TEST_TAG("ray")
     def test_full_executor_exports_checkpointed_result_true(self):
         self._check_full_executor_exports_checkpointed_result(True)
+
+    @TEST_TAG("ray")
+    def test_empty_export_resumes_after_completion_logging_fails(self):
+        config = _write_job(self.tmp_path, [{"text_length_filter": {"min_len": 100, "num_proc": 1}}])
+        executor = PartitionedRayExecutor(init_configs(["--config", str(config)]))
+        with patch.object(executor, "log_job_complete", side_effect=RuntimeError("late completion failure")):
+            with self.assertRaisesRegex(RuntimeError, "late completion failure"):
+                executor.run(skip_return=True)
+        self.assertTrue((self.tmp_path / "output.jsonl").is_dir())
+        resumed = PartitionedRayExecutor(init_configs(["--config", str(config), "--resume", executor.job_id]))
+        self.assertTrue(resumed.cfg._same_yaml_config)
+        resumed.run(skip_return=True)
+        self.assertEqual(_exported_texts(self.tmp_path), [])
+
+    @TEST_TAG("ray")
+    def test_manifest_failure_cleanup_requires_definitive_local_nonpublication(self):
+        for name, published, remote in [("absent", False, False), ("published", True, False), ("remote", False, True)]:
+            with self.subTest(name=name):
+                local = FailedPublicationStore(str(self.tmp_path / name), published)
+                files = write_tables(local, [pa.table({"v": [1]})])
+                stats = write_tables(local, [pa.table({"s": [1]})], kind="stats")
+                retained = write_tables(local, [pa.table({"foreign": [2]})])
+                store = AmbiguousPublicationStore(local.root) if remote else local
+                coordinator = ray_partition_runner._CommitCoordinator.remote(store, 1, 1)
+                try:
+                    with self.assertRaisesRegex(Exception, "injected manifest failure"):
+                        ray.get(coordinator.commit.remote(0, ((SOURCE_SEQ, 0, 1),), files, stats))
+                    for item in (*files, *stats):
+                        self.assertEqual(local.get(item.key) is not None, published or remote)
+                    self.assertIsNotNone(local.get(retained[0].key))
+                    self.assertEqual(local.get(commit_key(0, 0)) is not None, published)
+                finally:
+                    ray.kill(coordinator)
+
+    @TEST_TAG("ray")
+    def test_duplicate_attempt_removes_own_files_and_keeps_winning_data_and_stats(self):
+        store = LocalStore(str(self.tmp_path))
+        winner = write_tables(store, [pa.table({"v": [42]})])
+        stats = write_tables(store, [pa.table({"s": [42]})], kind="stats")
+        coordinator = ray_partition_runner._CommitCoordinator.remote(store, 1, 1)
+        consumed = ((SOURCE_SEQ, 0, 1),)
+        try:
+            committed = ray.get(coordinator.commit.remote(0, consumed, winner, stats))
+
+            class Worker:
+                def process_partition(self, tables, write_stats):
+                    write_stats([pa.table({"s": [99]})])
+                    yield from tables
+
+            context = ray_partition_runner.StageContext(store, 0, coordinator, 1)
+            result, outputs = ray_partition_runner._commit_slice(
+                context, Worker(), with_keys(pa.table({"v": [99]}), SOURCE_SEQ), consumed
+            )
+            self.assertEqual(result, committed)
+            self.assertEqual(outputs[0].to_pylist(), [{"v": 42}])
+            expected = {item.key for item in (*winner, *stats)}
+            self.assertEqual(
+                {str(path.relative_to(self.tmp_path)) for path in self.tmp_path.glob("data/**/*.parquet")}, expected
+            )
+        finally:
+            ray.kill(coordinator)
+
+    def test_operator_failure_removes_stats_written_before_commit(self):
+        store = LocalStore(str(self.tmp_path))
+        retained = write_tables(store, [pa.table({"v": [42]})])
+
+        class Worker:
+            def process_partition(self, tables, write_stats):
+                write_stats([pa.table({"s": [99]})])
+                raise RuntimeError("operator failed after stats")
+
+        context = ray_partition_runner.StageContext(store, 0, None, 1)
+        with self.assertRaisesRegex(RuntimeError, "operator failed after stats"):
+            ray_partition_runner._commit_slice(context, Worker(), with_keys(pa.table({"v": [99]}), SOURCE_SEQ), ())
+        self.assertEqual(
+            {str(path.relative_to(self.tmp_path)) for path in self.tmp_path.glob("data/**/*.parquet")},
+            {item.key for item in retained},
+        )
 
     @TEST_TAG("ray")
     def test_full_executor_checkpoints_the_prefix_before_a_deduplicator(self):
