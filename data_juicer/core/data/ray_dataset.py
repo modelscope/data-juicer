@@ -225,11 +225,14 @@ class RayDataset(DJDataset):
                 raise ValueError(f"k must be non-negative, got {k}")
             if k == 0:
                 return []
-            rows = self.data.take(k)
-        else:
-            rows = self.data.take_all()
+
+        # An empty result's schema belongs to the executed plan, including its limit.
+        requested_data = self.data if k is None else self.data.limit(k)
+        rows = requested_data.take_all()
         if columns is None and not rows:
-            raise KeyError(f"Column '{column}' not found in dataset")
+            columns = requested_data.columns(fetch_if_missing=False)
+            if columns is None or column not in columns:
+                raise KeyError(f"Column '{column}' not found in dataset")
         try:
             return [row[column] for row in rows]
         except KeyError:

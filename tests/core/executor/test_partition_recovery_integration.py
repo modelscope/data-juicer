@@ -865,11 +865,34 @@ class PartitionRecoveryIntegrationTest(unittest.TestCase):
 
     @TEST_TAG("ray")
     def test_get_column_does_not_execute_schema_probe(self):
-        log_path = str(self.tmp_path / "column.calls")
-        source = _source(_executor(self.tmp_path))
-        result = source.process([LoggingMapper(log_path, num_proc=1)])
-        self.assertEqual(result.get_column("id"), [0, 1, 2, 3])
-        self.assertEqual(sorted(_logged_ids(log_path)), [0, 1, 2, 3])
+        for k in (None, 1, 10):
+            with self.subTest(k=k):
+                log_path = str(self.tmp_path / f"column-{k}.calls")
+                source = _source(_executor(self.tmp_path))
+                result = source.process([LoggingMapper(log_path, num_proc=1)])
+                with patch.object(result.data, "materialize", side_effect=AssertionError("Unexpected materialization")):
+                    self.assertEqual(result.get_column("id", k=k), [0, 1, 2, 3][:k])
+                self.assertEqual(sorted(_logged_ids(log_path)), [0, 1, 2, 3])
+
+    @TEST_TAG("ray")
+    def test_get_column_empty_output_preserves_schema(self):
+        for k in (None, 0, 1):
+            for column in ("text", "missing"):
+                with self.subTest(k=k, column=column):
+                    log_path = str(self.tmp_path / f"empty-column-{k}-{column}.calls")
+                    source = _source(_executor(self.tmp_path))
+                    result = source.process([LoggingMapper(log_path, num_proc=1)])
+                    result.data = result.data.map_batches(lambda batch: batch.slice(0, 0), batch_format="pyarrow")
+                    self.assertIsNone(result.data.columns(fetch_if_missing=False))
+                    with patch.object(
+                        result.data, "materialize", side_effect=AssertionError("Unexpected materialization")
+                    ):
+                        if column == "text":
+                            self.assertEqual(result.get_column(column, k=k), [])
+                        else:
+                            with self.assertRaisesRegex(KeyError, "Column 'missing' not found in dataset"):
+                                result.get_column(column, k=k)
+                    self.assertEqual(sorted(_logged_ids(log_path)), [0, 1, 2, 3])
 
     @TEST_TAG("ray")
     def test_unsupported_checkpoint_scheme_fails_before_running(self):
