@@ -7,7 +7,6 @@ Shared utilities for job stopping and monitoring operations.
 
 import json
 import os
-import sys
 import threading
 import time
 from pathlib import Path
@@ -39,10 +38,6 @@ class JobUtils:
         else:
             # Default fallback
             self.work_dir = Path("outputs/partition-checkpoint-eventlog") / job_id
-
-        # Set up logging
-        logger.remove()
-        logger.add(sys.stderr, level="INFO", format="{time:HH:mm:ss} | {level} | {name}:{function}:{line} - {message}")
 
         if not self.work_dir.exists():
             raise FileNotFoundError(f"Job directory not found: {self.work_dir}")

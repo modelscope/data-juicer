@@ -1,6 +1,9 @@
 import json
 import os
+import subprocess
+import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -22,6 +25,41 @@ def setUpModule():
 
 
 class JobUtilsInitTest(DataJuicerTestCaseBase):
+
+    def test_init_preserves_redirected_application_logging(self):
+        # Use a child process because the old logging loop can hang the runner.
+        script = textwrap.dedent("""
+            import sys
+            import tempfile
+            from pathlib import Path
+
+            from loguru import logger
+
+            from data_juicer.utils.job.common import JobUtils
+            from data_juicer.utils.logger_utils import setup_logger
+
+            with tempfile.TemporaryDirectory() as work_dir:
+                setup_logger(work_dir, filename="application.log", redirect=True)
+                logger.info("before job inspection")
+                for _ in range(2):
+                    job = JobUtils("test_job", work_dir=work_dir)
+                    assert job.get_partition_status() == {}
+                    logger.info("after job inspection")
+                    sys.stderr.write("redirected output still works\\n")
+                logger.complete()
+                content = (Path(work_dir) / "application.log").read_text()
+                assert "before job inspection" in content
+                assert content.count("after job inspection") == 2
+                assert content.count("redirected output still works") == 2
+        """)
+        result = subprocess.run(
+            [sys.executable, "-c", script],
+            cwd=Path(__file__).resolve().parents[3],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_init_with_work_dir(self):
         with tempfile.TemporaryDirectory() as tmpdir:
