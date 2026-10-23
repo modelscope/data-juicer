@@ -1090,12 +1090,51 @@ class IcebergFixture:
 
         return DatasetBuilder(self.cfg, executor_type=executor).load_dataset()
 
+    def create_media_table(self):
+        import pyarrow as pa
+        from PIL import Image
+
+        media = self.root / "media"
+        media.mkdir()
+        Image.new("RGB", (16, 8)).save(media / "img.png")
+        schema = pa.schema([("body", pa.string()), ("images", pa.list_(pa.string()))])
+        table = self.catalog.create_table("training.media", schema=schema)
+        table.append(pa.Table.from_pylist([{"body": "hello", "images": ["img.png"]}], schema=schema))
+        self.ds_config.update(table_identifier="training.media", path=str(media / "source.jsonl"))
+        return media
+
     @staticmethod
     def sorted_rows(rows):
         return sorted(rows, key=lambda row: row["id"])
 
 
 class TestDefaultIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
+    def test_media_anchor_reaches_image_operator_without_mutating_config(self):
+        from copy import deepcopy
+
+        from data_juicer.ops.filter.image_shape_filter import ImageShapeFilter
+
+        media = self.create_media_table()
+        run_dir = self.root / "run"
+        run_dir.mkdir()
+        old_cwd = os.getcwd()
+        self.addCleanup(os.chdir, old_cwd)
+        os.chdir(run_dir)
+        # The file anchor need not exist; the image itself must exist.
+        self.assertFalse((media / "source.jsonl").exists())
+        for anchor in (str(media / "source.jsonl"), str(media)):
+            self.ds_config["path"] = anchor
+            before = deepcopy(self.cfg)
+            dataset = self.load()
+            self.assertEqual(dataset[0]["images"], [str(media / "img.png")])
+            result = dataset.process(
+                ImageShapeFilter(text_key="body", min_width=16, max_width=16,
+                                 min_height=8, max_height=8, num_proc=1, skip_op_error=False),
+                open_monitor=False,
+            )
+            self.assertEqual(len(result), 1)
+            self.assertEqual(self.cfg, before)
+
     def test_builder_reads_latest_without_mutating_configuration(self):
         from copy import deepcopy
 
@@ -1269,6 +1308,12 @@ class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
     def test_empty_table(self):
         self.catalog.create_table("training.empty", schema=self.arrow_schema)
         self.ds_config["table_identifier"] = "training.empty"
+        self.assertEqual(self.load("ray").data.take_all(), [])
+
+    @TEST_TAG("ray")
+    def test_empty_table_with_media_anchor(self):
+        self.catalog.create_table("training.empty", schema=self.arrow_schema)
+        self.ds_config.update(table_identifier="training.empty", path=str(self.root / "source.jsonl"))
         self.assertEqual(self.load("ray").data.take_all(), [])
 
     @TEST_TAG("ray")

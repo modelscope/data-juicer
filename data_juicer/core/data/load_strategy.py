@@ -262,6 +262,7 @@ class DefaultIcebergDataLoadStrategy(IcebergConfigMixin, DefaultDataLoadStrategy
             text_keys=getattr(self.cfg, "text_keys", ["text"]),
             num_proc=kwargs.get("num_proc", 1),
             global_cfg=self.cfg,
+            dataset_path=self.ds_config.get("path"),
         )
 
 

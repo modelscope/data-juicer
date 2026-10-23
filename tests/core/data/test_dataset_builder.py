@@ -22,6 +22,63 @@ WORK_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
 class DatasetBuilderTest(DataJuicerTestCaseBase):
 
+    def test_startup_redacts_read_and_write_credentials_in_console_and_logs(self):
+        import gzip
+        import subprocess
+        import sys
+        from pathlib import Path
+
+        import yaml
+
+        read_secret = "SYNTHETIC_READ_SECRET_1107"
+        write_token = "SYNTHETIC_WRITE_TOKEN_1107"
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            config = {
+                "project_name": "iceberg_redaction_test",
+                "np": 1,
+                "work_dir": str(root / "work"),
+                "dataset": {"configs": [{
+                    "type": "remote", "source": "iceberg", "table_identifier": "training.source",
+                    "catalog_kwargs": {"name": "test", "s3.secret-access-key": read_secret},
+                }]},
+                "export_path": str(root / "output.jsonl"),
+                "export_type": "iceberg",
+                "export_extra_args": {
+                    "table_identifier": "training.target",
+                    "catalog_kwargs": {"name": "test", "token": write_token},
+                },
+                "process": [],
+            }
+            recipe = root / "recipe.yaml"
+            recipe.write_text(yaml.safe_dump(config))
+            result = subprocess.run(
+                [sys.executable, "-c",
+                 "import sys; from data_juicer.config import init_configs; "
+                 "cfg = init_configs(['--config', sys.argv[1]]); "
+                 "assert cfg.dataset['configs'][0]['catalog_kwargs']['s3.secret-access-key'] == sys.argv[2]; "
+                 "assert cfg.export_extra_args['catalog_kwargs']['token'] == sys.argv[3]",
+                 str(recipe), read_secret, write_token],
+                cwd=Path(__file__).resolve().parents[3], capture_output=True, text=True, timeout=60,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            console = result.stdout + result.stderr
+            self.assertIn("s3.secret-access-key", console)
+            self.assertIn("***", console)
+            logs = list(root.rglob("*.txt*"))
+            self.assertTrue(logs)
+            contents = [console]
+            for path in logs:
+                if path.suffix == ".gz":
+                    with gzip.open(path, "rt") as log:
+                        contents.append(log.read())
+                else:
+                    contents.append(path.read_text())
+            self.assertTrue(any("s3.secret-access-key" in content for content in contents[1:]))
+            for content in contents:
+                self.assertNotIn(read_secret, content)
+                self.assertNotIn(write_token, content)
+
     def setUp(self):
         """Setup basic configuration for tests"""
         super().setUp()
