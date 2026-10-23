@@ -726,7 +726,7 @@ class RayBatchExecutionTest(unittest.TestCase):
                 plan = RayBatchPlan().map_batches(
                     inspect_batch, batch_size=2, batch_format="numpy", zero_copy_batch=zero_copy_batch
                 )
-                with patch("data_juicer.core.data.ray_batch_plan.batch_blocks", return_value=iter([batch])) as batching:
+                with patch("data_juicer.core.data.ray_batch_adapter.batch_blocks", return_value=iter([batch])) as batching:
                     list(BatchPlanWorker(plan).process_partition([pa.table({"value": np.arange(3)})]))
                 self.assertEqual(batching.call_args.kwargs["ensure_copy"], not zero_copy_batch)
                 self.assertFalse(readonly.flags.writeable)

@@ -23,11 +23,11 @@ from data_juicer.core.executor.partition_protocol import (
     SEQ_COLUMN,
     SOURCE_SEQ,
     CommitLog,
-    LocalStore,
     OutputFile,
     ProtocolError,
     commit_key,
     concat_outputs,
+    discard_failed_commit,
     discard_files,
     key_ranges,
     open_export_attempt,
@@ -73,17 +73,7 @@ class _CommitCoordinator:
             with self.condition:
                 self.failure = error
                 self.condition.notify_all()
-            # A synchronous local write that returned with no manifest cannot
-            # publish later. Remote write failures can be ambiguous; retain
-            # their files. Never scan other attempts' data directories.
-            if isinstance(self.store, LocalStore):
-                try:
-                    if self.store.get(commit_key(commit.stage, commit.seq)) is None:
-                        discard_files(self.store, (item.key for item in (*files, *stats_files)))
-                except Exception as cleanup_error:
-                    from loguru import logger
-
-                    logger.warning(f"Could not check failed checkpoint publication: {cleanup_error}")
+            discard_failed_commit(self.store, commit)
             raise
         with self.condition:
             self.durable.add(commit.seq)
@@ -274,27 +264,30 @@ class PartitionRecovery:
         ).remote(self.store, self.stage_count, self.source_rows)
         self.plan = ray.get(self.coordinator.plan.remote())
         source, self.source = self.source, None
-        pending = self.plan["source"]
+        pending = self.plan.source
         if not pending:
             return None
         offsets = ray.data.range(self.source_rows).rename_columns({"id": IDX_COLUMN})
         return source.zip(offsets).map_batches(
             _tag_source,
-            fn_kwargs={"pending": None if pending == [(0, self.source_rows)] else pending},
+            fn_kwargs={"pending": None if pending == ((0, self.source_rows),) else pending},
             batch_format="pyarrow",
             batch_size=None,
         )
 
     def stage_input(self, index, upstream):
-        pending = self.plan["stages"].get(index, ())
-        return _union(upstream, _stored_dataset(self.store, [(c.files, c.seq, gaps) for c, gaps in pending]))
+        pending = self.plan.stages.get(index, ())
+        return _union(
+            upstream,
+            _stored_dataset(self.store, [(item.commit.files, item.commit.seq, item.ranges) for item in pending]),
+        )
 
     def stage(self, index):
         return RecoveryStage(self, index)
 
     def output(self, upstream):
         """Strip lineage keys after recording that every final row went downstream."""
-        final = _stored_dataset(self.store, [(commit.files, commit.seq, None) for commit in self.plan["final"]])
+        final = _stored_dataset(self.store, [(commit.files, commit.seq, None) for commit in self.plan.final])
         data = _union(upstream, final)
         if data is None:
             return ray.data.from_items([])
@@ -307,11 +300,11 @@ class PartitionRecovery:
         )
 
     def export_attempt(self):
-        """Name this run's export files; ``finish`` runs before earlier attempts are removed."""
+        """Name this run's export files; the caller controls completion and cleanup."""
         from data_juicer.core.ray_exporter import ExportAttempt
 
         prefix, earlier = open_export_attempt(self.store)
-        return ExportAttempt(prefix, earlier, on_written=self.finish)
+        return ExportAttempt(prefix, earlier)
 
     def finish(self):
         """Verify complete delivery, then publish statistics of every commit."""
@@ -329,7 +322,7 @@ class PartitionRecovery:
 
     def committed_output(self):
         """Read the complete committed output without the coordinator, for re-execution."""
-        final = ray.get(self.coordinator.plan.remote())["final"]
+        final = ray.get(self.coordinator.plan.remote()).final
         data = _stored_dataset(self.store, [(commit.files, None, None) for commit in final])
         return ray.data.from_items([]) if data is None else data
 

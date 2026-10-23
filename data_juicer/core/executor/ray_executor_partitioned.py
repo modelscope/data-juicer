@@ -862,6 +862,10 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
             attempt = recovery.export_attempt() if recovery is not None else None
             self.exporter.export(final_dataset.data, columns=columns, attempt=attempt)
             if recovery is not None:
+                # Keep the completion order visible: verify delivery and publish
+                # committed statistics before removing earlier export attempts.
+                recovery.finish()
+                self.exporter.complete_attempt(attempt)
                 # Operators stream together, so only the whole prefix duration is known.
                 self._post_execute_operations_with_dag_monitoring(
                     ops[:checkpointed_ops],

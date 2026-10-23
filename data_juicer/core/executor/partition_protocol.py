@@ -102,6 +102,10 @@ class LocalStore:
     def delete(self, key: str) -> None:
         Path(self.root, key).unlink(missing_ok=True)
 
+    def failed_write_is_unpublished(self, key: str) -> bool:
+        """A completed synchronous POSIX call cannot publish its file later."""
+        return self.get(key) is None
+
     def list(self, directory: str) -> List[str]:
         try:
             names = os.listdir(Path(self.root, directory))
@@ -150,6 +154,10 @@ class S3Store:
 
     def delete(self, key: str) -> None:
         self.client.delete_object(Bucket=self.bucket, Key=self._key(key))
+
+    def failed_write_is_unpublished(self, key: str) -> bool:
+        """An unsuccessful remote response does not prove nonpublication."""
+        return False
 
     def put_if_absent(self, key: str, data: bytes) -> bool:
         from botocore.exceptions import ClientError
@@ -310,6 +318,19 @@ class Commit:
         )
 
 
+@dataclass(frozen=True)
+class PendingCommit:
+    commit: Commit
+    ranges: Tuple[Tuple[int, int], ...]
+
+
+@dataclass(frozen=True)
+class RecoveryPlan:
+    source: Tuple[Tuple[int, int], ...]
+    stages: Dict[int, Tuple[PendingCommit, ...]]
+    final: Tuple[Commit, ...]
+
+
 def commit_key(stage: int, seq: int) -> str:
     return f"{COMMIT_DIR}/{stage:04d}-{seq:016d}.json"
 
@@ -355,6 +376,17 @@ def discard_files(store, keys) -> None:
             store.delete(key)
         except Exception as error:
             logger.warning(f"Could not remove uncommitted checkpoint file {key}: {error}")
+
+
+def discard_failed_commit(store, commit: Commit) -> None:
+    """Reclaim owned files only when the backend can prove nonpublication."""
+    from loguru import logger
+
+    try:
+        if store.failed_write_is_unpublished(commit_key(commit.stage, commit.seq)):
+            discard_files(store, (item.key for item in (*commit.files, *commit.stats_files)))
+    except Exception as error:
+        logger.warning(f"Could not check failed checkpoint publication: {error}")
 
 
 def read_tables(store, files: Sequence[OutputFile]) -> Iterable[pa.Table]:
@@ -511,7 +543,7 @@ class CommitLog:
         consumed = self.consumed.get((level, seq))
         return consumed.gaps(rows) if consumed is not None else ([(0, rows)] if rows else [])
 
-    def plan(self) -> dict:
+    def plan(self) -> RecoveryPlan:
         """Rows each stage still has to consume, plus the committed final output."""
         stages = {}
         for level in range(1, self.stage_count):
@@ -519,10 +551,10 @@ class CommitLog:
             for seq, rows in self._upstreams(level):
                 gaps = self._gaps(level, seq, rows)
                 if gaps:
-                    pending.append((self.commits[seq], gaps))
-            stages[level] = pending
-        final = [self.commits[seq] for seq, rows in self._upstreams(self.stage_count) if rows]
-        return {"source": self._gaps(0, SOURCE_SEQ, self.source_rows), "stages": stages, "final": final}
+                    pending.append(PendingCommit(self.commits[seq], tuple(gaps)))
+            stages[level] = tuple(pending)
+        final = tuple(self.commits[seq] for seq, rows in self._upstreams(self.stage_count) if rows)
+        return RecoveryPlan(tuple(self._gaps(0, SOURCE_SEQ, self.source_rows)), stages, final)
 
     def verify(self) -> Dict[int, Tuple[OutputFile, ...]]:
         """Check that every row reached the final delivery; return stats files by stage."""

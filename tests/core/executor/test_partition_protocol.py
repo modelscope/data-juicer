@@ -146,9 +146,9 @@ class PartitionProtocolTest(unittest.TestCase):
 
         reloaded = CommitLog(store, stage_count=2, source_rows=10)
         plan = reloaded.plan()
-        self.assertEqual(plan["source"], [(7, 10)])
-        self.assertEqual([(commit.seq, gaps) for commit, gaps in plan["stages"][1]], [(first.seq, [(2, 3)])])
-        self.assertEqual(plan["final"], [downstream])
+        self.assertEqual(plan.source, ((7, 10),))
+        self.assertEqual([(item.commit.seq, item.ranges) for item in plan.stages[1]], [(first.seq, ((2, 3),))])
+        self.assertEqual(plan.final, (downstream,))
         self.assertEqual(reloaded.next_seq, 3)
         with self.assertRaisesRegex(ProtocolError, "never consumed by stage 0"):
             reloaded.verify()

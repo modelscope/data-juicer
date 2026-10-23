@@ -375,7 +375,7 @@ class RayDataset(DJDataset):
                             session = getattr(cfg, "_stage_profile_session", None)
                             if session is not None:
                                 actor_kwargs.update(session.actor_arguments(op, stamped_stage_identity(op)))
-                        plan.map_batches(
+                        plan.map_operator(
                             actor_class,
                             fn_args=None,
                             fn_kwargs=None,
@@ -390,7 +390,7 @@ class RayDataset(DJDataset):
                         )
                     else:
                         compute = TaskPoolStrategy(size=op.num_proc)
-                        plan.map_batches(
+                        plan.map_operator(
                             op.process,
                             batch_size=batch_size,
                             batch_format="pyarrow",
@@ -421,7 +421,7 @@ class RayDataset(DJDataset):
                     )
                 if op.use_ray_actor() and not use_instance_for_ray_tasks:
                     compute = _build_actor_pool_strategy(op.num_proc)
-                    plan.map_batches(
+                    plan.map_operator(
                         RayOperatorActor,
                         fn_args=None,
                         fn_kwargs=None,
@@ -436,7 +436,7 @@ class RayDataset(DJDataset):
                     )
                 else:
                     compute = TaskPoolStrategy(size=op.num_proc)
-                    plan.map_batches(
+                    plan.map_operator(
                         op.compute_stats,
                         batch_size=batch_size,
                         batch_format="pyarrow",

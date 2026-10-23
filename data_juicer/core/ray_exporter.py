@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
-from typing import Callable, Optional, Tuple
+from typing import Tuple
 from urllib.parse import urlparse
 
 from loguru import logger
@@ -20,7 +20,6 @@ class ExportAttempt:
 
     prefix: str
     earlier: Tuple[str, ...] = ()
-    on_written: Optional[Callable[[], None]] = None
 
 
 def _drop_export_columns(batch, columns):
@@ -288,9 +287,6 @@ class RayExporter:
                         encrypt_file(str(fpath), str(fpath), self._fernet)
                         logger.debug(f"Encrypted exported file: {fpath}")
 
-        if attempt is not None:
-            self._complete_attempt(attempt, export_path_for_checks)
-
         # Checkpoint exports are directories, including empty ones: a later
         # resume must be able to enumerate and write a new export attempt.
         if attempt is None and probe_after_write and not is_remote_path(export_path_for_checks):
@@ -346,11 +342,10 @@ class RayExporter:
                 f"readers of the directory will see them next to the export, e.g. {foreign[0]}"
             )
 
-    def _complete_attempt(self, attempt, export_path):
-        if attempt.on_written is not None:
-            attempt.on_written()
+    def complete_attempt(self, attempt):
+        """Remove older exports after the caller verifies this attempt's output."""
         if self.export_format in self._FILE_SUFFIXES:
-            self._remove_attempts(export_path, attempt.earlier)
+            self._remove_attempts(self.export_path, attempt.earlier)
 
     def export(self, dataset, columns=None, attempt=None):
         """
@@ -358,8 +353,8 @@ class RayExporter:
 
         :param dataset: the dataset to export.
         :param columns: the columns to export.
-        :param attempt: an ``ExportAttempt`` that names this write's files so files of earlier
-            attempts of the same job are removed only after this write and ``on_written`` succeed.
+        :param attempt: an ``ExportAttempt`` naming this write's files. After a successful
+            write and checkpoint verification, call ``complete_attempt`` to remove earlier exports.
         :return:
         """
         self._export_impl(dataset, self.export_path, columns, attempt)

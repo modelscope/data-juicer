@@ -1,20 +1,52 @@
 import hashlib
-import inspect
 from dataclasses import dataclass
-from types import GeneratorType
+from typing import List, Optional, Union
 
 import pyarrow.fs as pafs
-from ray.data import ActorPoolStrategy, Dataset
-from ray.data._internal.block_batching import batch_blocks
-from ray.data.block import BlockAccessor
+from ray.data import ActorPoolStrategy
 from ray.data.dataset import MaterializedDataset
 from ray.data.datasource.path_util import _resolve_paths_and_filesystem
+
+from data_juicer.core.data.ray_batch_adapter import (
+    apply_batch_operation,
+    map_whole_blocks,
+)
 
 
 @dataclass
 class BatchOperation:
     function: object
     options: dict
+
+    def bind(self):
+        """Construct a callable once per worker; plain functions need no setup."""
+        if isinstance(self.function, type):
+            return self.function(
+                *(self.options.get("fn_constructor_args") or ()),
+                **(self.options.get("fn_constructor_kwargs") or {}),
+            )
+        return self.function
+
+
+@dataclass(frozen=True)
+class Materialize:
+    """A global barrier, which cannot execute within a checkpointed batch."""
+
+
+@dataclass(frozen=True)
+class StageResources:
+    compute: object
+    num_cpus: Optional[float]
+    num_gpus: Optional[float]
+    runtime_env: object
+
+    def ray_options(self):
+        return {
+            "compute": self.compute,
+            "num_cpus": self.num_cpus,
+            "num_gpus": self.num_gpus,
+            "runtime_env": self.runtime_env,
+        }
 
 
 @dataclass
@@ -35,7 +67,17 @@ class StatsExport:
 
 class RayBatchPlan:
     def __init__(self):
-        self.steps = []
+        self.steps: List[Union[BatchOperation, StatsExport, Materialize]] = []
+        self.resources: Optional[StageResources] = None
+
+    def map_operator(self, function, *, compute, num_cpus=None, num_gpus=None, runtime_env=None, **options):
+        """Declare the operator's scheduling resources, separately from helper batches."""
+        if self.resources is not None:
+            raise ValueError("A batch plan can declare only one operator resource owner")
+        resources = StageResources(compute, num_cpus, num_gpus, runtime_env)
+        self.map_batches(function, **resources.ray_options(), **options)
+        self.resources = resources
+        return self
 
     def map_batches(self, function, **options):
         batch_size = options.get("batch_size")
@@ -47,7 +89,7 @@ class RayBatchPlan:
         return self
 
     def materialize(self):
-        self.steps.append("materialize")
+        self.steps.append(Materialize())
         return self
 
     def write_json(self, path, **options):
@@ -67,29 +109,26 @@ class RayBatchPlan:
                         dataset = dataset.materialize()
                         materialized = True
                     dataset.write_json(step.path, **step.options)
-                else:
+                elif isinstance(step, Materialize):
                     dataset = dataset.materialize()
                     materialized = True
+                else:
+                    raise TypeError(f"Unknown batch plan step: {type(step).__name__}")
             return dataset
 
         from data_juicer.core.executor import ray_partition_runner
         from data_juicer.core.executor.partition_protocol import ProtocolError
 
-        if "materialize" in self.steps:
+        if any(isinstance(step, Materialize) for step in self.steps):
             raise ProtocolError("A global materialization barrier cannot execute within a checkpointed batch")
         for step in self.steps:
             if isinstance(step, StatsExport):
                 recovery.register_stats(step)
+        if self.resources is None:
+            raise ProtocolError("Checkpointed batch plans require explicit operator resources")
         if dataset is None:
             return None
-        compute_step = next(
-            step for step in self.steps if isinstance(step, BatchOperation) and "compute" in step.options
-        )
-        options = {
-            key: compute_step.options[key]
-            for key in ("compute", "num_cpus", "num_gpus", "runtime_env")
-            if key in compute_step.options
-        }
+        options = self.resources.ray_options()
         if isinstance(options["compute"], ActorPoolStrategy):
             function = ray_partition_runner.CheckpointStageActor
             options.update(fn_constructor_args=(recovery.context, self))
@@ -99,58 +138,19 @@ class RayBatchPlan:
         return map_whole_blocks(dataset, function, batch_format="pyarrow", zero_copy_batch=True, **options)
 
 
-def map_whole_blocks(dataset, function, **options):
-    """Hand every Ray block to ``function`` unmerged, also for GPU stages.
-
-    An integer ``batch_size`` makes Ray merge smaller blocks into one task, and
-    the public ``map_batches`` rejects ``batch_size=None`` together with GPUs.
-    """
-    method = dataset._map_batches_without_batch_size_validation
-    accepted = inspect.signature(method).parameters
-    defaults = {
-        name: parameter.default
-        for name, parameter in inspect.signature(Dataset.map_batches).parameters.items()
-        if name in accepted and parameter.default is not inspect.Parameter.empty
-    }
-    return method(function, **{**defaults, **options, "batch_size": None})
-
-
 class BatchPlanWorker:
     def __init__(self, plan):
         self.plan = plan
         self.functions = {}
 
     def _map(self, tables, index, step):
-        options = step.options
-        batch_size = options.get("batch_size")
-        if batch_size == "auto":
-            from ray.data._internal.execution.operators.map_transformer import (
-                _compute_auto_batch_size,
-            )
-
-            batch_size, tables = _compute_auto_batch_size(tables)
-        zero_copy_batch = options.get("zero_copy_batch", True)
-        batches = batch_blocks(
-            iter(tables),
-            batch_size=batch_size,
-            batch_format=options.get("batch_format", "default"),
-            ensure_copy=not zero_copy_batch,
-        )
-        for batch in batches:
-            # Arrow-to-NumPy conversion can recreate read-only views after the block copy.
-            if not zero_copy_batch and isinstance(batch, dict):
-                batch = {key: column if column.flags.writeable else column.copy() for key, column in batch.items()}
+        # Defer construction until a batch actually reaches this operation.
+        def invoke(batch, *args, **kwargs):
             if index not in self.functions:
-                function = step.function
-                if isinstance(function, type):
-                    function = function(
-                        *(options.get("fn_constructor_args") or ()), **(options.get("fn_constructor_kwargs") or {})
-                    )
-                self.functions[index] = function
-            result = self.functions[index](batch, *(options.get("fn_args") or ()), **(options.get("fn_kwargs") or {}))
-            outputs = result if isinstance(result, GeneratorType) else (result,)
-            for output in outputs:
-                yield BlockAccessor.for_block(BlockAccessor.batch_to_block(output)).to_arrow()
+                self.functions[index] = step.bind()
+            return self.functions[index](batch, *args, **kwargs)
+
+        yield from apply_batch_operation(tables, step, invoke)
 
     def process_partition(self, tables, *, write_stats=None):
         for index, step in enumerate(self.plan.steps):
@@ -160,6 +160,8 @@ class BatchPlanWorker:
                 if write_stats is None:
                     raise RuntimeError("Statistics export requires an attempt-owned writer")
                 tables = write_stats(tables)
-            else:
+            elif isinstance(step, Materialize):
                 raise RuntimeError("A global materialization barrier cannot execute within a checkpointed batch")
+            else:
+                raise TypeError(f"Unknown batch plan step: {type(step).__name__}")
         yield from tables

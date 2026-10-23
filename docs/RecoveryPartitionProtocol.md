@@ -15,6 +15,15 @@ is unchanged. Checkpointing is a side path: a worker writes its output to
 storage, commits it, and only then yields it downstream. A downstream commit
 therefore never references a row whose producing batch is not committed.
 
+`RayBatchPlan` records typed batch operations, statistics exports, and global
+materialization barriers. The primary operator declares its scheduling
+resources explicitly; helper operations do not determine stage placement.
+Native execution hands the operations to Ray Data. A checkpoint worker keeps
+callable instances across batches and uses Ray's batch UDF transform for
+invocation, generator handling, and output validation. The remaining private
+Ray batching and whole-block scheduling calls are isolated in
+`ray_batch_adapter.py`; they remain a Ray-version compatibility boundary.
+
 ## Lineage keys
 
 Every row carries two internal columns while it is inside the plan:
@@ -126,6 +135,12 @@ registers an export attempt, `exports/{n:08d}.json`, and names its files
    so repeated failures keep at most one earlier partial export;
 2. the attempt writes the complete output and the delivery check above runs;
 3. only then are the files of every earlier attempt removed.
+
+The executor calls these phases explicitly: `exporter.export()`,
+`recovery.finish()` (delivery verification and statistics publication), then
+`exporter.complete_attempt()`. The exporter does not trigger checkpoint
+completion through a callback. If verification or statistics publication
+fails, the latest earlier export remains available.
 
 A failed resume therefore never leaves less exported output than it found.
 Files in the export directory that no attempt of the job wrote are kept, with a

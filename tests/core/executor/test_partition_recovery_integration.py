@@ -165,6 +165,9 @@ class AmbiguousPublicationStore:
     def delete(self, key):
         return self.delegate.delete(key)
 
+    def failed_write_is_unpublished(self, key):
+        return False
+
 
 def exit_after_first_commit_task(batch, context, plan):
     for table in ray_partition_runner.run_checkpoint_task(batch, context, plan):
@@ -651,6 +654,45 @@ class PartitionRecoveryIntegrationTest(unittest.TestCase):
         self.assertTrue(resumed.cfg._same_yaml_config)
         resumed.run(skip_return=True)
         self.assertEqual(_exported_texts(self.tmp_path), [])
+
+    @TEST_TAG("ray")
+    def test_failed_statistics_publication_keeps_previous_export_until_verified_resume(self):
+        from data_juicer.core.data.ray_batch_plan import StatsExport
+
+        config = _write_job(
+            self.tmp_path,
+            [
+                {
+                    "text_length_filter": {
+                        "min_len": 1,
+                        "num_proc": 1,
+                        "stats_export_path": str(self.tmp_path / "statistics"),
+                    }
+                }
+            ],
+        )
+        initial = PartitionedRayExecutor(init_configs(["--config", str(config)]))
+        output = self.tmp_path / "output.jsonl"
+        publish = StatsExport.publish
+
+        def fail_after_publish(export, data, identity):
+            publish(export, data, identity)
+            raise RuntimeError("statistics publication failed")
+
+        with patch.object(StatsExport, "publish", fail_after_publish):
+            with self.assertRaisesRegex(RuntimeError, "statistics publication failed"):
+                initial.run(skip_return=True)
+            first_files = set(output.glob("*.json"))
+            self.assertTrue(first_files)
+            args = ["--config", str(config), "--resume", initial.job_id]
+            with self.assertRaisesRegex(RuntimeError, "statistics publication failed"):
+                PartitionedRayExecutor(init_configs(args)).run(skip_return=True)
+            self.assertTrue(first_files <= set(output.glob("*.json")))
+        incomplete_files = set(output.glob("*.json"))
+        self.assertGreater(len(incomplete_files), len(first_files))
+        PartitionedRayExecutor(init_configs(args)).run(skip_return=True)
+        self.assertTrue(incomplete_files.isdisjoint(output.glob("*.json")))
+        self.assertEqual(_exported_texts(self.tmp_path), [" A\tB ", " C ", " C ", "!!!"])
 
     @TEST_TAG("ray")
     def test_manifest_failure_cleanup_requires_definitive_local_nonpublication(self):
