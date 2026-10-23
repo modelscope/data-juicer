@@ -998,7 +998,8 @@ class IcebergFixture:
         import pyarrow as pa
         from pyiceberg.catalog import load_catalog
 
-        temp = tempfile.TemporaryDirectory()
+        # CI workers share the repository mount, but not the head's /tmp.
+        temp = tempfile.TemporaryDirectory(prefix="tmp_iceberg_", dir=WORK_DIR)
         self.addCleanup(temp.cleanup)
         self.root = Path(temp.name)
         self.catalog_kwargs = {
@@ -1199,7 +1200,6 @@ class TestIcebergConfiguration(DataJuicerTestCaseBase):
                         strategy(config, Namespace())
 
 
-@TEST_TAG("ray")
 class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
     @classmethod
     def setUpClass(cls):
@@ -1208,7 +1208,9 @@ class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
 
         cls.started_ray = not ray.is_initialized()
         if cls.started_ray:
-            ray.init(num_cpus=2, include_dashboard=False)
+            address = os.environ.get("RAY_ADDRESS", "local")
+            options = {"num_cpus": 2} if address == "local" else {}
+            ray.init(address=address, include_dashboard=False, **options)
 
     @classmethod
     def tearDownClass(cls):
@@ -1218,6 +1220,7 @@ class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
             ray.shutdown()
         super().tearDownClass()
 
+    @TEST_TAG("ray")
     def test_builder_reads_latest_without_mutating_configuration(self):
         from copy import deepcopy
 
@@ -1228,6 +1231,7 @@ class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
         self.assertEqual(self.ds_config, before)
         self.assertEqual(self.sorted_rows(self.load("ray").data.take_all()), self.initial + self.added)
 
+    @TEST_TAG("ray")
     def test_snapshot_filter_and_projection(self):
         self.assertEqual(len(self.load("ray").data.take_all()), 3)
         self.ds_config.update(
@@ -1235,6 +1239,7 @@ class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
         )
         self.assertEqual(self.load("ray").data.take_all(), [{"id": 2, "body": "短"}])
 
+    @TEST_TAG("ray")
     def test_typed_columns_match_pyiceberg_scan(self):
         expected = self.create_typed_table()
         result = self.load("ray").data
@@ -1260,11 +1265,13 @@ class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
             return pa.struct([pa.field(f.name, cls.logical_type(f.type), f.nullable) for f in arrow_type])
         return arrow_type
 
+    @TEST_TAG("ray")
     def test_empty_table(self):
         self.catalog.create_table("training.empty", schema=self.arrow_schema)
         self.ds_config["table_identifier"] = "training.empty"
         self.assertEqual(self.load("ray").data.take_all(), [])
 
+    @TEST_TAG("ray")
     def test_missing_table_surfaces_error(self):
         from pyiceberg.exceptions import NoSuchTableError
 
@@ -1273,6 +1280,7 @@ class TestRayIcebergDataLoadStrategy(IcebergFixture, DataJuicerTestCaseBase):
             self.load("ray").data.take_all()
         self.assertIsInstance(raised.exception.__cause__, NoSuchTableError)
 
+    @TEST_TAG("ray")
     def test_invalid_snapshot_is_not_silently_replaced_by_latest(self):
         self.ds_config["snapshot_id"] = 1
         with self.assertRaisesRegex(RuntimeError, "training.documents") as raised:
