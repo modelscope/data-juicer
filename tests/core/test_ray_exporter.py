@@ -10,7 +10,7 @@ from data_juicer.utils.unittest_utils import TEST_TAG, DataJuicerTestCaseBase
 from data_juicer.core.ray_exporter import RayExporter
 from data_juicer.utils.constant import Fields, HashKeys
 from data_juicer.utils.mm_utils import load_images_byte
-from tests.core.test_exporter import IcebergWriterFixture
+from .test_exporter import IcebergWriterFixture
 
 
 class TestRayExporter(DataJuicerTestCaseBase):
