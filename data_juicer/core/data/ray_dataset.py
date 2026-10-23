@@ -210,8 +210,14 @@ class RayDataset(DJDataset):
         if self.data is None:
             raise KeyError(f"Column '{column}' not found in dataset")
 
-        columns = self.data.columns()
-        if columns is None or column not in columns:
+        columns = self.data.columns(fetch_if_missing=False)
+        # A zero-row request still validates the column, but needs no second
+        # execution to retrieve values. Other requests validate the rows read.
+        if columns is None and k == 0:
+            columns = self.data.columns()
+            if columns is None:
+                raise KeyError(f"Column '{column}' not found in dataset")
+        if columns is not None and column not in columns:
             raise KeyError(f"Column '{column}' not found in dataset")
 
         if k is not None:
@@ -219,9 +225,15 @@ class RayDataset(DJDataset):
                 raise ValueError(f"k must be non-negative, got {k}")
             if k == 0:
                 return []
-            return [row[column] for row in self.data.take(k)]
-
-        return [row[column] for row in self.data.take_all()]
+            rows = self.data.take(k)
+        else:
+            rows = self.data.take_all()
+        if columns is None and not rows:
+            raise KeyError(f"Column '{column}' not found in dataset")
+        try:
+            return [row[column] for row in rows]
+        except KeyError:
+            raise KeyError(f"Column '{column}' not found in dataset") from None
 
     def process(
         self,
@@ -259,11 +271,17 @@ class RayDataset(DJDataset):
         if defer_schema_probe:
             cached_columns = set()
         else:
-            columns_result = self.data.columns()
-            if not columns_result:
-                logger.warning("Dataset is empty (0 rows or unknown schema), skipping operator processing")
+            columns_result = self.data.columns(fetch_if_missing=False)
+            if columns_result is None:
+                # Inferring a lazy schema executes upstream operators. Prepare
+                # optional columns inside each batch instead of probing the plan.
+                defer_schema_probe = True
+                cached_columns = set()
+            elif not columns_result:
+                logger.warning("Dataset has no columns, skipping operator processing")
                 return self
-            cached_columns = set(columns_result)
+            else:
+                cached_columns = set(columns_result)
 
         if partition_recovery is not None:
             self.data = partition_recovery.open()
@@ -306,10 +324,10 @@ class RayDataset(DJDataset):
             raise ValueError(f"{op._name}: adaptive batching requires a resolved positive GPU reservation")
         if adaptive and tracer and should_trace_op(tracer, op._name):
             raise ValueError("Sample tracing is not yet supported with adaptive batching")
-        if cached_columns is None and not defer_schema_probe:
-            cached_columns = set(self.data.columns())
-        elif cached_columns is None:
-            cached_columns = set()
+        if cached_columns is None:
+            columns = None if defer_schema_probe else self.data.columns(fetch_if_missing=False)
+            defer_schema_probe = defer_schema_probe or columns is None
+            cached_columns = set(columns or ())
 
         if "ray" not in op._supported_exec_modes:
             raise NotImplementedError(

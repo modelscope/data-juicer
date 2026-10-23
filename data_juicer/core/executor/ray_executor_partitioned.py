@@ -843,6 +843,10 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                 final_dataset, recovery = self._process_with_partition_recovery(dataset, ops[:checkpointed_ops])
                 if checkpointed_ops < len(ops):
                     final_dataset = self._process_merged(final_dataset.data, ops[checkpointed_ops:])
+                    if not skip_return:
+                        # Export and API reads must share this execution, including
+                        # stateful and nondeterministic operators after the prefix.
+                        final_dataset.data = final_dataset.data.materialize()
             else:
                 # Detect convergence points for global operations
                 convergence_points = self._detect_convergence_points(self.cfg)
@@ -863,11 +867,9 @@ class PartitionedRayExecutor(ExecutorBase, DAGExecutionMixin, EventLoggingMixin)
                     ops[:checkpointed_ops],
                     metrics={"duration": time.time() - checkpoint_started, "input_rows": recovery.source_rows},
                 )
-                if not skip_return:
+                if not skip_return and checkpointed_ops == len(ops):
                     # The streamed plan needs the coordinator; re-reading starts from storage instead.
                     final_dataset = self._wrap_with_precomputed_parallelism(recovery.committed_output())
-                    if checkpointed_ops < len(ops):
-                        final_dataset = final_dataset.process(ops[checkpointed_ops:])
         finally:
             if recovery is not None:
                 recovery.close()

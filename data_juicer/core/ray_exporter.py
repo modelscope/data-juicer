@@ -23,6 +23,11 @@ class ExportAttempt:
     on_written: Optional[Callable[[], None]] = None
 
 
+def _drop_export_columns(batch, columns):
+    present = [column for column in columns if column in batch.column_names]
+    return batch.drop_columns(present) if present else batch
+
+
 def _prefixed_filenames(prefix, file_format):
     from ray.data.datasource import FilenameProvider
 
@@ -191,31 +196,13 @@ class RayExporter:
         :param columns: the columns to export.
         :return:
         """
-        # Handle empty dataset case - Ray returns None for columns() on empty datasets.
-        # Fetching an unknown schema executes the plan up to its first block, so an
-        # unexecuted plan is written directly and checked for emptiness afterwards.
+        # Schema inference can execute a lazy plan. Resolve optional fields in
+        # each output batch instead, and check unknown-schema emptiness after writing.
         cols = dataset.columns(fetch_if_missing=False)
-        probe_after_write = cols is None and bool(columns)
-        if cols is None and not columns:
-            cols = dataset.columns()
-        if cols is None and not probe_after_write:
-            if attempt is not None:
-                self._complete_attempt(attempt, export_path)
-            # Empty dataset with unknown schema - create an empty file
-            logger.warning(f"Dataset is empty, creating empty export file at {export_path}")
-            os.makedirs(os.path.dirname(export_path) or ".", exist_ok=True)
-            if os.path.isdir(export_path) and not os.listdir(export_path):
-                os.rmdir(export_path)
-            with open(export_path, "w"):
-                pass  # Create empty file
-            return
-
-        # Use provided columns or infer from dataset
-        feature_fields = columns if columns else cols
+        probe_after_write = cols is None
         removed_fields = []
         if not self.keep_stats_in_res_ds:
-            extra_fields = {Fields.stats, Fields.meta}
-            removed_fields.extend(list(extra_fields.intersection(feature_fields)))
+            removed_fields.extend([Fields.stats, Fields.meta])
         if not self.keep_hashes_in_res_ds:
             extra_fields = {
                 HashKeys.hash,
@@ -224,10 +211,21 @@ class RayExporter:
                 HashKeys.imagehash,
                 HashKeys.videohash,
             }
-            removed_fields.extend(list(extra_fields.intersection(feature_fields)))
+            removed_fields.extend(sorted(extra_fields))
 
-        if len(removed_fields):
-            dataset = dataset.drop_columns(removed_fields)
+        if removed_fields:
+            if cols is None:
+                dataset = dataset.map_batches(
+                    _drop_export_columns,
+                    fn_kwargs={"columns": removed_fields},
+                    batch_format="pyarrow",
+                    batch_size=None,
+                    zero_copy_batch=True,
+                )
+            else:
+                present = [column for column in removed_fields if column in cols]
+                if present:
+                    dataset = dataset.drop_columns(present)
 
         export_method = RayExporter._router()[self.export_format]
         export_kwargs = {
@@ -260,13 +258,16 @@ class RayExporter:
             export_kwargs["export_extra_args"]["filesystem"] = self.hdfs_filesystem
             export_path = strip_hdfs_scheme(export_path)
         if self.export_shard_size > 0:
-            # compute the min_rows_per_file for export methods
+            # Exact sizing evaluates the plan. Retain those rows so the write
+            # does not execute operators (or mutate their state) a second time.
+            dataset = dataset.materialize()
             dataset_nbytes = dataset.size_bytes()
             dataset_num_rows = dataset.count()
-            num_shards = int(dataset_nbytes / self.export_shard_size) + 1
-            num_shards = min(num_shards, dataset_num_rows)
-            rows_per_file = int(dataset_num_rows / num_shards)
-            export_kwargs["export_extra_args"]["min_rows_per_file"] = rows_per_file
+            if dataset_num_rows:
+                num_shards = int(dataset_nbytes / self.export_shard_size) + 1
+                num_shards = min(num_shards, dataset_num_rows)
+                rows_per_file = int(dataset_num_rows / num_shards)
+                export_kwargs["export_extra_args"]["min_rows_per_file"] = rows_per_file
 
         # Ensure export directory exists (Ray's write_json treats export_path as a directory).
         # Skip for any remote path (s3://, hdfs://, ...); the remote filesystem

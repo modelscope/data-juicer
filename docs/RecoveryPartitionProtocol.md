@@ -122,6 +122,18 @@ Files in the export directory that no attempt of the job wrote are kept, with a
 warning. Formats that Ray does not write as named files (Lance) cannot replace
 a partial export; resume stops until it is removed.
 
+When `export_shard_size` is set, the exporter materializes its final input once
+and reuses it for exact size/row counting and writing. When an API caller asks
+for a returned dataset and the recipe has operators after the checkpointed
+prefix, the executor materializes their final result once for both export and
+subsequent API reads. It does not rerun those operators with already-used state.
+The CLI uses `skip_return=True`; ordinary unsharded exports keep streaming.
+
+Outside checkpointed stages, an explicit Filter statistics export materializes
+the computed statistics once so its writer and downstream filtering share the
+same computation. Within checkpointed stages, the commit already owns both the
+statistics and filtered output.
+
 ## Scope
 
 Only the leading Mapper/Filter operators are checkpointed. A Deduplicator,

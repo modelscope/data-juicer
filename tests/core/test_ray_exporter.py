@@ -147,6 +147,17 @@ class TestRayExporter(DataJuicerTestCaseBase):
 
     @TEST_TAG('ray')
     def test_lazy_plan_with_columns_executes_once(self):
+        self._check_lazy_plan_executes_once(columns=['text'])
+
+    @TEST_TAG('ray')
+    def test_lazy_plan_without_columns_executes_once(self):
+        self._check_lazy_plan_executes_once(columns=None)
+
+    @TEST_TAG('ray')
+    def test_lazy_sharded_plan_executes_once(self):
+        self._check_lazy_plan_executes_once(columns=['text'], shard_size=1048576)
+
+    def _check_lazy_plan_executes_once(self, columns, shard_size=0):
         import ray
 
         marks = osp.join(self.tmp_dir, 'marks')
@@ -159,7 +170,7 @@ class TestRayExporter(DataJuicerTestCaseBase):
 
         out_path = osp.join(self.tmp_dir, 'outdata.jsonl')
         dataset = ray.data.from_items([{'text': str(i)} for i in range(6)]).map_batches(mark)
-        RayExporter(out_path).export(dataset, columns=['text'])
+        RayExporter(out_path, export_shard_size=shard_size).export(dataset, columns=columns)
 
         self.assertEqual(len(os.listdir(marks)), 6)
         self.assertEqual(sorted(row['text'] for row in ray.data.read_json(out_path).take_all()),
@@ -174,6 +185,28 @@ class TestRayExporter(DataJuicerTestCaseBase):
         self.assertIsNone(dataset.columns(fetch_if_missing=False))
         RayExporter(out_path).export(dataset, columns=['text'])
 
+        self.assertTrue(osp.isfile(out_path))
+        self.assertEqual(osp.getsize(out_path), 0)
+
+    @TEST_TAG('ray')
+    def test_lazy_export_removes_generated_fields_with_input_column_hint(self):
+        import ray
+
+        def add_fields(batch):
+            return {'text': batch['text'], Fields.stats: [{'score': 1}], HashKeys.hash: ['hash']}
+
+        out_path = osp.join(self.tmp_dir, 'generated.jsonl')
+        dataset = ray.data.from_items([{'text': 'hello'}]).map_batches(add_fields)
+        RayExporter(out_path, keep_stats_in_res_ds=False).export(dataset, columns=['text'])
+        self.assertEqual(ray.data.read_json(out_path).take_all(), [{'text': 'hello'}])
+
+    @TEST_TAG('ray')
+    def test_empty_sharded_lazy_export(self):
+        import ray
+
+        out_path = osp.join(self.tmp_dir, 'empty-sharded.jsonl')
+        dataset = ray.data.from_items([{'text': 'a'}]).map_batches(lambda batch: {'text': []})
+        RayExporter(out_path, export_shard_size=1048576).export(dataset, columns=['text'])
         self.assertTrue(osp.isfile(out_path))
         self.assertEqual(osp.getsize(out_path), 0)
 

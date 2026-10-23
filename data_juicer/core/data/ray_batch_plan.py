@@ -7,6 +7,7 @@ import pyarrow.fs as pafs
 from ray.data import ActorPoolStrategy, Dataset
 from ray.data._internal.block_batching import batch_blocks
 from ray.data.block import BlockAccessor
+from ray.data.dataset import MaterializedDataset
 from ray.data.datasource.path_util import _resolve_paths_and_filesystem
 
 
@@ -54,13 +55,21 @@ class RayBatchPlan:
 
     def apply(self, dataset, recovery=None):
         if recovery is None:
+            materialized = isinstance(dataset, MaterializedDataset)
             for step in self.steps:
                 if isinstance(step, BatchOperation):
                     dataset = dataset.map_batches(step.function, **step.options)
+                    materialized = False
                 elif isinstance(step, StatsExport):
+                    # The statistics writer and downstream filter consume the
+                    # same computed rows, including any shared operator state.
+                    if not materialized:
+                        dataset = dataset.materialize()
+                        materialized = True
                     dataset.write_json(step.path, **step.options)
                 else:
                     dataset = dataset.materialize()
+                    materialized = True
             return dataset
 
         from data_juicer.core.executor import ray_partition_runner

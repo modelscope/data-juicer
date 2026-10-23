@@ -416,6 +416,14 @@ removing the internal lineage columns before the export. For cheap text
 operators the write can cost more than re-running them; disable checkpointing
 for short jobs.
 
+Two optional consumers require retained final results: setting
+`export_shard_size` materializes the export input for exact sizing, and asking
+the Python API for a returned dataset materializes any operators after the
+checkpointed prefix so export and later reads share one execution. The CLI
+discards the return value and uses `skip_return=True`. Explicit Filter
+statistics exports outside the checkpointed prefix also retain their computed
+statistics for both writing and filtering.
+
 ### Storage Recommendations
 
 - Event logs: fast storage (SSD)

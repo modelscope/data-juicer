@@ -30,6 +30,7 @@ from data_juicer.ops.fused_sequential_batch_op import FusedSequentialBatchOp
 from data_juicer.ops.mapper.whitespace_normalization_mapper import (
     WhitespaceNormalizationMapper,
 )
+from data_juicer.ops.pipeline.ray_repartition_pipeline import RayRepartitionPipeline
 from data_juicer.utils import logger_utils
 from data_juicer.utils.ckpt_utils import RayCheckpointManager
 from data_juicer.utils.constant import Fields
@@ -65,6 +66,7 @@ class LoggingMapper(Mapper):
     """Record processed ids; optionally fail once when it sees ``fail_id``."""
 
     _batched_op = True
+    _name = "logging_mapper"
 
     def __init__(self, log_path, fail_id=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -79,6 +81,17 @@ class LoggingMapper(Mapper):
         with open(self.log_path, "a") as stream:
             stream.write(json.dumps(samples["id"]) + "\n")
         return samples
+
+
+class LoggingTextLengthFilter(TextLengthFilter):
+    def __init__(self, log_path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.log_path = log_path
+
+    def compute_stats_batched(self, samples):
+        with open(self.log_path, "a") as stream:
+            stream.write(json.dumps(samples["id"]) + "\n")
+        return super().compute_stats_batched(samples)
 
 
 class OutputFormatMapper(Mapper):
@@ -604,6 +617,102 @@ class PartitionRecoveryIntegrationTest(unittest.TestCase):
         store = LocalStore(str(self.tmp_path / "work" / "checkpoints" / "partition_recovery"))
         stages = {Commit.from_bytes(store.get(key)).stage for key in store.list(COMMIT_DIR)}
         self.assertEqual(stages, {0})
+
+    @TEST_TAG("ray")
+    def test_full_executor_return_reuses_stateful_suffix_result(self):
+        config_path = _write_job(
+            self.tmp_path,
+            [
+                {"whitespace_normalization_mapper": {"num_proc": 1}},
+                {"ray_document_deduplicator": {"num_proc": 1, "dedup_set_num": 1}},
+            ],
+        )
+        result = PartitionedRayExecutor(init_configs(["--config", str(config_path)])).run()
+        expected = _exported_texts(self.tmp_path)
+        self.assertEqual(expected, ["!!!", "A B", "C"])
+        self.assertEqual(sorted(result.get_column("text")), expected)
+        self.assertEqual(sorted(result.get_column("text")), expected)
+        self.assertEqual(result.count(), 3)
+
+    def _check_full_executor_suffix_executes_once(self, mode, *, sharded, skip_return):
+        config_path = _write_job(
+            self.tmp_path,
+            [{"whitespace_normalization_mapper": {"num_proc": 1}}],
+            extra={"export_shard_size": 1048576 if sharded else 0},
+        )
+        rows = [{"text": str(i), "id": i} for i in range(4)]
+        (self.tmp_path / "input.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
+        prefix_log, suffix_log = str(self.tmp_path / "prefix.calls"), str(self.tmp_path / "suffix.calls")
+        kwargs = {"num_proc": 1, "ray_execution_mode": mode, "batch_size": 1}
+        ops = [LoggingMapper(prefix_log, **kwargs), RayRepartitionPipeline(), LoggingMapper(suffix_log, **kwargs)]
+        executor = PartitionedRayExecutor(init_configs(["--config", str(config_path)]))
+        with patch("data_juicer.core.executor.ray_executor_partitioned.load_ops", return_value=ops):
+            result = executor.run(skip_return=skip_return)
+        self.assertEqual(_exported_texts(self.tmp_path), ["0", "1", "2", "3"])
+        if skip_return:
+            self.assertIsNone(result)
+        else:
+            self.assertEqual(_by_id(result.data.take_all()), rows)
+            self.assertEqual(_by_id(result.data.take_all()), rows)
+        self.assertEqual(sorted(_logged_ids(prefix_log)), [0, 1, 2, 3])
+        self.assertEqual(sorted(_logged_ids(suffix_log)), [0, 1, 2, 3])
+
+    @TEST_TAG("ray")
+    def test_full_executor_return_does_not_recompute_suffix_actor(self):
+        self._check_full_executor_suffix_executes_once("actor", sharded=False, skip_return=False)
+
+    @TEST_TAG("ray")
+    def test_full_executor_return_does_not_recompute_suffix_task(self):
+        self._check_full_executor_suffix_executes_once("task", sharded=False, skip_return=False)
+
+    @TEST_TAG("ray")
+    def test_full_executor_sharded_export_does_not_recompute_suffix_actor(self):
+        self._check_full_executor_suffix_executes_once("actor", sharded=True, skip_return=True)
+
+    @TEST_TAG("ray")
+    def test_full_executor_sharded_export_does_not_recompute_suffix_task(self):
+        self._check_full_executor_suffix_executes_once("task", sharded=True, skip_return=True)
+
+    def _check_native_stats_export_computes_once(self, mode):
+        log_path = str(self.tmp_path / "stats.calls")
+        stats_path = self.tmp_path / "stats"
+        source = _source(_executor(self.tmp_path))
+        result = source.process(
+            [
+                LoggingTextLengthFilter(
+                    log_path, min_len=4, num_proc=1, ray_execution_mode=mode, stats_export_path=str(stats_path)
+                )
+            ]
+        )
+        self.assertEqual([row["id"] for row in result.data.take_all()], [0])
+        self.assertEqual(sorted(_logged_ids(log_path)), [0, 1, 2, 3])
+        self.assertEqual([row["id"] for row in _by_id(_read_json_rows(stats_path))], [0, 1, 2, 3])
+
+    @TEST_TAG("ray")
+    def test_native_stats_export_computes_once_actor(self):
+        self._check_native_stats_export_computes_once("actor")
+
+    @TEST_TAG("ray")
+    def test_native_stats_export_computes_once_task(self):
+        self._check_native_stats_export_computes_once("task")
+
+    @TEST_TAG("ray")
+    def test_chained_process_does_not_execute_schema_probe(self):
+        log_path = str(self.tmp_path / "chain.calls")
+        source = _source(_executor(self.tmp_path))
+        result = source.process([LoggingMapper(log_path, num_proc=1)])
+        result.process([TextLengthFilter(min_len=4, num_proc=1)])
+        self.assertEqual(_logged_ids(log_path), [])
+        self.assertEqual([row["id"] for row in result.data.take_all()], [0])
+        self.assertEqual(sorted(_logged_ids(log_path)), [0, 1, 2, 3])
+
+    @TEST_TAG("ray")
+    def test_get_column_does_not_execute_schema_probe(self):
+        log_path = str(self.tmp_path / "column.calls")
+        source = _source(_executor(self.tmp_path))
+        result = source.process([LoggingMapper(log_path, num_proc=1)])
+        self.assertEqual(result.get_column("id"), [0, 1, 2, 3])
+        self.assertEqual(sorted(_logged_ids(log_path)), [0, 1, 2, 3])
 
     @TEST_TAG("ray")
     def test_unsupported_checkpoint_scheme_fails_before_running(self):
