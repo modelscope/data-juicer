@@ -6,6 +6,7 @@ from uuid import uuid4
 
 import numpy as np
 import pyarrow as pa
+import pyarrow.fs as pafs
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
@@ -793,8 +794,18 @@ class RayImageBTSMinhashDeduplicator(Deduplicator):
 
         # Lazy result datasets may still reference a previous invocation's files.
         tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id(), uuid4().hex)
+        input_dataset = dataset
         dataset = self._compute_minhash(dataset)
         dataset.map_batches(band_with_uid, **self._get_map_batches_kwargs()).write_parquet(tmp_dir)
+        # Ray removes the output directory after a successful zero-row write.
+        # Return the input's empty result without reading a missing directory or
+        # exposing the intermediate MinHash/UID columns.
+        filesystem, path = pafs.FileSystem.from_uri(os.path.abspath(tmp_dir) if "://" not in tmp_dir else tmp_dir)
+        if filesystem.get_file_info(path).type == pafs.FileType.NotFound:
+            input_schema = input_dataset.schema()
+            if input_schema is not None:
+                return ray.data.from_arrow(pa.Table.from_batches([], schema=input_schema.base_schema))
+            return input_dataset.limit(0)
         logger.info(f"Write to temporary dir: {tmp_dir}")
         del dataset
         end_time = time.time()

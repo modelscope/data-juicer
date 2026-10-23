@@ -530,6 +530,34 @@ class ImageMinHashRayRegressionTest(DataJuicerTestCaseBase):
                 self.assertEqual(self._export_labels(first, f"{cls.__name__}-first"), {"first", "first-unique"})
 
     @TEST_TAG("ray")
+    def test_empty_arrow_input_preserves_schema(self):
+        import ray
+
+        schema = pa.schema([("images", pa.list_(pa.string())), ("text", pa.string())])
+        dataset = ray.data.from_arrow(pa.Table.from_batches([], schema=schema))
+        op = self._op(RayImageBTSMinhashDeduplicator)
+        result = op.run(dataset)
+        self.assertEqual(result.take_all(), [])
+        self.assertEqual(result.schema().base_schema, schema)
+
+    @TEST_TAG("ray")
+    def test_upstream_filter_can_remove_all_rows_in_one_pipeline(self):
+        import ray
+
+        from data_juicer.core.data.ray_dataset import RayDataset
+        from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+
+        op = self._op(RayImageBTSMinhashDeduplicator)
+        source = ray.data.from_arrow(pa.table({"images": [["unused.png"]], "text": ["short"]}))
+        result = RayDataset(source).process([TextLengthFilter(min_len=100), op]).data
+        self.assertEqual(result.take_all(), [])
+        self.assertEqual(result.count(), 0)
+        output_dir = Path(self.work_dir, "empty-output")
+        result.write_json(str(output_dir))
+        rows = [line for path in output_dir.glob("*.json") for line in path.read_text().splitlines()]
+        self.assertEqual(rows, [])
+
+    @TEST_TAG("ray")
     def test_with_uid_merges_deep_band_chain(self):
         op = self._op(image_minhash.RayImageBTSMinhashDeduplicatorWithUid)
         uids = list(range(2999, -1, -1))
